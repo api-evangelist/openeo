@@ -1,0 +1,39 @@
+generated: '2026-10-09'
+method: searched
+source: https://openeo.org/documentation/1.0/authentication.html; openapi/openeo-commercial-data-openapi.yml, openapi/openeo-openapi.yml,
+  openapi/openeo-processing-parameters-openapi.yml, openapi/openeo-workspaces-openapi.yml
+summary:
+  types:
+  - http
+  - unknown
+schemes:
+- name: Bearer
+  type: http
+  scheme: bearer
+  bearerFormat: 'The Bearer Token MUST consist of the authentication method, a provider ID (if available) and the
+    token itself. All separated by a forward slash `/`. Examples (replace `TOKEN` with the actual access token):
+    (1) Basic authentication (no provider ID available): `basic//TOKEN` (2) OpenID Connect (provider ID is `ms`):
+    `oidc/ms/TOKEN`. For OpenID Connect, the provider ID corresponds to the value specified for `id` for each provider
+    in `GET /credentials/oidc`.'
+  sources:
+  - openapi/openeo-commercial-data-openapi.yml
+  - openapi/openeo-openapi.yml
+- name: Basic
+  type: http
+  scheme: basic
+  sources:
+  - openapi/openeo-commercial-data-openapi.yml
+  - openapi/openeo-openapi.yml
+- name: Bearer
+  type: unknown
+  sources:
+  - openapi/openeo-processing-parameters-openapi.yml
+  - openapi/openeo-workspaces-openapi.yml
+docs: https://openeo.org/documentation/1.0/authentication.html
+docs_summary:
+  methods:
+  - OpenID Connect (recommended) - authorization code, device flow, refresh token flow; providers discovered via
+    GET /credentials/oidc
+  - HTTP Basic (not recommended) via GET /credentials/basic, returns a token
+  bearer_format: basic//TOKEN or oidc/<provider_id>/TOKEN (openEO-specific format deprecated in 1.3.0 in favour
+    of standard JWT)

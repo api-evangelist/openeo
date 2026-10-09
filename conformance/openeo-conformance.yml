@@ -1,0 +1,33 @@
+generated: '2026-10-09'
+method: searched
+source: https://openeo.org/
+standards:
+- id: ogc-community-standard
+  conforms: true
+  evidence: 'openeo.org news: "May 14, 2026 OGC publishes openEO as a new Community Standard"'
+  url: https://openeo.org/
+- id: oidc
+  conforms: true
+  evidence: 'GET /credentials/oidc lists OpenID Connect providers; docs: "OpenID Connect (recommended ...)" incl. device flow and refresh token
+    flow'
+  url: https://openeo.org/documentation/1.0/authentication.html
+- id: stac
+  conforms: true
+  domain_standard: true
+  evidence: 'openapi/openeo-openapi.yml: collections and batch job results are STAC; "STAC versions 1.x.x (RECOMMENDED) and 0.9.x (DEPRECATED),
+    and STAC API versions 1.x.x (RECOMMENDED)"'
+- id: pagination
+  conforms: true
+  evidence: components.parameters.pagination_limit + links_pagination rel links
+- id: rfc9457
+  conforms: false
+  evidence: Errors use the openEO JSON error object (id, code, message, links), not application/problem+json
+- id: openapi-3.0
+  conforms: true
+  evidence: the document declares 3.0.2
+- id: oauth2
+  conforms: false
+  evidence: 'securitySchemes: Basic (http), Bearer (None)'
+- id: idempotency
+  conforms: false
+  evidence: no idempotency key parameter on mutating operations

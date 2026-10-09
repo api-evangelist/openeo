@@ -1,0 +1,281 @@
+generated: '2026-10-09'
+method: derived
+generator: derive-data-model.py
+source:
+- openapi/openeo-commercial-data-openapi.yml
+- openapi/openeo-openapi.yml
+- openapi/openeo-processing-parameters-openapi.yml
+- openapi/openeo-workspaces-openapi.yml
+notation: has_one = property $ref; has_many = array of $ref; belongs_to = <entity>_id field
+summary:
+  entities: 56
+  entities_in_spec: 56
+  relationships: 31
+entities:
+- name: GeoJsonGeometry
+  fields: 1
+- name: GeoJsonGeometryCollection
+  fields: 0
+- name: GeoJsonLineString
+  fields: 0
+- name: GeoJsonMultiLineString
+  fields: 0
+- name: GeoJsonMultiPoint
+  fields: 0
+- name: GeoJsonMultiPolygon
+  fields: 0
+- name: GeoJsonPoint
+  fields: 2
+- name: GeoJsonPolygon
+  fields: 0
+- name: asset
+  fields: 5
+- name: base_parameter
+  fields: 6
+- name: batch_job
+  fields: 17
+  description: The metadata of a batch jobs that has been submitted by the authenticated user.
+- name: batch_job_result
+  fields: 9
+  description: The STAC specification should be the main guidance for implementing this.
+- name: collection
+  fields: 16
+- name: collection_summary_stats
+  fields: 2
+  description: 'By default, only ranges with a minimum and a maximum value can be specified. Ranges can be specified
+    for ordinal values only, which means they need to have a rank order. Therefore, ranges can only be '
+- name: create_workspace
+  fields: 3
+- name: datacube_json_schema
+  fields: 2
+- name: dimension
+  fields: 2
+  description: A dimension, each object represents a distinct dimension with the key being the dimension name.
+- name: dimension_bands
+  fields: 0
+- name: dimension_geometry
+  fields: 0
+- name: dimension_other
+  fields: 0
+- name: dimension_spatial
+  fields: 0
+- name: dimension_spatial_horizontal
+  fields: 0
+- name: dimension_spatial_vertical
+  fields: 0
+- name: dimension_temporal
+  fields: 0
+- name: error
+  fields: 4
+  description: An error object declares additional information about a client-side or server-side error.
+- name: file
+  fields: 3
+- name: file_format
+  fields: 7
+  description: Describes a specific file format.
+- name: json_schema
+  fields: 10
+  description: A JSON Schema compliant to [JSON Schema draft-07](https://json-schema.org/draft-07/json-schema-validation.html)
+    or later.
+- name: link
+  fields: 4
+  description: A link to another resource on the web. Bases on [RFC 5899](https://www.rfc-editor.org/rfc/rfc5988.html).
+- name: log_entry
+  fields: 10
+  description: An log message that communicates information about the processed data.
+- name: order
+  fields: 11
+  description: Information about an order.
+- name: order_parameters
+  fields: 0
+  description: Key-value pairs of available `order_parameters` as listed at `GET /collections/{collection_id}` for
+    filtering available items.
+- name: parameter
+  fields: 1
+- name: process
+  fields: 12
+- name: process_arguments
+  fields: 0
+- name: process_exceptions
+  fields: 0
+  description: Declares exceptions (errors) that might occur during execution
+- name: process_graph
+  fields: 0
+  description: A process graph defines a graph-like structure as a connected set of executable processes. Each key
+    is a unique identifier (node ID) that is used to refer to the process in the graph.
+- name: process_graph_json_schema
+  fields: 3
+- name: process_graph_with_metadata
+  fields: 5
+  description: A process graph, optionally enriched with process metadata.
+- name: process_json_schema
+  fields: 2
+  description: Specifies a data type supported by a parameter or return value.
+- name: process_parameter
+  fields: 1
+- name: process_return_value
+  fields: 2
+  description: Description of the data that is returned by this process.
+- name: register_workspace
+  fields: 4
+- name: resource_parameter
+  fields: 4
+  description: Describes a parameter for various resources (e.g. file formats, service types).
+- name: service
+  fields: 15
+  description: The metadata of a secondary web service that has been submitted by the authenticated user.
+- name: service_configuration
+  fields: 0
+  description: Map of configuration settings, i.e. the setting names supported by the secondary web service combined
+    with actual values. See `GET /service_types` for supported configuration settings. For example, th
+- name: stac_assets
+  fields: 0
+  description: Dictionary of asset objects for data that can be downloaded, each with a
+- name: udf_docker
+  fields: 0
+- name: udf_programming_language
+  fields: 0
+- name: udf_runtime
+  fields: 7
+- name: usage
+  fields: 6
+- name: usage_metric
+  fields: 2
+- name: user_defined_process_meta
+  fields: 4
+  description: A user-defined process, may only contain metadata and no process graph.
+- name: workspace
+  fields: 7
+- name: workspace_parameters
+  fields: 0
+  description: Additional parameters to register the workspace as defined in `GET /workspace_providers`. The structure
+    is not specified by the API.
+- name: workspace_properties
+  fields: 0
+  description: Any additional metadata of the workspace provided by the workspace provider. The structure is not
+    specified by the API.
+relationships:
+- from: order
+  to: order_parameters
+  type: has_one
+  via: parameters
+- from: order
+  to: link
+  type: has_many
+  via: links
+- from: udf_runtime
+  to: link
+  type: has_many
+  via: links
+- from: batch_job_result
+  to: GeoJsonGeometry
+  type: has_one
+  via: geometry
+- from: batch_job_result
+  to: stac_assets
+  type: has_one
+  via: assets
+- from: batch_job_result
+  to: link
+  type: has_many
+  via: links
+- from: file_format
+  to: link
+  type: has_many
+  via: links
+- from: collection
+  to: link
+  type: has_many
+  via: links
+- from: collection
+  to: stac_assets
+  type: has_one
+  via: assets
+- from: process
+  to: process_return_value
+  type: has_one
+  via: returns
+- from: process
+  to: process_exceptions
+  type: has_one
+  via: exceptions
+- from: process
+  to: link
+  type: has_many
+  via: links
+- from: process
+  to: process_graph
+  type: has_one
+  via: process_graph
+- from: batch_job
+  to: process_graph_with_metadata
+  type: has_one
+  via: process
+- from: batch_job
+  to: usage
+  type: has_one
+  via: usage
+- from: batch_job
+  to: link
+  type: has_many
+  via: links
+- from: service
+  to: process_graph_with_metadata
+  type: has_one
+  via: process
+- from: service
+  to: service_configuration
+  type: has_one
+  via: configuration
+- from: service
+  to: usage
+  type: has_one
+  via: usage
+- from: process_graph_json_schema
+  to: parameter
+  type: has_many
+  via: parameters
+- from: process_graph_json_schema
+  to: process_json_schema
+  type: has_one
+  via: returns
+- from: GeoJsonGeometryCollection
+  to: GeoJsonGeometry
+  type: has_many
+  via: geometries
+- from: log_entry
+  to: usage
+  type: has_one
+  via: usage
+- from: usage
+  to: usage_metric
+  type: has_one
+  via: cpu
+- from: usage
+  to: usage_metric
+  type: has_one
+  via: memory
+- from: usage
+  to: usage_metric
+  type: has_one
+  via: duration
+- from: usage
+  to: usage_metric
+  type: has_one
+  via: network
+- from: usage
+  to: usage_metric
+  type: has_one
+  via: disk
+- from: usage
+  to: usage_metric
+  type: has_one
+  via: storage
+- from: create_workspace
+  to: workspace_parameters
+  type: has_one
+  via: parameters
+- from: register_workspace
+  to: workspace_parameters
+  type: has_one
+  via: parameters

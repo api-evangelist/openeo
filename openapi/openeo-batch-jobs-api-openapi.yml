@@ -1,0 +1,2981 @@
+openapi: 3.2.0
+info:
+  title: Openeo Batch Jobs API
+  version: 1.3.0
+  contact:
+    name: openEO Project Steering Committee
+    url: https://openeo.org
+    email: openeo.psc@uni-muenster.de
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  description: 'Operations tagged Batch Jobs across 2 of this provider''s published API definitions: openeo-api-openapi.yaml, openeo-openapi.yml. Each path carries the servers of the definition it was published in.'
+servers:
+- url: https://openeo.example/api/{version}
+  description: The URL of the API MAY freely be chosen by the back-end providers. The path, including API versioning, is a *recommendation* only. Nevertheless, all servers MUST support HTTPS as the authentication methods are not secure with HTTP only!
+  variables:
+    version:
+      default: v1
+      description: 'API versioning is RECOMMENDED. As the openEO API is following
+
+        [SemVer](https://semver.org/) only the **major** part of the version
+
+        numbers SHOULD be used for API versioning in the URL. To make clear
+
+        that it is a version number, it is RECOMMENDED to add the prefix `v`.
+
+
+        Example: API version `1.2.3` is recommended to use `v1`.
+
+
+        The reason to only consider the major part is that backward-incompatible
+
+        changes are introduced by major changes only. All changes from minor
+
+        and patch releases can usually be integrated without breakages and thus
+
+        a change in the URL is not really needed.
+
+
+        The version number in the URL MUST not be used by the clients to detect
+
+        the version number of the API. Use the version number returned in the
+
+        property `api_version` from `GET /` instead.'
+tags:
+- name: Batch Jobs
+  description: Management of batch processing tasks (jobs) and their results.
+paths:
+  /jobs:
+    get:
+      summary: List all batch jobs
+      operationId: list-jobs
+      description: 'Lists all batch jobs submitted by a user.
+
+
+        It is **strongly RECOMMENDED** to keep the response size small by
+
+        omitting all optional non-scalar values (i.e. arrays and objects) from
+
+        objects in `jobs` (i.e. the `process` property).
+
+        To get the full metadata for a job clients MUST request `GET /jobs/{job_id}`.'
+      tags:
+      - Batch Jobs
+      security:
+      - Bearer: []
+      parameters:
+      - $ref: '#/components/parameters/pagination_limit'
+      responses:
+        '200':
+          description: Array of job descriptions
+          content:
+            application/json:
+              schema:
+                title: Batch Jobs
+                type: object
+                required:
+                - jobs
+                - links
+                properties:
+                  jobs:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/batch_job'
+                  links:
+                    $ref: '#/components/schemas/links_pagination'
+        4XX:
+          $ref: '#/components/responses/client_error_auth'
+        5XX:
+          $ref: '#/components/responses/server_error'
+    post:
+      summary: Create a new batch job
+      operationId: create-job
+      description: 'Creates a new batch processing task (job) from one or more (chained)
+
+        processes at the back-end.
+
+
+        Processing the data does not start yet. The job status gets initialized
+
+        as `created` by default.'
+      tags:
+      - Batch Jobs
+      security:
+      - Bearer: []
+      responses:
+        '201':
+          description: The batch job has been created successfully.
+          headers:
+            Location:
+              required: true
+              schema:
+                description: 'Absolute URL to the newly created batch job.
+
+
+                  The URL points to the metadata endpoint
+
+                  `GET /jobs/{job_id}` with the `{job_id}` being the
+
+                  unique identifier (ID) of the created batch job.'
+                format: uri
+                type: string
+                example: https://openeo.example/api/v1/jobs/123
+            OpenEO-Identifier:
+              required: true
+              schema:
+                $ref: '#/components/schemas/job_id'
+        4XX:
+          $ref: '#/components/responses/client_error_auth'
+        5XX:
+          $ref: '#/components/responses/server_error'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              title: Store Batch Job Request
+              type: object
+              required:
+              - process
+              properties:
+                title:
+                  $ref: '#/components/schemas/eo_title'
+                description:
+                  $ref: '#/components/schemas/eo_description'
+                process:
+                  $ref: '#/components/schemas/process_graph_with_metadata'
+                plan:
+                  $ref: '#/components/schemas/billing_plan_null_default'
+                budget:
+                  $ref: '#/components/schemas/budget'
+                log_level:
+                  $ref: '#/components/schemas/min_log_level_default'
+              additionalProperties:
+                description: Additional back-end specific properties are allowed.
+        description: Specifies the job details, e.g. the user-defined process and billing details.
+    servers:
+    - url: https://openeo.example/api/{version}
+      description: The URL of the API MAY freely be chosen by the back-end providers. The path, including API versioning, is a *recommendation* only. Nevertheless, all servers MUST support HTTPS as the authentication methods are not secure with HTTP only!
+      variables:
+        version:
+          default: v1
+          description: 'API versioning is RECOMMENDED. As the openEO API is following
+
+            [SemVer](https://semver.org/) only the **major** part of the version
+
+            numbers SHOULD be used for API versioning in the URL. To make clear
+
+            that it is a version number, it is RECOMMENDED to add the prefix `v`.
+
+
+            Example: API version `1.2.3` is recommended to use `v1`.
+
+
+            The reason to only consider the major part is that backward-incompatible
+
+            changes are introduced by major changes only. All changes from minor
+
+            and patch releases can usually be integrated without breakages and thus
+
+            a change in the URL is not really needed.
+
+
+            The version number in the URL MUST not be used by the clients to detect
+
+            the version number of the API. Use the version number returned in the
+
+            property `api_version` from `GET /` instead.'
+  /jobs/{job_id}:
+    parameters:
+    - $ref: '#/components/parameters/job_id'
+    patch:
+      summary: Modify a batch job
+      operationId: update-job
+      description: 'Modifies an existing job at the back-end, but maintains the identifier.
+
+        Changes can be grouped in a single request.
+
+
+        The job status does not change.
+
+
+        Jobs can only be modified when the job is not queued and not running.
+
+        Otherwise, requests to this endpoint MUST be rejected with openEO error
+
+        `JobLocked`.'
+      tags:
+      - Batch Jobs
+      security:
+      - Bearer: []
+      responses:
+        '204':
+          description: Changes to the job applied successfully.
+        4XX:
+          $ref: '#/components/responses/client_error_auth'
+        5XX:
+          $ref: '#/components/responses/server_error'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              title: Update Batch Job Request
+              type: object
+              properties:
+                title:
+                  $ref: '#/components/schemas/eo_title'
+                description:
+                  $ref: '#/components/schemas/eo_description'
+                process:
+                  $ref: '#/components/schemas/process_graph_with_metadata'
+                plan:
+                  $ref: '#/components/schemas/billing_plan_null'
+                budget:
+                  $ref: '#/components/schemas/budget_update'
+                log_level:
+                  $ref: '#/components/schemas/min_log_level_update'
+              additionalProperties:
+                description: Additional back-end specific properties are allowed.
+        description: Specifies the job details to update.
+    get:
+      summary: Full metadata for a batch job
+      operationId: describe-job
+      description: Lists all information about a submitted batch job.
+      tags:
+      - Batch Jobs
+      security:
+      - Bearer: []
+      responses:
+        '200':
+          description: Full job information.
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - process
+                allOf:
+                - $ref: '#/components/schemas/batch_job'
+                additionalProperties:
+                  description: You can list additional back-end specific properties here.
+        4XX:
+          $ref: '#/components/responses/client_error_auth'
+        5XX:
+          $ref: '#/components/responses/server_error'
+    delete:
+      summary: Delete a batch job
+      operationId: delete-job
+      description: Deletes all data related to a given batch job. Computations are stopped and computed results are deleted. This job will not generate additional costs for processing.
+      tags:
+      - Batch Jobs
+      security:
+      - Bearer: []
+      responses:
+        '204':
+          description: The job has been successfully deleted.
+        4XX:
+          $ref: '#/components/responses/client_error_auth'
+        5XX:
+          $ref: '#/components/responses/server_error'
+    servers:
+    - url: https://openeo.example/api/{version}
+      description: The URL of the API MAY freely be chosen by the back-end providers. The path, including API versioning, is a *recommendation* only. Nevertheless, all servers MUST support HTTPS as the authentication methods are not secure with HTTP only!
+      variables:
+        version:
+          default: v1
+          description: 'API versioning is RECOMMENDED. As the openEO API is following
+
+            [SemVer](https://semver.org/) only the **major** part of the version
+
+            numbers SHOULD be used for API versioning in the URL. To make clear
+
+            that it is a version number, it is RECOMMENDED to add the prefix `v`.
+
+
+            Example: API version `1.2.3` is recommended to use `v1`.
+
+
+            The reason to only consider the major part is that backward-incompatible
+
+            changes are introduced by major changes only. All changes from minor
+
+            and patch releases can usually be integrated without breakages and thus
+
+            a change in the URL is not really needed.
+
+
+            The version number in the URL MUST not be used by the clients to detect
+
+            the version number of the API. Use the version number returned in the
+
+            property `api_version` from `GET /` instead.'
+  /jobs/{job_id}/estimate:
+    get:
+      summary: Get an estimate for a batch job
+      operationId: estimate-job
+      description: 'Calculates an estimate for a batch job. Back-ends can decide to either calculate the duration, the costs, the size or a combination of them.
+
+        Back-end providers MAY specify an expiry time for the estimate. Starting to process data afterwards MAY be charged at a higher cost. Costs do often not include download costs. Whether download costs are included or not can be indicated explicitly with the `downloads_included` flag.
+
+        The estimate SHOULD be the upper limit of the costs, but back-end are free to use the field according to their terms of service.
+
+        For some batch jobs it is not (easily) possible to estimate the costs reliably, e.g. if a UDF or ML model is part of the process. In this case, the server SHOULD return a `EstimateComplexity` error with HTTP status code 500.'
+      tags:
+      - Batch Jobs
+      security:
+      - Bearer: []
+      parameters:
+      - $ref: '#/components/parameters/job_id'
+      responses:
+        '200':
+          description: The estimated costs with regard to money, processing time and storage capacity. At least one of `costs`, `duration` or `size` MUST be provided.
+          content:
+            application/json:
+              schema:
+                title: Batch Job Estimate
+                type: object
+                anyOf:
+                - required:
+                  - costs
+                - required:
+                  - duration
+                - required:
+                  - size
+                properties:
+                  costs:
+                    $ref: '#/components/schemas/money'
+                  duration:
+                    type: string
+                    description: Estimated duration for the operation. Duration MUST be specified as an [ISO 8601 duration](https://en.wikipedia.org/wiki/ISO_8601#Durations).
+                    example: P1Y2M10DT2H30M
+                  size:
+                    type: integer
+                    description: Estimated required storage capacity, i.e. the size of the generated files. Size MUST be specified in bytes.
+                    example: 157286400
+                  downloads_included:
+                    type:
+                    - integer
+                    - 'null'
+                    description: Specifies how many full downloads of the processed data are included in the estimate. Set to `null` for unlimited downloads, which is also the default value.
+                    example: 5
+                    default: null
+                  expires:
+                    type: string
+                    format: date-time
+                    description: Time until which the estimate is valid, formatted as a [RFC 3339](https://www.rfc-editor.org/rfc/rfc3339.html) date-time.
+                    example: '2020-11-01T00:00:00Z'
+        4XX:
+          $ref: '#/components/responses/client_error_auth'
+        5XX:
+          $ref: '#/components/responses/server_error'
+    servers:
+    - url: https://openeo.example/api/{version}
+      description: The URL of the API MAY freely be chosen by the back-end providers. The path, including API versioning, is a *recommendation* only. Nevertheless, all servers MUST support HTTPS as the authentication methods are not secure with HTTP only!
+      variables:
+        version:
+          default: v1
+          description: 'API versioning is RECOMMENDED. As the openEO API is following
+
+            [SemVer](https://semver.org/) only the **major** part of the version
+
+            numbers SHOULD be used for API versioning in the URL. To make clear
+
+            that it is a version number, it is RECOMMENDED to add the prefix `v`.
+
+
+            Example: API version `1.2.3` is recommended to use `v1`.
+
+
+            The reason to only consider the major part is that backward-incompatible
+
+            changes are introduced by major changes only. All changes from minor
+
+            and patch releases can usually be integrated without breakages and thus
+
+            a change in the URL is not really needed.
+
+
+            The version number in the URL MUST not be used by the clients to detect
+
+            the version number of the API. Use the version number returned in the
+
+            property `api_version` from `GET /` instead.'
+  /jobs/{job_id}/logs:
+    get:
+      summary: Logs for a batch job
+      operationId: debug-job
+      description: 'Lists log entries for the batch job, usually for debugging purposes.
+
+
+        Back-ends can log any information that may be relevant for a user
+
+        at any stage (status) of the batch job.
+
+        Users can log information during data processing using respective
+
+        processes such as `inspect`.
+
+
+        If requested consecutively, it is RECOMMENDED that clients use the offset
+
+        parameter to get only the entries they have not received yet.
+
+
+        While pagination itself is OPTIONAL, the `offset` parameter is REQUIRED
+
+        to be implemented by back-ends.'
+      tags:
+      - Batch Jobs
+      security:
+      - Bearer: []
+      parameters:
+      - $ref: '#/components/parameters/job_id'
+      - $ref: '#/components/parameters/log_offset'
+      - $ref: '#/components/parameters/log_level'
+      - $ref: '#/components/parameters/pagination_limit'
+      responses:
+        '200':
+          $ref: '#/components/responses/logs'
+        4XX:
+          $ref: '#/components/responses/client_error_auth'
+        5XX:
+          $ref: '#/components/responses/server_error'
+    servers:
+    - url: https://openeo.example/api/{version}
+      description: The URL of the API MAY freely be chosen by the back-end providers. The path, including API versioning, is a *recommendation* only. Nevertheless, all servers MUST support HTTPS as the authentication methods are not secure with HTTP only!
+      variables:
+        version:
+          default: v1
+          description: 'API versioning is RECOMMENDED. As the openEO API is following
+
+            [SemVer](https://semver.org/) only the **major** part of the version
+
+            numbers SHOULD be used for API versioning in the URL. To make clear
+
+            that it is a version number, it is RECOMMENDED to add the prefix `v`.
+
+
+            Example: API version `1.2.3` is recommended to use `v1`.
+
+
+            The reason to only consider the major part is that backward-incompatible
+
+            changes are introduced by major changes only. All changes from minor
+
+            and patch releases can usually be integrated without breakages and thus
+
+            a change in the URL is not really needed.
+
+
+            The version number in the URL MUST not be used by the clients to detect
+
+            the version number of the API. Use the version number returned in the
+
+            property `api_version` from `GET /` instead.'
+  /jobs/{job_id}/results:
+    parameters:
+    - $ref: '#/components/parameters/job_id'
+    get:
+      summary: List batch job results
+      operationId: list-results
+      description: 'Lists signed URLs pointing to the processed files, usually after the batch job
+
+        has finished. Back-ends may also point to intermediate results after the
+
+        job has stopped due to an error or if the `partial` parameter has been set.
+
+
+        The response includes additional metadata. It is a valid
+
+        STAC Item
+
+        (if it has spatial and temporal references included) or a valid
+
+        STAC Collection
+
+        (supported since openEO API version 1.1.0).
+
+        The assets to download are in both cases available in the property `assets`
+
+        and have the same structure. Additional metadata is not strictly required
+
+        to download the files, but are helpful for users to understand the data.
+
+
+        STAC Collections can either (1) add all assets as collection-level assets or
+
+        (2) link to STAC Catalogs and STAC Items with signed URLs, which will provide a full
+
+        STAC catalog structure a client has to go through. Option 2 is overall the better
+
+        architectural choice and allows a fine-grained description of the processed data,
+
+        but it is not compliant with previous versions of the openEO API.
+
+        **To maintain backward compatibility, it is REQUIRED to still copy
+
+        all assets in the STAC catalog structure into the collection-level assets.**
+
+        This requirement is planned to be removed in openEO API version 2.0.0.
+
+        A client can enforce that the server returns a GeoJSON through content negotiation
+
+        with the media type `application/geo+json`, but the results may not contain very
+
+        meaningful metadata aside from the assets.
+
+
+        Clients are RECOMMENDED to store this response and all potential sub-catalogs
+
+        and items with the assets so that the downloaded data is then a self-contained
+
+        STAC catalog user could publish easily with all the data and metadata.
+
+
+        URL signing is a way to protect files from unauthorized access with a
+
+        key in the URL instead of HTTP header based authorization. The URL
+
+        signing key is similar to a password and its inclusion in the URL allows
+
+        to download files using simple GET requests supported by a wide range of
+
+        programs, e.g. web browsers or download managers. Back-ends are
+
+        responsible to generate the URL signing keys and to manage their
+
+        appropriate expiration. The back-end MAY indicate an expiration time by
+
+        setting the `expires` property in the reponse. Requesting this endpoint
+
+        SHOULD always return non-expired URLs. Signed URLs that were generated
+
+        for a previous request and already expired SHOULD NOT be reused,
+
+        but regenerated with new expiration time.
+
+        Signed URLs that expired MAY return the openEO error `ResultLinkExpired`.
+
+
+        Adding a link with relation type `canonical` to the STAC Item or STAC Collection
+
+        is STRONGLY RECOMMENDED (see the `links` property for details).
+
+
+        If processing has not finished yet and the `partial` parameter is not set to `true`
+
+        requests to this endpoint MUST be rejected with openEO error `JobNotFinished`.'
+      tags:
+      - Batch Jobs
+      security:
+      - Bearer: []
+      parameters:
+      - name: partial
+        description: 'If set to `true`, the results endpoint returns incomplete results while still running.
+
+          Enabling this parameter requires to indicate the status of the batch job in the STAC metadata by setting the `openeo:status`.'
+        in: query
+        allowEmptyValue: true
+        schema:
+          type: boolean
+          default: false
+      responses:
+        '200':
+          description: Valid download links have been returned. The download links does not necessarily need to be located under the API base url.
+          headers:
+            OpenEO-Costs:
+              description: Specifies the costs for fully downloading the data **once**, i.e. this header MAY change in subsequent calls. It MUST be set to `0` if the requester is the owner of the job and still has free downloads included in his processing charges estimated by `GET /jobs/{job_id}/estimate`. If a requester other than the owner is requesting the data of a shared job this header indicates the costs for the requester.
+              schema:
+                $ref: '#/components/schemas/money'
+          content:
+            application/json:
+              schema:
+                oneOf:
+                - $ref: '#/components/schemas/batch_job_result'
+                - title: Batch Job Results Response as STAC Collection
+                  type: object
+                  required:
+                  - assets
+                  properties:
+                    created:
+                      $ref: '#/components/schemas/created'
+                    updated:
+                      $ref: '#/components/schemas/updated'
+                    queued:
+                      $ref: '#/components/schemas/queued'
+                    started:
+                      $ref: '#/components/schemas/started'
+                    expires:
+                      $ref: '#/components/schemas/expires'
+                    unpublished:
+                      $ref: '#/components/schemas/unpublished'
+                    openeo:status:
+                      $ref: '#/components/schemas/result_status'
+                  allOf:
+                  - $ref: '#/components/schemas/collection'
+                  example:
+                    stac_version: 1.0.0
+                    id: a3cca2b2aa1e3b5b
+                    title: NDVI based on Sentinel-2
+                    description: Deriving minimum NDVI measurements over pixel time series of Sentinel-2
+                    license: Apache-2.0
+                    providers:
+                    - name: Example Cloud Corp.
+                      description: No further processing applied.
+                      roles:
+                      - producer
+                      - licensor
+                      - host
+                      url: https://cloud.example
+                    extent:
+                      temporal:
+                        interval:
+                        - - 2019-08-24 14:15:22+00:00
+                          - 2019-08-24 14:15:22+00:00
+                      spatial:
+                        bbox:
+                        - - -180
+                          - -90
+                          - 180
+                          - 90
+                    assets:
+                      preview.png:
+                        href: https://openeo.example/api/v1/download/583fba8b2ce583fba8b2ce/preview.png
+                        type: image/png
+                        title: Thumbnail
+                        roles:
+                        - thumbnail
+                      process.json:
+                        href: https://openeo.example/api/v1/download/583fba8b2ce583fba8b2ce/process.json
+                        type: application/json
+                        title: Original Process
+                        roles:
+                        - process
+                        - reproduction
+                      1.tif:
+                        href: https://openeo.example/api/v1/download/583fba8b2ce583fba8b2ce/1.tif
+                        type: image/tiff; application=geotiff
+                        roles:
+                        - data
+                      2.tif:
+                        href: https://openeo.example/api/v1/download/583fba8b2ce583fba8b2ce/2.tif
+                        type: image/tiff; application=geotiff
+                        roles:
+                        - data
+                      inspire.xml:
+                        href: https://openeo.example/api/v1/download/583fba8b2ce583fba8b2ce/inspire.xml
+                        type: application/xml
+                        title: INSPIRE metadata
+                        description: INSPIRE compliant XML metadata
+                        roles:
+                        - metadata
+                    links:
+                    - rel: canonical
+                      type: application/json
+                      href: https://openeo.example/api/v1/download/583fba8b2ce583fba8b2ce/collection.json
+                    - rel: item
+                      type: application/geo+json
+                      href: https://openeo.example/api/v1/download/583fba8b2ce583fba8b2ce/item_1.json
+                    - rel: item
+                      type: application/geo+json
+                      href: https://openeo.example/api/v1/download/583fba8b2ce583fba8b2ce/item_2.json
+            application/geo+json:
+              schema:
+                $ref: '#/components/schemas/batch_job_result'
+        '424':
+          description: 'The request can not be fulfilled as the batch job failed. This request will deliver the last error message that was produced by the batch job.
+
+
+            This HTTP code MUST be sent only when the job `status` is `error`.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/log_entry'
+        4XX:
+          $ref: '#/components/responses/client_error_auth'
+        5XX:
+          $ref: '#/components/responses/server_error'
+    post:
+      summary: Start processing a batch job
+      operationId: start-job
+      description: 'Adds a batch job to the processing queue to compute the results.
+
+
+        The result will be stored in the format specified in the process.
+
+        To specify the format use a process such as `save_result`.
+
+
+        The job status is set to `queued`, if processing does not start
+
+        instantly. The same applies if the job status is `canceled`, `finished`,
+
+        or `error`, which restarts the job and discards previous results if the
+
+        back-end does not reject the request with an error.
+
+        Clients SHOULD warn users and ask for confirmation if results may get
+
+        discarded.
+
+
+        * Once the processing starts the status is set to `running`.
+
+        * Once the data is available to download the status is set to
+
+        `finished`.
+
+        * Whenever an error occurs during processing, the status MUST be set to
+
+        `error`.
+
+
+        This endpoint has no effect if the job status is already `queued` or
+
+        `running`. In particular, it does not restart a running job. To restart
+
+        a queued or running job, processing MUST have been canceled.
+
+
+        Back-ends SHOULD reject queueing jobs with openEO error `PaymentRequired`,
+
+        if the back-end is able to detect that the budget is too low to fully
+
+        process the request. Alternatively, back-ends MAY provide partial results
+
+        once reaching the budget. If none of the alternatives is feasible, the
+
+        results are discarded. Thus, client SHOULD warn users that reaching the
+
+        budget may lead to partial or no results at all.'
+      tags:
+      - Batch Jobs
+      security:
+      - Bearer: []
+      responses:
+        '202':
+          description: The creation of the resource has been queued successfully.
+        4XX:
+          $ref: '#/components/responses/client_error_auth'
+        5XX:
+          $ref: '#/components/responses/server_error'
+    delete:
+      summary: Cancel processing a batch job
+      operationId: stop-job
+      description: 'Cancels all related computations for this job at the back-end. It will
+
+        stop generating additional costs for processing.
+
+
+        A subset of processed results may be available for downloading depending
+
+        on the state of the job at the time it was canceled.
+
+
+        Results MUST NOT be deleted until the job processing is started again or
+
+        the job is completely deleted through a request to
+
+        `DELETE /jobs/{job_id}`.
+
+
+        This endpoint only has an effect if the job status is `queued` or
+
+        `running`.
+
+
+        The job status is set to `canceled` if the status was `running`
+
+        beforehand and partial or preliminary results are available to be
+
+        downloaded. Otherwise the status is set to `created`.'
+      tags:
+      - Batch Jobs
+      security:
+      - Bearer: []
+      responses:
+        '204':
+          description: Processing the job has been successfully canceled.
+        4XX:
+          $ref: '#/components/responses/client_error_auth'
+        5XX:
+          $ref: '#/components/responses/server_error'
+    servers:
+    - url: https://openeo.example/api/{version}
+      description: The URL of the API MAY freely be chosen by the back-end providers. The path, including API versioning, is a *recommendation* only. Nevertheless, all servers MUST support HTTPS as the authentication methods are not secure with HTTP only!
+      variables:
+        version:
+          default: v1
+          description: 'API versioning is RECOMMENDED. As the openEO API is following
+
+            [SemVer](https://semver.org/) only the **major** part of the version
+
+            numbers SHOULD be used for API versioning in the URL. To make clear
+
+            that it is a version number, it is RECOMMENDED to add the prefix `v`.
+
+
+            Example: API version `1.2.3` is recommended to use `v1`.
+
+
+            The reason to only consider the major part is that backward-incompatible
+
+            changes are introduced by major changes only. All changes from minor
+
+            and patch releases can usually be integrated without breakages and thus
+
+            a change in the URL is not really needed.
+
+
+            The version number in the URL MUST not be used by the clients to detect
+
+            the version number of the API. Use the version number returned in the
+
+            property `api_version` from `GET /` instead.'
+components:
+  schemas:
+    process_graph_json_schema:
+      title: Process Graph
+      type: object
+      properties:
+        subtype:
+          type: string
+          enum:
+          - process-graph
+        parameters:
+          type: array
+          title: Process Graph Parameters
+          description: 'A list of parameters passed to the child process graph.
+
+
+            The order in the array corresponds to the parameter order to
+
+            be used in clients that do not support named parameters.'
+          items:
+            $ref: '#/components/schemas/parameter'
+        returns:
+          type: object
+          title: Process Graph Return Value
+          description: Description of the data that is returned by the child process graph.
+          required:
+          - schema
+          properties:
+            description:
+              $ref: '#/components/schemas/process_description'
+            schema:
+              $ref: '#/components/schemas/data_type_schema'
+          allOf:
+          - $ref: '#/components/schemas/process_json_schema'
+    stac_version:
+      type: string
+      description: 'The [version of the STAC specification](https://github.com/radiantearth/stac-spec/releases), which MAY not be equal to the [STAC API version](#tag/EO-Data-Discovery/STAC).
+
+        The openEO API allows for the STAC versions 1.x.x (RECOMMENDED) and 0.9.x (DEPRECATED).'
+      pattern: ^(0\.9.\d+|1\.\d+.\d+)
+      example: 1.1.0
+    process_description:
+      type: string
+      format: commonmark
+      description: 'Detailed description to explain the entity.
+
+
+        [CommonMark 0.29](http://commonmark.org/) syntax MAY be used for rich text representation. In addition to the CommonMark syntax, clients can convert process IDs that are formatted as in the following example into links instead of code blocks: ``` ``process_id()`` ```'
+    parameter:
+      title: Parameter
+      type: object
+      required:
+      - schema
+      properties:
+        schema:
+          $ref: '#/components/schemas/data_type_schema'
+      allOf:
+      - $ref: '#/components/schemas/base_parameter'
+    billing_plan:
+      type: string
+      description: 'The billing plan to process and charge the job or service with.
+
+
+        Billing plans MUST be handled in a *case insensitive* manner.
+
+
+        The plans can be retrieved from `GET /`, but the value returned here may
+
+        not be in the list of plans any longer.'
+      example: free
+    process_json_schema:
+      type: object
+      title: Single Data Type
+      description: 'Specifies a data type supported by a parameter or return value.
+
+
+        The data types are specified according to the [JSON Schema draft-07](http://json-schema.org/) specification.
+
+        See the chapter [''Schemas'' in ''Defining Processes''](#section/Processes/Defining-Processes) for more information.
+
+
+        JSON Schemas SHOULD NOT contain `default`, `anyOf`, `oneOf`, `allOf` or `not` at the top-level of the schema.
+
+        Instead specify each data type in a separate array element.
+
+
+        The following more complex JSON Schema keywords SHOULD NOT be used:
+
+        `if`, `then`, `else`, `readOnly`, `writeOnly`, `dependencies`, `minProperties`, `maxProperties`, `patternProperties`.
+
+
+        JSON Schemas SHOULD always be dereferenced (i.e. all `$refs` should be resolved). This allows clients to consume the schemas much better.
+
+        Clients are not expected to support dereferencing `$refs`.
+
+
+        Note: The specified schema is only a common subset of JSON Schema. Additional keywords MAY be used.'
+      properties:
+        subtype:
+          type: string
+          description: The allowed sub data type for a value. See the chapter on [subtypes](#section/Processes/Defining-Processes) for more information.
+        deprecated:
+          $ref: '#/components/schemas/deprecated'
+      allOf:
+      - $ref: '#/components/schemas/json_schema'
+      oneOf:
+      - title: Generic
+      - $ref: '#/components/schemas/process_graph_json_schema'
+      - $ref: '#/components/schemas/datacube_json_schema'
+    process_graph:
+      title: Process Graph
+      description: A process graph defines a graph-like structure as a connected set of executable processes. Each key is a unique identifier (node ID) that is used to refer to the process in the graph.
+      type: object
+      additionalProperties:
+        x-additionalPropertiesName: Node ID
+        title: Process Node
+        type: object
+        required:
+        - process_id
+        - arguments
+        properties:
+          process_id:
+            $ref: '#/components/schemas/process_id'
+          namespace:
+            $ref: '#/components/schemas/process_namespace'
+          result:
+            type: boolean
+            description: Used to specify which node is the last in the chain and returns the result to return to the requesting context. This flag MUST only be set once in each list of process nodes.
+            default: false
+          description:
+            description: Optional description about the process and its arguments.
+            type:
+            - string
+            - 'null'
+          arguments:
+            $ref: '#/components/schemas/process_arguments'
+      example:
+        dc:
+          process_id: load_collection
+          arguments:
+            id: Sentinel-2
+            spatial_extent:
+              west: 16.1
+              east: 16.6
+              north: 48.6
+              south: 47.2
+            temporal_extent:
+            - '2018-01-01'
+            - '2018-02-01'
+        bands:
+          process_id: filter_bands
+          description: Filter and order the bands. The order is important for the following reduce operation.
+          arguments:
+            data:
+              from_node: dc
+            bands:
+            - B08
+            - B04
+            - B02
+        evi:
+          process_id: reduce
+          description: 'Compute the EVI. Formula: 2.5 * (NIR - RED) / (1 + NIR + 6*RED + -7.5*BLUE)'
+          arguments:
+            data:
+              from_node: bands
+            dimension: bands
+            reducer:
+              process_graph:
+                nir:
+                  process_id: array_element
+                  arguments:
+                    data:
+                      from_parameter: data
+                    index: 0
+                red:
+                  process_id: array_element
+                  arguments:
+                    data:
+                      from_parameter: data
+                    index: 1
+                blue:
+                  process_id: array_element
+                  arguments:
+                    data:
+                      from_parameter: data
+                    index: 2
+                sub:
+                  process_id: subtract
+                  arguments:
+                    data:
+                    - from_node: nir
+                    - from_node: red
+                p1:
+                  process_id: product
+                  arguments:
+                    data:
+                    - 6
+                    - from_node: red
+                p2:
+                  process_id: product
+                  arguments:
+                    data:
+                    - -7.5
+                    - from_node: blue
+                sum:
+                  process_id: sum
+                  arguments:
+                    data:
+                    - 1
+                    - from_node: nir
+                    - from_node: p1
+                    - from_node: p2
+                div:
+                  process_id: divide
+                  arguments:
+                    data:
+                    - from_node: sub
+                    - from_node: sum
+                p3:
+                  process_id: product
+                  arguments:
+                    data:
+                    - 2.5
+                    - from_node: div
+                  result: true
+        mintime:
+          process_id: reduce
+          description: Compute a minimum time composite by reducing the temporal dimension
+          arguments:
+            data:
+              from_node: evi
+            dimension: temporal
+            reducer:
+              process_graph:
+                min:
+                  process_id: min
+                  arguments:
+                    data:
+                      from_parameter: data
+                  result: true
+        save:
+          process_id: save_result
+          arguments:
+            data:
+              from_node: mintime
+            format: GTiff
+          result: true
+    usage:
+      title: Resource usage metrics
+      type: object
+      properties:
+        cpu:
+          description: Specifies the CPU usage, usually in a unit such as `cpu-seconds`.
+          allOf:
+          - $ref: '#/components/schemas/usage_metric'
+        memory:
+          description: Specifies the memory usage, usually in a unit such as `mb-seconds` or `gb-hours`.
+          allOf:
+          - $ref: '#/components/schemas/usage_metric'
+        duration:
+          description: Specifies the wall time, usually in a unit such as `seconds`, `minutes` or `hours`.
+          allOf:
+          - $ref: '#/components/schemas/usage_metric'
+        network:
+          description: Specifies the network transfer usage (incoming and outgoing), usually in a unit such as `b` (bytes), `kb` (kilobytes), `mb` (megabytes) or `gb` (gigabytes).
+          allOf:
+          - $ref: '#/components/schemas/usage_metric'
+        disk:
+          description: Specifies the amount of input (read) and output (write) operations on the storage such as disks, usually in a unit such as `b` (bytes), `kb` (kilobytes), `mb` (megabytes) or `gb` (gigabytes).
+          allOf:
+          - $ref: '#/components/schemas/usage_metric'
+        storage:
+          description: Specifies the usage of storage space, usually in a unit such as `b` (bytes), `kb` (kilobytes), `mb` (megabytes) or `gb` (gigabytes).
+          allOf:
+          - $ref: '#/components/schemas/usage_metric'
+      additionalProperties:
+        description: Additional metrics.
+        allOf:
+        - $ref: '#/components/schemas/usage_metric'
+      example:
+        cpu:
+          value: 40668
+          unit: cpu-seconds
+        duration:
+          value: 2611
+          unit: seconds
+        memory:
+          value: 108138811
+          unit: mb-seconds
+        network:
+          value: 0
+          unit: kb
+        storage:
+          value: 55
+          unit: mb
+    process_parameters:
+      type: array
+      description: 'A list of parameters.
+
+
+        The order in the array corresponds to the parameter order to
+
+        be used in clients that do not support named parameters.
+
+
+        **Note:** Specifying an empty array is different from (if allowed)
+
+        `null` or the property being absent.
+
+        An empty array means the process has no parameters.
+
+        `null` / property absent means that the parameters are unknown as
+
+        the user has not specified them. There could still be parameters in the
+
+        process graph, if one is specified.'
+      items:
+        $ref: '#/components/schemas/process_parameter'
+    min_log_level_default:
+      description: 'The minimum severity level for log entries that the back-end stores for the processing request.
+
+
+        The order of the levels is as follows (from low to high severity): `debug`, `info`, `warning`, `error`.
+
+        That means if `warning` is set, the back-end will only store log entries with the level `warning` and `error`.
+
+
+        The default minimum log level is `info`.
+
+        Users need to specifically set this property to `debug` to capture *all* log entries.
+
+        It is RECOMMENDED that users set the level at least to "warning" in production workflows.'
+      type: string
+      enum:
+      - error
+      - warning
+      - info
+      - debug
+      default: info
+      example: warning
+    job_id:
+      type: string
+      description: Per-back-end unique identifier of the batch job, generated by the back-end during creation. MUST match the specified pattern.
+      pattern: ^[\w\-\.~]+$
+      example: a3cca2b2aa1e3b5b
+    GeoJsonGeometry:
+      title: GeoJSON Geometry
+      type: object
+      required:
+      - type
+      properties:
+        type:
+          $ref: '#/components/schemas/geometry_type'
+      discriminator:
+        propertyName: type
+        mapping:
+          Point: '#/components/schemas/GeoJsonPoint'
+          LineString: '#/components/schemas/GeoJsonLineString'
+          Polygon: '#/components/schemas/GeoJsonPolygon'
+          MultiPoint: '#/components/schemas/GeoJsonMultiPoint'
+          MultiLineString: '#/components/schemas/GeoJsonMultiLineString'
+          MultiPolygon: '#/components/schemas/GeoJsonMultiPolygon'
+          GeometryCollection: '#/components/schemas/GeoJsonGeometryCollection'
+    experimental:
+      type: boolean
+      description: Declares that the specified entity is experimental, which means that it is likely to change or may produce unpredictable behavior. Users should refrain from using it in production, but still feel encouraged to try it out and give feedback.
+      default: false
+    process_schema:
+      title: Process Data types
+      description: Either a single data type or a list of data types for process parameter or process return values.
+      oneOf:
+      - $ref: '#/components/schemas/process_json_schema'
+      - title: Multiple data types
+        description: A list of data types supported, specified as JSON Schemas.
+        type: array
+        minItems: 1
+        uniqueItems: true
+        items:
+          $ref: '#/components/schemas/process_json_schema'
+    asset:
+      title: STAC Asset
+      type: object
+      required:
+      - href
+      properties:
+        href:
+          title: Asset location
+          description: 'URL to the downloadable asset.
+
+            The URLs SHOULD be available without authentication so that external clients can download them easily. If the data is confidential, signed URLs SHOULD be used to protect against unauthorized access from third parties.'
+          type: string
+        title:
+          description: The displayed title for clients and users.
+          type: string
+        description:
+          type: string
+          format: commonmark
+          description: 'Multi-line description to explain the asset.
+
+
+            [CommonMark 0.29](http://commonmark.org/) syntax MAY be used for rich
+
+            text representation.'
+        type:
+          title: Media Type
+          description: Media type of the asset.
+          type: string
+          example: image/tiff; application=geotiff
+        roles:
+          type: array
+          items:
+            type: string
+          description: 'Purposes of the asset. Can be any value, but commonly used values are:
+
+
+            * `thumbnail`: A visualization of the data, usually a lower-resolution true color image in JPEG or PNG format.
+
+            * `reproducibility`: Information how the data was produced and/or can be reproduced, e.g. the process graph used to compute the data in JSON format.
+
+            * `data`: The computed data in the format specified by the user in the process graph (applicable in `GET /jobs/{job_id}/results` only).
+
+            * `metadata`: Additional metadata available for the computed data.'
+          example:
+          - data
+    stac_extensions:
+      type: array
+      description: A list of implemented STAC extensions. The list contains URLs to the JSON Schema files it can be validated against.
+      uniqueItems: true
+      items:
+        anyOf:
+        - title: Reference to a JSON Schema
+          type: string
+          format: uri
+          example: https://openeo.example/stac/custom-extemsion/v1.0.0/schema.json
+        - title: Reference to a core extension (STAC < 1.0.0-rc.1 only, DEPRECATED)
+          type: string
+          example: datacube
+    batch_job:
+      title: Batch Job
+      description: The metadata of a batch jobs that has been submitted by the authenticated user.
+      type: object
+      required:
+      - id
+      - status
+      - created
+      properties:
+        id:
+          $ref: '#/components/schemas/job_id'
+        title:
+          $ref: '#/components/schemas/eo_title'
+        description:
+          $ref: '#/components/schemas/eo_description'
+        process:
+          $ref: '#/components/schemas/process_graph_with_metadata'
+        status:
+          type: string
+          enum:
+          - created
+          - queued
+          - running
+          - canceled
+          - finished
+          - error
+          description: "The current status of a batch job.\n\nThe following status changes can occur:\n\n* `POST /jobs`: The status is initialized as `created`.\n* `POST /jobs/{job_id}/results`: The status is set to `queued`, if\nprocessing does not start instantly.\n    * Once the processing starts the status is set to `running`.\n    * Once the data is available to download the status is set to `finished`.\n    * Whenever an error occurs during processing, the status MUST be set to `error`.\n* `DELETE /jobs/{job_id}/results`: The status is set to `canceled` if\nthe status was `running` beforehand and partial or preliminary results\nare available to be downloaded. Otherwise the status is set to\n`created`.\n\nThe following state diagram shows the possible status changes:\n\n![State diagram](assets/status-diagram.png)"
+          example: running
+          default: created
+        progress:
+          type: number
+          description: 'Indicates the process of a running batch job, in percent.
+
+            Can also be set for a job which stopped due to an error or was canceled by the user. In this case, the value indicates the progress at which the job stopped. This property may not be available for the status codes `created` and `queued`.
+
+            Submitted and queued jobs only allow the value `0`, finished jobs only allow the value `100`.'
+          minimum: 0
+          maximum: 100
+          example: 75.5
+        created:
+          $ref: '#/components/schemas/created'
+        updated:
+          $ref: '#/components/schemas/updated'
+        queued:
+          $ref: '#/components/schemas/queued'
+        started:
+          $ref: '#/components/schemas/started'
+        unpublished:
+          $ref: '#/components/schemas/unpublished'
+        plan:
+          $ref: '#/components/schemas/billing_plan'
+        costs:
+          $ref: '#/components/schemas/money'
+        budget:
+          $ref: '#/components/schemas/budget'
+        usage:
+          description: 'Metrics about the resource usage of the batch job.
+
+
+            Back-ends are not expected to update the metrics while processing data,
+
+            so the metrics can only be available after the job has finished
+
+            or has stopped due to an error.
+
+            For usage metrics during processing, metrics can better be added to the
+
+            logs (e.g. `GET /jobs/{job_id}/logs`) with the same schema.'
+          allOf:
+          - $ref: '#/components/schemas/usage'
+        log_level:
+          $ref: '#/components/schemas/min_log_level_default'
+        links:
+          type: array
+          description: "Links related to this batch job such as links to \ninvoices, log files or results.\n\nProviding links with the following `rel` (relation) types is RECOMMENDED:\n\n1. `monitor`: If logs are available, a link to the [logs endpoint](#tag/Batch-Jobs/operation/debug-job).\n2. `result`: If batch job results are available, a link to the [results endpoint](#tag/Batch-Jobs/operation/list-results).\n\nThe relation types `monitor` and `result` may occur for various batch job states:\n\n1. `created`: When the batch job was executed before and has been reset to `created` after an\n   [update](#tag/Batch-Jobs/operation/update-job) there could still be results and logs available\n   until they get discarded by [queueing the batch job again](#tag/Batch-Jobs/operation/start-job).\n2. `finished`: The full log and results are expected to be available.\n3. `error` / `canceled`: Partial results and logs may be available.\n\nFor more relation types see the lists of\n[common relation types in openEO](#section/API-Principles/Web-Linking)."
+          items:
+            $ref: '#/components/schemas/link'
+          example:
+          - rel: result
+            type: application/json
+            title: Batch Job Results
+            href: https://openeo.example/api/v1/jobs/123/logs
+          - rel: result
+            type: application/json
+            title: Batch Job Logs
+            href: https://openeo.example/api/v1/jobs/123/logs
+    log_entry:
+      title: Log Entry
+      description: An log message that communicates information about the processed data.
+      type: object
+      required:
+      - id
+      - level
+      - message
+      properties:
+        id:
+          type: string
+          description: An unique identifier for the log message, could simply be an incrementing number.
+          example: '1'
+        code:
+          $ref: '#/components/schemas/log_code'
+        level:
+          $ref: '#/components/schemas/log_level'
+        message:
+          type: string
+          description: 'A concise message explaining the log entry.
+
+            Messages do *not* explicitly support [CommonMark 0.29](http://commonmark.org/) syntax as other descriptive fields in the openEO API do, but the messages MAY contain line breaks or indentation.
+
+            It is NOT RECOMMENDED to add stacktraces to the `message`.'
+          example: Can not load the UDF file from the URL `https://openeo.example/invalid/file.txt`. Server responded with error 404.
+        time:
+          type: string
+          format: date-time
+          title: Date and Time
+          description: The date and time the event happened, in UTC. Formatted as a [RFC 3339](https://www.rfc-editor.org/rfc/rfc3339.html) date-time.
+        data:
+          description: 'Data of any type. It is the back-ends task to decide how to best
+
+            present passed data to a user.
+
+
+            For example, a datacube passed to the `inspect` SHOULD return the
+
+            metadata similar to the collection metadata, including `cube:dimensions`.
+
+            There are implementation guidelines available for the `inspect` process.'
+        path:
+          description: 'Describes where the log entry originates from.
+
+
+            The first element of the array is the process that has triggered the log entry, the second element is the parent of the process that has triggered the log entry, etc. This pattern is followed until the root of the process graph.'
+          type: array
+          items:
+            type: object
+            required:
+            - node_id
+            properties:
+              node_id:
+                type: string
+                description: The id of the node the log entry originates from.
+                example: runudf1
+              process_id:
+                $ref: '#/components/schemas/process_id'
+              namespace:
+                $ref: '#/components/schemas/process_namespace'
+              parameter:
+                type:
+                - string
+                - 'null'
+                description: If applicable, the name of the parameter the log entry corresponds to.
+                pattern: ^\w+$
+                example: udf
+        usage:
+          $ref: '#/components/schemas/usage'
+        stacktrace:
+          type: string
+          description: A stacktrace or similar, may include whitespaces for formatting.
+        links:
+          $ref: '#/components/schemas/log_links'
+    log_code:
+      type: string
+      description: The code is either one of the standardized error codes or a custom code, for example specified by a user in the `inspect` process.
+      example: SampleError
+    geometry_type:
+      title: Geometry type
+      type: string
+      enum:
+      - Point
+      - MultiPoint
+      - LineString
+      - MultiLineString
+      - Polygon
+      - MultiPolygon
+      - GeometryCollection
+    bbox:
+      description: 'Each bounding box is provided as four or six numbers,
+
+        depending on whether the coordinate reference system
+
+        includes a vertical axis (height or depth):
+
+
+        * West (lower left corner, coordinate axis 1)
+
+        * South (lower left corner, coordinate axis 2)
+
+        * Base (optional, minimum value, coordinate axis 3)
+
+        * East (upper right corner, coordinate axis 1)
+
+        * North (upper right corner, coordinate axis 2)
+
+        * Height (optional, maximum value, coordinate axis 3)
+
+
+        The coordinate reference system of the values is WGS 84
+
+        longitude/latitude (http://www.opengis.net/def/crs/OGC/1.3/CRS84).
+
+
+        For WGS 84 longitude/latitude the values are in most cases
+
+        the sequence of minimum longitude, minimum latitude, maximum
+
+        longitude and maximum latitude.
+
+
+        However, in cases where the box spans the antimeridian the
+
+        first value (west-most box edge) is larger than the third value
+
+        (east-most box edge).
+
+
+        If the vertical axis is included, the third and the sixth
+
+        number are the bottom and the top of the 3-dimensional bounding box.'
+      type: array
+      oneOf:
+      - title: 4 elements
+        minItems: 4
+        maxItems: 4
+      - title: 6 elements
+        minItems: 6
+        maxItems: 6
+      items:
+        type: number
+      example:
+      - -180
+      - -90
+      - 180
+      - 90
+    dimension:
+      title: Dimension
+      description: A dimension, each object represents a distinct dimension with the key being the dimension name.
+      type: object
+      required:
+      - type
+      properties:
+        type:
+          description: Type of the dimension.
+          type: string
+          enum:
+          - spatial
+          - temporal
+          - bands
+          - geometry
+          - other
+        description:
+          $ref: '#/components/schemas/description'
+      discriminator:
+        propertyName: type
+        mapping:
+          spatial: '#/components/schemas/dimension_spatial'
+          temporal: '#/components/schemas/dimension_temporal'
+          bands: '#/components/schemas/dimension_bands'
+          geometry: '#/components/schemas/dimension_geometry'
+          other: '#/components/schemas/dimension_other'
+    money:
+      description: An amount of money or credits. The value MUST be specified in the currency the back-end is working with. The currency can be retrieved by calling `GET /`. If no currency is set, this field MUST be `null`.
+      type:
+      - number
+      - 'null'
+      minimum: 0
+      example: 12.98
+      default: null
+    base_parameter:
+      type: object
+      required:
+      - name
+      - description
+      properties:
+        name:
+          type: string
+          description: "A unique name for the parameter. \n\nUsing [snake case](https://en.wikipedia.org/wiki/Snake_case) (e.g. `window_size` or `scale_factor`) is RECOMMENDED."
+          pattern: ^\w+$
+        description:
+          $ref: '#/components/schemas/process_description'
+        optional:
+          type: boolean
+          description: 'Determines whether this parameter is optional to be specified even when no default is specified.
+
+            Clients SHOULD automatically set this parameter to `true`, if a default value is specified. Back-ends SHOULD NOT fail, if a default value is specified and this flag is missing.'
+          default: false
+        deprecated:
+          $ref: '#/components/schemas/deprecated'
+        experimental:
+          $ref: '#/components/schemas/experimental'
+        default:
+          description: The default value for this parameter. Required parameters SHOULD NOT specify a default value. Optional parameters SHOULD always specify a default value.
+    process_parameter:
+      title: Process Parameter
+      type: object
+      required:
+      - schema
+      properties:
+        schema:
+          $ref: '#/components/schemas/process_schema'
+      allOf:
+      - $ref: '#/components/schemas/base_parameter'
+    billing_plan_null_default:
+      type:
+      - string
+      - 'null'
+      description: "The billing plan to process and charge the job or service with.\n\nBilling plans MUST be accepted in a *case insensitive* manner.\nBack-ends MUST resolve the billing plan in the following way:\n\n* If a non-`null` value is given: Persist the `plan` that has been provided in the request.\n* Otherwise:\n  1. Persist the `default_plan` exposed through `GET /me`, if available.\n  2. Persist the `default_plan` exposed through `GET /`, if available.\n  3. If a single plan is exposed by the back-end, persist it.\n  4. Otherwise, the back-end MUST throw a `BillingPlanMissing` error.\n\nThe resolved plan MUST be persisted permanently, regardless of any \nchanges to the exposed billing plans in `GET /` in the future.\n\nBilling plans not on the list of available plans MUST be rejected with\nopenEO error `BillingPlanInvalid`."
+      example: free
+      default: null
+    result_status:
+      type: string
+      enum:
+      - running
+      - canceled
+      - finished
+      - error
+      description: 'The status of a batch job.
+
+
+        This field is REQUIRED if the `partial` parameter is given.
+
+        This field is strongly RECOMMENDED if the job has stopped due to an error.'
+      default: finished
+    unpublished:
+      type: string
+      format: date-time
+      description: Time until which the batch job results are stored on the back-end, in UTC. Formatted as a [RFC 3339](https://www.rfc-editor.org/rfc/rfc3339.html) date-time.
+      example: '2018-01-01T09:54:18Z'
+    process_summary:
+      type: string
+      description: A short summary of what the process does.
+    usage_metric:
+      type: object
+      required:
+      - value
+      - unit
+      properties:
+        value:
+          type: number
+          minimum: 0
+        unit:
+          type: string
+    batch_job_result:
+      title: Batch Job Results Response as STAC Item
+      description: 'The STAC specification should be the main guidance for implementing this.
+
+        Specifying the `bbox` is strongly RECOMMENDED for STAC compliance, but can be omitted if the result is unlocated and the `geometry` is set to `null`.'
+      type: object
+      required:
+      - stac_version
+      - id
+      - type
+      - geometry
+      - properties
+      - assets
+      - links
+      properties:
+        stac_version:
+          $ref: '#/components/schemas/stac_version'
+        stac_extensions:
+          $ref: '#/components/schemas/stac_extensions'
+        id:
+          $ref: '#/components/schemas/job_id'
+        type:
+          type: string
+          description: 'The GeoJSON type that applies to this metadata document, which MUST always be a "Feature" according to the STAC specification.
+
+            This type does **not** describe the spatial data type of the assets.'
+          enum:
+          - Feature
+        bbox:
+          $ref: '#/components/schemas/bbox'
+        geometry:
+          type:
+          - object
+          - 'null'
+          description: 'Defines the full footprint of the asset represented by this item as
+
+            GeoJSON Geometry.
+
+
+            Results without a known location can set this value to `null`.'
+          allOf:
+          - $ref: '#/components/schemas/GeoJsonGeometry'
+          example:
+            type: Polygon
+            coordinates:
+            - - - -180
+                - -90
+              - - 180
+                - -90
+              - - 180
+                - 90
+              - - -180
+                - 90
+              - - -180
+                - -90
+        properties:
+          type: object
+          title: Item Properties
+          description: MAY contain additional properties other than the required property `datetime`, e.g. custom properties or properties from the STAC specification or STAC extensions.
+          required:
+          - datetime
+          additionalProperties: true
+          properties:
+            datetime:
+              title: Date and Time
+              description: 'The searchable date/time of the data, in UTC. Formatted as a [RFC 3339](https://www.rfc-editor.org/rfc/rfc3339.html) date-time.
+
+
+                If this field is set to `null` (usually for larger time ranges), it is STRONGLY RECOMMENDED to specify both `start_datetime` and `end_datetime` for STAC compliance.'
+              type:
+              - string
+              - 'null'
+              format: date-time
+            start_datetime:
+              type: string
+              format: date-time
+              description: 'For time series: The first or start date and time for the data, in UTC. Formatted as a [RFC 3339](https://www.rfc-editor.org/rfc/rfc3339.html) date-time.'
+            end_datetime:
+              type: string
+              format: date-time
+              description: 'For time series: The last or end date and time for the data, in UTC. Formatted as a [RFC 3339](https://www.rfc-editor.org/rfc/rfc3339.html) date-time.'
+            title:
+              $ref: '#/components/schemas/eo_title'
+            description:
+              $ref: '#/components/schemas/eo_description'
+            license:
+              $ref: '#/components/schemas/stac_license'
+            providers:
+              $ref: '#/components/schemas/stac_providers'
+            created:
+              $ref: '#/components/schemas/created'
+            updated:
+              $ref: '#/components/schemas/updated'
+            queued:
+              $ref: '#/components/schemas/queued'
+            started:
+              $ref: '#/components/schemas/started'
+            expires:
+              $ref: '#/components/schemas/expires'
+            unpublished:
+              $ref: '#/components/schemas/unpublished'
+            openeo:status:
+              $ref: '#/components/schemas/result_status'
+        assets:
+          $ref: '#/components/schemas/stac_assets'
+        links:
+          type: array
+          description: "Links related to this batch job result, e.g. a link to an \ninvoice, additional log files or external documentation.\n\nThe links MUST NOT contain links to the processed and\ndownloadable data. Instead specify these in the `assets` property.\nClients MUST NOT download the data referenced in the links by\ndefault.\n\nIt is **strongly recommended** to add a link with relation type\n`canonical` pointing to this STAC document using a signed URL.\nNote that query parameters that influence the response of the current request\n(like `partial`) MUST also be included or encoded within the signed URL\nin order to give a consistent response when the signed URL is used.\nThis signed URL allows consumption of the STAC metadata\nby (possibly non-openEO) clients and tools\nwithout additional authentication steps.\nIt is recommended to regenerate the signed URL (and its expiry) with each request.\n\nFor relation types see the lists of\n[common relation types in openEO](#section/API-Principles/Web-Linking)."
+          items:
+            $ref: '#/components/schemas/link'
+          example:
+          - rel: canonical
+            type: application/geo+json
+            href: https://openeo.example/api/v1/download/583fba8b2ce583fba8b2ce/item.json
+    stac_providers:
+      type: array
+      description: A list of providers, which MAY include all organizations capturing or processing the data or the hosting provider. Providers SHOULD be listed in chronological order with the most recent provider being the last element of the list.
+      items:
+        type: object
+        title: Provider
+        required:
+        - name
+        properties:
+          name:
+            description: The name of the organization or the individual.
+            type: string
+            example: Example Cloud Corp.
+          description:
+            description: 'Multi-line description to add further provider information such as processing details for processors and producers, hosting details for hosts or basic contact information.
+
+
+              CommonMark 0.29 syntax MAY be used for rich text representation.'
+            type: string
+            example: No further processing applied.
+          roles:
+            description: 'Roles of the provider.
+
+
+              The provider''s role(s) can be one or more of the following
+
+              elements:
+
+              * `licensor`: The organization that is licensing the dataset under
+
+              the license specified in the collection''s license field.
+
+              * `producer`: The producer of the data is the provider that
+
+              initially captured and processed the source data, e.g. ESA for
+
+              Sentinel-2 data.
+
+              * `processor`: A processor is any provider who processed data to a
+
+              derived product.
+
+              * `host`: The host is the actual provider offering the data on their
+
+              storage. There SHOULD be no more than one host, specified as last
+
+              element of the list.'
+            type: array
+            items:
+              type: string
+              enum:
+              - producer
+              - licensor
+              - processor
+              - host
+            example:
+            - producer
+            - licensor
+            - host
+          url:
+            description: Homepage on which the provider describes the dataset and publishes contact information.
+            type: string
+            format: uri
+            example: https://cloud.example
+    process_arguments:
+      title: Process Arguments
+      type: object
+      additionalProperties:
+        $ref: '#/components/schemas/process_argument_value'
+    budget:
+      type:
+      - number
+      - 'null'
+      minimum: 0
+      description: 'Maximum amount of costs the request is allowed to produce.
+
+        The value MUST be specified in the currency of the back-end.
+
+        No limits apply, if the value is `null` or the back-end has no currency
+
+        set in `GET /`.'
+      example: 100
+      default: null
+    eo_title:
+      description: A short description to easily distinguish entities.
+      type:
+      - string
+      - 'null'
+      example: NDVI based on Sentinel-2
+    billing_plan_null:
+      type:
+      - string
+      - 'null'
+      description: 'The billing plan to process and charge the job or service with.
+
+
+        Billing plans MUST be accepted in a *case insensitive* manner.
+
+        Back-ends MUST resolve the billing plan in the following way if billing is supported:
+
+
+        * If a value is given and it is not `null`: Persist the `plan` that has been provided in the request.
+
+        * Otherwise, do not change the billing plan.
+
+
+        Billing plans not on the list of available plans MUST be rejected with
+
+        openEO error `BillingPlanInvalid`.'
+      example: free
+    queued:
+      type: string
+      format: date-time
+      description: Date and time of queueing the batch job (i.e., when the status 'queued' was set), formatted as a [RFC 3339](https://www.rfc-editor.org/rfc/rfc3339.html) date-time.
+      example: '2017-01-01T09:34:00Z'
+    description:
+      type: string
+      format: commonmark
+      description: 'Detailed description to explain the entity.
+
+
+        [CommonMark 0.29](http://commonmark.org/) syntax MAY be used for rich text representation.'
+    collection:
+      title: Collection
+      type: object
+      required:
+      - stac_version
+      - id
+      - description
+      - license
+      - extent
+      - links
+      properties:
+        stac_version:
+          $ref: '#/components/schemas/stac_version'
+        stac_extensions:
+          $ref: '#/components/schemas/stac_extensions'
+        type:
+          type: string
+          enum:
+          - Collection
+          description: For STAC versions >= 1.0.0-rc.1 this field is required.
+        id:
+          $ref: '#/components/schemas/collection_id'
+        title:
+          type: string
+          description: A short descriptive one-line title for the collection.
+        description:
+          type: string
+          format: commonmark
+          description: 'Detailed multi-line description to explain the collection.
+
+
+            [CommonMark 0.29](http://commonmark.org/) syntax MAY be used for rich text representation.'
+        keywords:
+          type: array
+          description: List of keywords describing the collection.
+          items:
+            type: string
+        version:
+          type: string
+          description: 'Version of the collection.
+
+
+            This property REQUIRES to add `version` (STAC < 1.0.0-rc.1) or
+
+            `https://stac-extensions.github.io/version/v1.2.0/schema.json` (STAC >= 1.0.0-rc.1)
+
+            to the list of `stac_extensions`.'
+        deprecated:
+          type: boolean
+          default: false
+          description: 'Specifies that the collection is deprecated with the potential to
+
+            be removed. It should be transitioned out of usage as soon as
+
+            possible and users should refrain from using it in new projects.
+
+
+            A link with relation type `latest-version` SHOULD be added to the
+
+            links and MUST refer to the collection that can be used instead.
+
+
+            This property REQUIRES to add `version` (STAC < 1.0.0-rc.1) or
+
+            `https://stac-extensions.github.io/version/v1.2.0/schema.json` (STAC >= 1.0.0-rc.1)
+
+            to the list of `stac_extensions`.'
+        license:
+          $ref: '#/components/schemas/stac_license'
+        providers:
+          $ref: '#/components/schemas/stac_providers'
+        extent:
+          type: object
+          title: Collection Extent
+          description: 'The extent of the data in the collection. Additional members MAY
+
+            be added to represent other extents, for example, thermal or
+
+            pressure ranges.
+
+
+            The first item in the array always describes the overall extent of
+
+            the data. All subsequent items describe more preciseextents,
+
+            e.g. to identify clusters of data.
+
+            Clients only interested in the overall extent will only need to
+
+            access the first item in each array.'
+          required:
+          - spatial
+          - temporal
+          properties:
+            spatial:
+              title: Collection Spatial Extent
+              description: The *potential* spatial extents of the features in the collection.
+              type: object
+              properties:
+                bbox:
+                  description: 'One or more bounding boxes that describe the spatial extent
+
+                    of the dataset.
+
+
+                    The first bounding box describes the overall spatial extent
+
+                    of the data. All subsequent bounding boxes describe more
+
+                    precise bounding boxes, e.g. to identify clusters of data.
+
+                    Clients only interested in the overall spatial extent will
+
+                    only need to access the first item in each array.'
+                  type: array
+                  minItems: 1
+                  items:
+                    $ref: '#/components/schemas/bbox'
+            temporal:
+              title: Collection Temporal Extent
+              description: The *potential* temporal extents of the features in the collection.
+              type: object
+              properties:
+                interval:
+                  description: 'One or more time intervals that describe the temporal extent
+
+                    of the dataset.
+
+
+                    The first time interval describes the overall temporal extent
+
+                    of the data. All subsequent time intervals describe more
+
+                    precise time intervals, e.g. to identify clusters of data.
+
+                    Clients only interested in the overall extent will only need
+
+                    to access the first item in each array.'
+                  type: array
+                  minItems: 1
+                  items:
+                    description: 'Begin and end times of the time interval. The coordinate
+
+                      reference system is the Gregorian calendar.
+
+
+                      The value `null` is supported and indicates an open time
+
+                      interval.'
+                    type: array
+                    minItems: 2
+                    maxItems: 2
+                    items:
+                      type:
+                      - string
+                      - 'null'
+                      format: date-time
+                    example:
+                    - '2011-11-11T12:22:11Z'
+                    - null
+        links:
+          description: 'Links related to this collection.
+
+            Could reference to licensing information, other meta data formats with
+
+            additional information or a preview image.
+
+
+            Providing links with the following `rel` (relation) types is RECOMMENDED:
+
+
+            1. `root` and `parent`: URL to the data discovery endpoint at `/collections`.
+
+
+            2. `license`: A link to the license(s) SHOULD be specified if the `license`
+
+            field is set to `proprietary` or `various`.
+
+
+            3. `example`: Links to examples of processes that use this collection.
+
+
+            4. `latest-version`: If a collection has been marked as deprecated, a link SHOULD
+
+            point to the latest version of the collection. The relation types `predecessor-version`
+
+            (link to older version) and `successor-version` (link to newer version) can also be used
+
+            to show the relation between versions.
+
+
+            5. `alternate`: An alternative representation of the collection.
+
+            For example, this could be the collection available through another
+
+            catalog service such as OGC CSW, a human-readable HTML version or a
+
+            metadata document following another standard such as ISO 19115 or DCAT.
+
+
+            6. `http://www.opengis.net/def/rel/ogc/1.0/queryables`: URL to the
+
+            queryables endpoint at `/collections/{collection_id}/queryables`.
+
+            For JSON Schema documents, the `type` field must be set to `application/schema+json`.
+
+
+            For additional relation types see also the lists of
+
+            [common relation types in openEO](#section/API-Principles/Web-Linking)
+
+            and the STAC specification for Collections.'
+          type: array
+          items:
+            $ref: '#/components/schemas/link'
+        cube:dimensions:
+          title: STAC Collection Cube Dimensions
+          description: 'The named default dimensions of the data cube.
+
+            Names must be unique per collection.
+
+
+            The keys of the object are the dimension names. For
+
+            interoperability, it is RECOMMENDED to use the
+
+            following dimension names if there is only a single
+
+            dimension with the specified criteria:
+
+
+            * `x` for the dimension of type `spatial` with the axis set to `x`
+
+            * `y` for the dimension of type `spatial` with the axis set to `y`
+
+            * `z` for the dimension of type `spatial` with the axis set to `z`
+
+            * `t` for the dimension of type `temporal`
+
+            * `bands` for dimensions of type `bands`
+
+            * `geometry` for dimensions of type `geometry`
+
+
+            This property REQUIRES to add a version of the data cube extension to the list
+
+            of `stac_extensions`, e.g. `https://stac-extensions.github.io/datacube/v2.2.0/schema.json`.'
+          type: object
+          additionalProperties:
+            x-additionalPropertiesName: Dimension Name
+            allOf:
+            - $ref: '#/components/schemas/dimension'
+        summaries:
+          title: STAC Summaries (Collection Properties)
+          description: "Collection properties from STAC extensions (e.g. EO,\nSAR, Satellite or Scientific) or even custom extensions.\n\nSummaries are either a unique set of all available\nvalues, statistics *or* a JSON Schema. Statistics only\nspecify the range (minimum and maximum values) by default,\nbut can optionally be accompanied by additional\nstatistical values. The range can specify the\npotential range of values, but it is recommended to be\nas precise as possible. The set of values MUST contain\nat least one element and it is strongly RECOMMENDED to\nlist all values. It is recommended to list as many\nproperties as reasonable so that consumers get a full\noverview of the Collection. Properties that are\ncovered by the Collection specification (e.g.\n`providers` and `license`) SHOULD NOT be repeated in the\nsummaries.\n\nPotential fields for the summaries can be found here:\n\n* **[STAC Common Metadata](https://github.com/radiantearth/stac-spec/blob/v1.1.0/commons/common-metadata.md)**:\n  A list of commonly used fields throughout all domains\n* **[Content Extensions](https://stac-extensions.github.io)**:\n  Domain-specific fields for domains such as EO, SAR and point clouds.\n* **Custom Properties**:\n  It is generally allowed to add custom fields."
+          type: object
+          additionalProperties:
+            oneOf:
+            - type: array
+              title: Set of values
+              items:
+                description: A value of any type.
+            - $ref: '#/components/schemas/collection_summary_stats'
+            - $ref: '#/components/schemas/json_schema'
+        assets:
+          description: 'Dictionary of asset objects for data that can be downloaded,
+
+            each with a unique key.
+
+            The keys MAY be used by clients as file names.'
+          allOf:
+          - $ref: '#/components/schemas/stac_assets'
+    log_level:
+      description: 'The severity level of the log entry.
+
+
+        The order of the levels is as follows (from low to high severity): `debug`, `info`, `warning`, `error`.
+
+
+        The level `error` usually corresponds with critical issues that usually terminate the data processing.'
+      type: string
+      enum:
+      - error
+      - warning
+      - info
+      - debug
+      example: error
+    process_argument_value:
+      title: Process Argument Value
+      description: Arguments for a process. See the API documentation for more information.
+      anyOf:
+      - type:
+        - object
+        - 'null'
+        title: Object (restricted)
+        properties:
+          from_parameter:
+            not: {}
+          from_node:
+            not: {}
+          process_graph:
+            not: {}
+      - type: string
+        title: String
+      - type: number
+        title: Number (incl. integers)
+      - type: boolean
+        title: Boolean
+      - type: array
+        title: Array
+        items:
+          $ref: '#/components/schemas/process_argument_value'
+      - $ref: '#/components/schemas/process_graph_with_metadata'
+      - type: object
+        title: Result Reference
+        description: Data that is expected to be passed from another process.
+        required:
+        - from_node
+        properties:
+          from_node:
+            description: The ID of the node that data is expected to come from.
+            type: string
+        additionalProperties: false
+      - type: object
+        title: Parameter Reference
+        description: A parameter for a process graph. Data that is expected to be passed to a process graph either from the user directly or from the process that is executing the process graph.
+        required:
+        - from_parameter
+        properties:
+          from_parameter:
+            description: The name of the parameter that data is expected to come from.
+            type: string
+        additionalProperties: false
+    json_schema_type:
+      type: string
+      enum:
+      - array
+      - boolean
+      - integer
+      - 'null'
+      - number
+      - object
+      - string
+    dimension_axis_xyz:
+      title: Axis
+      description: Axis of a geometry or dimension (`x`, `y` or `z`)
+      type: string
+      enum:
+      - x
+      - y
+      - z
+    process_exceptions:
+      type: object
+      title: Process Exceptions
+      description: 'Declares exceptions (errors) that might occur during execution
+
+        of this process. This list is just for informative purposes and may be
+
+        incomplete. This list MUST only contain exceptions that stop the
+
+        execution of a process and MUST NOT contain warnings, notices or
+
+        debugging messages. It is meant to primarily contain errors that
+
+        have been caused by the user. It is RECOMMENDED that exceptions
+
+        are referred to and explained in process or parameter descriptions.
+
+
+        The keys define the error code and MUST match the following pattern:
+
+        `^\w+$`
+
+
+        This schema follows the schema of the general openEO error list (see
+
+        errors.json).'
+      additionalProperties:
+        x-additionalPropertiesName: Error Code
+        title: Process Exception
+        type: object
+        required:
+        - message
+        properties:
+          description:
+            type: string
+            format: commonmark
+            description: 'Detailed description to explain the error to client
+
+              users and back-end developers. This should not be shown in the
+
+              clients directly, but MAY be linked to in the errors `url`
+
+              property.
+
+
+              [CommonMark 0.29](http://commonmark.org/) syntax MAY be used
+
+              for rich text representation.'
+          message:
+            type: string
+            description: 'Explains the reason the server is rejecting the request. This message is intended to be displayed to the client user. For "4xx" error codes the message SHOULD explain shortly how the client needs to modify the request.
+
+
+              The message MAY contain variables, which are enclosed by curly brackets. Example: `{variable_name}`'
+            example: 'The value specified for the process argument ''{argument}'' in process ''{process}'' is invalid: {reason}'
+          http:
+            type: integer
+            description: HTTP Status Code, following the [error handling conventions in openEO](#section/API-Principles/Error-Handling). Defaults to `400`.
+            default: 400
+    process_namespace:
+      type:
+      - string
+      - 'null'
+      default: null
+      example: null
+      description: "The namespace the `process_id` is valid for.\n\nThe following options are predefined by the openEO API, but additional\nnamespaces may be introduced by back-ends or in a future version of the API.\n\n* `null` (default): Checks both user-defined and predefined processes,\n   but prefers user-defined processes if both are available.\n   This allows users to add missing predefined processes for portability,\n   e.g. common processes from [processes.openeo.org](https://processes.openeo.org)\n   that have a process graph included.\n   Logging the namespace selected by the back-end for debugging purposes is RECOMMENDED.\n* `backend`: Uses exclusively the predefined processes listed at `GET /processes`.\n* `user`: Uses exclusively the user-defined processes listed at `GET /process_graphs`.\n\nIf multiple processes with the same identifier exist, Clients SHOULD\ninform the user that it's recommended to select a namespace."
+    min_log_level_update:
+      description: 'Updates the minimum severity level for log entries that the back-end stores for the processing requests.
+
+
+        The back-end does not need to update existing log entries.'
+      type: string
+      enum:
+      - error
+      - warning
+      - info
+      - debug
+      example: warning
+    deprecated:
+      type: boolean
+      description: 'Declares that the specified entity is deprecated with the potential
+
+        to be removed in any of the next versions. It should be transitioned out
+
+        of usage as soon as possible and users should refrain from using it in
+
+        new implementations.'
+      default: false
+    links_pagination:
+      description: 'Links related to this list of resources, for example links for pagination
+
+        or alternative formats such as a human-readable HTML version.
+
+        The links array MUST NOT be paginated.
+
+
+        If pagination is implemented, the following `rel` (relation) types apply:
+
+
+        1. `next` (REQUIRED): A link to the next page, except on the last page.
+
+
+        2. `prev` (OPTIONAL): A link to the previous page, except on the first page.
+
+
+        3. `first` (OPTIONAL): A link to the first page, except on the first page.
+
+
+        4. `last` (OPTIONAL): A link to the last page, except on the last page.
+
+
+        For additional relation types see also the lists of
+
+        [common relation types in openEO](#section/API-Principles/Web-Linking).'
+      type: array
+      items:
+        $ref: '#/components/schemas/link'
+    process:
+      title: Process
+      type: object
+      properties:
+        id:
+          $ref: '#/components/schemas/process_id'
+        summary:
+          $ref: '#/components/schemas/process_summary'
+        description:
+          $ref: '#/components/schemas/process_description'
+        categories:
+          $ref: '#/components/schemas/process_categories'
+        parameters:
+          $ref: '#/components/schemas/process_parameters'
+        returns:
+          $ref: '#/components/schemas/process_return_value'
+        deprecated:
+          $ref: '#/components/schemas/deprecated'
+        experimental:
+          $ref: '#/components/schemas/experimental'
+        exceptions:
+          $ref: '#/components/schemas/process_exceptions'
+        examples:
+          type: array
+          description: Examples, may be used for unit tests.
+          items:
+            title: Process Example
+            type: object
+            required:
+            - arguments
+            properties:
+              title:
+                type: string
+                description: A title for the example.
+              description:
+                $ref: '#/components/schemas/process_description'
+              arguments:
+                $ref: '#/components/schemas/process_arguments'
+              returns:
+                description: The return value which can by of any data type.
+        links:
+          type: array
+          description: 'Links related to this process, e.g. additional external documentation.
+
+
+            Providing links with the following `rel` (relation) types is RECOMMENDED:
+
+
+            1. `latest-version`: If a process has been marked as deprecated, a link SHOULD
+
+            point to the preferred version of the process. The relation types `predecessor-version`
+
+            (link to older version) and `successor-version` (link to newer version) can also be used
+
+            to show the relation between versions.
+
+
+            2. `version-history`: A link to a changelog and/or a list of versions of the process
+
+            (see also the relation types `latest-version` etc.).
+
+
+            3. `example`: Links to examples of other processes that use this process.
+
+
+            4. `cite-as`: For all DOIs associated with the process, the respective DOI
+
+            links SHOULD be added.
+
+
+            5. `license`: Links to applicable license(s). The link titles should reflect the license names.
+
+
+            6. `author`: Links to authors of the process. The `href` can use the `mailto:` protocol to
+
+            link to an email address. The link titles should reflect the author names and affiliations.
+
+
+            7. `canonical`: Points to a publicly accessible and more long-lived URL.
+
+
+            For additional relation types see also the lists of
+
+            [common relation types in openEO](#section/API-Principles/Web-Linking).'
+          items:
+            $ref: '#/components/schemas/link'
+        process_graph:
+          $ref: '#/components/schemas/process_graph'
+    process_id:
+      type: string
+      description: "The identifier for the process. It MUST be unique across its namespace\n(e.g. predefined processes or user-defined processes).\n\nClients SHOULD warn the user if a user-defined process is added with the \nsame identifier as one of the predefined process."
+      pattern: ^\w+$
+      example: ndvi
+    process_graph_with_metadata:
+      title: Process Graph with metadata
+      description: A process graph, optionally enriched with process metadata.
+      type: object
+      required:
+      - process_graph
+      properties:
+        id:
+          type:
+          - string
+          - 'null'
+        summary:
+          type:
+          - string
+          - 'null'
+        description:
+          type:
+          - string
+          - 'null'
+        parameters:
+          type:
+          - array
+          - 'null'
+          items: {}
+        returns:
+          type:
+          - object
+          - 'null'
+      allOf:
+      - $ref: '#/components/schemas/process'
+    process_categories:
+      type: array
+      description: A list of categories.
+      items:
+        type: string
+        description: Name of the category.
+    created:
+      type: string
+      format: date-time
+      description: 'Date and time of creation (for batch jobs: the status ''created'' was set), formatted as a [RFC 3339](https://www.rfc-editor.org/rfc/rfc3339.html) date-time.'
+      example: '2017-01-01T09:32:12Z'
+    process_return_value:
+      type: object
+      title: Process Return Value
+      description: Description of the data that is returned by this process.
+      required:
+      - schema
+      properties:
+        description:
+          $ref: '#/components/schemas/process_description'
+        schema:
+          $ref: '#/components/schemas/process_schema'
+    updated:
+      type: string
+      format: date-time
+      description: Date and time of the last status change, formatted as a [RFC 3339](https://www.rfc-editor.org/rfc/rfc3339.html) date-time. If the status is `error`, `canceled` or `finished`, this is the time when the job has ended.
+      example: '2017-01-01T09:54:18Z'
+    log_links:
+      description: 'Links related to this log entry / error, e.g. to a resource that
+
+        provides further explanations.
+
+
+        For relation types see the lists of
+
+        [common relation types in openEO](#section/API-Principles/Web-Linking).'
+      type: array
+      items:
+        $ref: '#/components/schemas/link'
+      example:
+      - href: https://openeo.example/docs/errors/SampleError
+        rel: about
+    link:
+      title: Link
+      description: A link to another resource on the web. Bases on [RFC 5899](https://www.rfc-editor.org/rfc/rfc5988.html).
+      type: object
+      required:
+      - href
+      - rel
+      properties:
+        rel:
+          type: string
+          description: Relationship between the current document and the linked document. SHOULD be a [registered link relation type](https://www.iana.org/assignments/link-relations/link-relations.xml) whenever feasible.
+          example: related
+        href:
+          type: string
+          description: The value MUST be a valid URL.
+          format: uri
+          example: https://openeo.example
+        type:
+          type: string
+          description: The value MUST be a string that hints at the format used to represent data at the provided URI, preferably a media (MIME) type.
+          example: text/html
+        title:
+          type: string
+          description: Used as a human-readable label for a link.
+          example: openEO
+    budget_update:
+      type:
+      - number
+      - 'null'
+      minimum: 0
+      description: 'Maximum amount of costs the request is allowed to produce.
+
+        The value MUST be specified in the currency of the back-end.
+
+        No limits apply, if the value is `null`.'
+      example: 100
+    expires:
+      type: string
+      format: date-time
+      description: Time in UTC until which the assets and this document are accessible via the signed URL that is provided with the relation type `canonical` in the links. Formatted as a [RFC 3339](https://www.rfc-editor.org/rfc/rfc3339.html) date-time. After expiration, a document with new signed URLs can be retrieved through an authenticated request to this endpoint.
+      example: '2017-02-01T09:54:18Z'
+    collection_summary_stats:
+      type: object
+      title: Statistics / Range
+      description: 'By default, only ranges with a minimum and a maximum value can be specified. Ranges can be specified for ordinal values only, which means they need to have a rank order. Therefore, ranges can only be specified for numbers and some special types of strings. Examples: grades (A to F), dates or times. Implementors are free to add other derived statistical values to the object, for example `mean` or `stddev`.'
+      required:
+      - minimum
+      - maximum
+      properties:
+        minimum:
+          description: The minimum value (inclusive).
+          anyOf:
+          - type: string
+          - type: number
+        maximum:
+          description: The maximum value (inclusive).
+          anyOf:
+          - type: string
+          - type: number
+    datacube_json_schema:
+      title: Datacube
+      properties:
+        subtype:
+          type: string
+          enum:
+          - datacube
+        dimensions:
+          title: Datacube constraints
+          description: "Allows to specify requirements the data cube has to fulfill.\nRight now, it only allows to specify the dimension types and \nadds for specific dimension types:\n* axes for `spatial` dimensions in raster datacubes\n* geometry types for `geometry` dimensions in vector datacubes"
+          type: array
+          items:
+            type: object
+            required:
+            - type
+            properties:
+              type:
+                type: string
+            oneOf:
+            - title: Spatial (raster)
+              properties:
+                type:
+                  type: string
+                  enum:
+                  - spatial
+                axis:
+                  type: array
+                  minItems: 1
+                  items:
+                    $ref: '#/components/schemas/dimension_axis_xyz'
+            - title: Spatial (vector)
+              properties:
+                type:
+                  type: string
+                  enum:
+                  - geometry
+                geometry_type:
+                  type: array
+                  minItems: 1
+                  items:
+                    $ref: '#/components/schemas/geometry_type'
+            - title: Other
+              properties:
+                type:
+                  type: string
+                  enum:
+                  - bands
+                  - temporal
+                  - other
+    data_type_schema:
+      title: Data Types
+      description: Either a single data type or a list of data types.
+      oneOf:
+      - $ref: '#/components/schemas/process_json_schema'
+      - title: Multiple data types
+        description: A list of data types this parameter supports, specified as JSON Schemas.
+        type: array
+        minItems: 1
+        uniqueItems: true
+        items:
+          $ref: '#/components/schemas/process_json_schema'
+    stac_assets:
+      type: object
+      title: Assets
+      description: 'Dictionary of asset objects for data that can be downloaded, each with a
+
+        unique key. The keys MAY be used by clients as file names.'
+      additionalProperties:
+        $ref: '#/components/schemas/asset'
+      example:
+        preview.png:
+          href: https://openeo.example/api/v1/download/583fba8b2ce583fba8b2ce/preview.png
+          type: image/png
+          title: Thumbnail
+          roles:
+          - thumbnail
+        process.json:
+          href: https://openeo.example/api/v1/download/583fba8b2ce583fba8b2ce/process.json
+          type: application/json
+          title: Original Process
+          roles:
+          - process
+          - reproduction
+        1.tif:
+          href: https://openeo.example/api/v1/download/583fba8b2ce583fba8b2ce/1.tif
+          type: image/tiff; application=geotiff
+          title: Band 1
+          roles:
+          - data
+        2.tif:
+          href: https://openeo.example/api/v1/download/583fba8b2ce583fba8b2ce/2.tif
+          type: image/tiff; application=geotiff
+          title: Band 2
+          roles:
+          - data
+        inspire.xml:
+          href: https://openeo.example/api/v1/download/583fba8b2ce583fba8b2ce/inspire.xml
+          type: application/xml
+          title: INSPIRE metadata
+          description: INSPIRE compliant XML metadata
+          roles:
+          - metadata
+    error:
+      title: General Error
+      description: 'An error object declares additional information about a client-side or server-side error.
+
+        See also: * [Error Handling](#section/API-Principles/Error-Handling) in the API in general. * [Common Error Codes](errors.json)'
+      type: object
+      required:
+      - code
+      - message
+      properties:
+        id:
+          type: string
+          description: A back-end MAY add a unique identifier to the error response to be able to log and track errors with further non-disclosable details. A client could communicate this id to a back-end provider to get further information.
+          example: 550e8400-e29b-11d4-a716-446655440000
+        code:
+          $ref: '#/components/schemas/log_code'
+        message:
+          type: string
+          description: A message explaining what the client may need to change or what difficulties the server is facing.
+          example: Parameter 'sample' is missing.
+        links:
+          $ref: '#/components/schemas/log_links'
+    json_schema:
+      type: object
+      title: JSON Schema
+      description: 'A JSON Schema compliant to [JSON Schema draft-07](https://json-schema.org/draft-07/json-schema-validation.html) or later.
+
+
+        JSON Schemas SHOULD always be dereferenced (i.e. all `$refs` should be resolved).
+
+        This allows clients to consume the schemas much better.
+
+        Clients are not expected to support dereferencing `$refs`.
+
+
+        Note: The specified schema in the OpenAPI document is only a common subset of JSON Schema.
+
+        Additional keywords from the JSON Schema specification MAY be used.'
+      properties:
+        $schema:
+          description: 'The JSON Schema version. If not given in the context of openEO,
+
+            defaults to JSON Schema draft-07: `http://json-schema.org/draft-07/schema#`
+
+
+            The default value for `$schema` property may have to be added to the JSON Schema
+
+            object before passing it to a JSON Schema validator.'
+          type: string
+          format: uri
+          default: http://json-schema.org/draft-07/schema#
+        $id:
+          description: ID of your JSON Schema.
+          type: string
+          format: uri
+        type:
+          description: 'The allowed data type(s) for a value.
+
+
+            If this property is not present, all data types are allowed.'
+          oneOf:
+          - $ref: '#/components/schemas/json_schema_type'
+          - type: array
+            minItems: 1
+            uniqueItems: true
+            items:
+              $ref: '#/components/schemas/json_schema_type'
+        pattern:
+          type: string
+          format: regex
+          description: The regular expression a string value must match against.
+        enum:
+          type: array
+          items: {}
+          description: An exclusive list of allowed values.
+        minimum:
+          type: number
+          description: The minimum value (inclusive) allowed for a numerical value.
+        maximum:
+          type: number
+          description: The maximum value (inclusive) allowed for a numerical value.
+        minItems:
+          type: number
+          minimum: 0
+          default: 0
+          description: The minimum number of items required in an array.
+        maxItems:
+          type: number
+          minimum: 0
+          description: The maximum number of items required in an array.
+        items:
+          description: Specifies schemas for the items in an array.
+          anyOf:
+          - type: array
+            minItems: 1
+            items:
+              $ref: '#/components/schemas/json_schema'
+          - $ref: '#/components/schemas/json_schema'
+      additionalProperties:
+        description: Any other property supported by the JSON Schema version that is given through the property `$schema` are allowed. Defaults to JSON Schema [draft-07](https://json-schema.org/draft-07/json-schema-validation.html), but can also be any later version of JSON Schema.
+      example:
+        type: string
+        enum:
+        - a
+        - b
+    started:
+      type: string
+      format: date-time
+      description: Date and time when the batch job started processing (i.e., when the status 'running' was set), formatted as a [RFC 3339](https://www.rfc-editor.org/rfc/rfc3339.html) date-time.
+      example: '2017-01-01T09:36:18Z'
+    collection_id:
+      type: string
+      description: A unique identifier for the collection, which MUST match the specified pattern.
+      pattern: ^[\w\-\.~\/]+$
+      example: Sentinel-2A
+    eo_description:
+      type:
+      - string
+      - 'null'
+      format: commonmark
+      description: 'Detailed multi-line description to explain the entity.
+
+
+        [CommonMark 0.29](http://commonmark.org/) syntax MAY be used for rich text representation.'
+      example: Deriving minimum NDVI measurements over pixel time series of Sentinel-2
+    stac_license:
+      type: string
+      description: 'License(s) of the data as a SPDX [License identifier](https://spdx.org/licenses/).
+
+        Alternatively, use `proprietary` if the license is not on the SPDX
+
+        license list or `various` if multiple licenses apply. In these two cases
+
+        links to the license texts SHOULD be added, see the `license` link
+
+        relation type.
+
+
+        Non-SPDX licenses SHOULD add a link to the license text with the
+
+        `license` relation in the links section. The license text MUST NOT be
+
+        provided as a value of this field. If there is no public license URL
+
+        available, it is RECOMMENDED to host the license text and link to it.'
+      example: Apache-2.0
+  parameters:
+    job_id:
+      name: job_id
+      in: path
+      description: Identifier of the batch job.
+      required: true
+      schema:
+        $ref: '#/components/schemas/job_id'
+    pagination_limit:
+      name: limit
+      description: 'This parameter enables pagination for the endpoint and specifies the maximum number of
+
+        elements that arrays in the top-level object (e.g. collections, processes, batch jobs,
+
+        secondary services, log entries, etc.) are allowed to contain.
+
+        The `links` array MUST NOT be paginated like the resources,
+
+        but instead contain links related to the paginated resources
+
+        or the pagination itself (e.g. a link to the next page).
+
+        If the parameter is not provided or empty, all elements are returned.
+
+
+        Pagination is OPTIONAL: back-ends or clients may not support it.
+
+        Therefore, it MUST be implemented in a way that clients not supporting
+
+        pagination get all resources regardless. Back-ends not supporting
+
+        pagination MUST return all resources.
+
+
+        If the response is paginated, the `links` array MUST be used to communicate the
+
+        links for browsing the pagination with predefined `rel` types. See the `links` array schema
+
+        for supported `rel` types.
+
+        Back-end implementations can, unless specified otherwise, use any kind of pagination technique,
+
+        depending on what is supported best by their infrastructure: page-based, offset-based, token-based
+
+        or something else. The clients SHOULD use whatever is specified
+
+        in the links with the corresponding `rel` types.'
+      in: query
+      allowEmptyValue: true
+      example: 10
+      schema:
+        type: integer
+        minimum: 1
+    log_offset:
+      name: offset
+      description: The last identifier (property `id` of a log entry) the client has received. If provided, the back-end MUST only send the entries that occurred after the specified identifier. If not provided or empty, the back-end MUST start with the first entry.
+      in: query
+      allowEmptyValue: true
+      example: log1234
+      schema:
+        type: string
+    log_level:
+      name: level
+      description: 'The minimum severity level for log entries that the back-end returns.
+
+
+        The order of the levels is as follows (from low to high severity): `debug`, `info`, `warning`, `error`.
+
+        That means if `warning` is set, the back-end will only return log entries with the level `warning` and `error`.
+
+
+        The default minimum log level is `debug`, which returns all log levels.'
+      in: query
+      allowEmptyValue: true
+      example: error
+      schema:
+        type: string
+        enum:
+        - error
+        - warning
+        - info
+        - debug
+        default: debug
+  responses:
+    client_error_auth:
+      description: 'The request can not be fulfilled due to an error on client-side, i.e. the
+
+        request is invalid. The client SHOULD NOT repeat the request without
+
+        modifications.
+
+
+        The response body SHOULD contain a JSON error object.
+
+        MUST be any HTTP status code specified in [RFC 7231](https://www.rfc-editor.org/rfc/rfc7231.html#section-6.6).
+
+        This request MUST respond with HTTP status codes 401 if authorization is required or
+
+        403 if the authorization failed or access is forbidden in general to the
+
+        authenticated user. HTTP status code 404 SHOULD be used if the value of
+
+        a path parameter is invalid.
+
+
+        See also:
+
+        * [Error Handling](#section/API-Principles/Error-Handling) in the API in general.
+
+        * [Common Error Codes](errors.json)'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/error'
+    logs:
+      description: Lists the requested log entries.
+      content:
+        application/json:
+          schema:
+            title: Log Entries
+            type: object
+            required:
+            - logs
+            - links
+            properties:
+              level:
+                description: 'The minimum severity level for log entries that the back-end returns.
+
+                  This property MUST reflect the effective lowest `level` that may appear in the document,
+
+                  which is (if implemented) the highest level of:
+
+                  1. the `log_level` specified by the user for the processing request.
+
+                  2. the `level` specified by the user for the log request.
+
+
+                  The order of the levels is as follows (from low to high severity): `debug`, `info`, `warning`, `error`.
+
+                  That means if `warning` is set, the logs will only contain entries with the level `warning` and `error`.'
+                type: string
+                enum:
+                - error
+                - warning
+                - info
+                - debug
+                default: debug
+              logs:
+                description: A chronological list of logs.
+                type: array
+                items:
+                  $ref: '#/components/schemas/log_entry'
+              links:
+                $ref: '#/components/schemas/links_pagination'
+    server_error:
+      description: 'The request can not be fulfilled due to an error at the back-end. The
+
+        error is never the client’s fault and therefore it is reasonable for the
+
+        client to retry the exact same request that triggered this response.
+
+
+        The response body SHOULD contain a JSON error object. MUST be any HTTP
+
+        status code specified in [RFC 7231](https://www.rfc-editor.org/rfc/rfc7231.html#section-6.6).
+
+
+        See also:
+
+        * [Error Handling](#section/API-Principles/Error-Handling) in the API in general.
+
+        * [Common Error Codes](errors.json)'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/error'
+  securitySchemes:
+    Bearer:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT or openEO
+      description: "A Bearer token can be provided in two different formats:\n1. **JSON Web Token (JWT) - RECOMMENDED**\n\n   - Conformance class: `https://api.openeo.org/1.3.0/authentication/jwt`\n   \n   The Bearer token is an access token in [JWT](https://datatracker.ietf.org/doc/html/rfc7519) format\n   as defined in RFC 7519. For openEO, it MUST include the issuer in the\n   `iss` claim although being optional in RFC 7519.\n   If the concept of an issuer does not exist in an authentication method (e.g. in HTTP Basic),\n   implementations could use the endpoint for Basic Authentication as the issuer, for example.\n\n   openEO backend implementations MUST signal their support for JWT by listing the given\n   conformance class. Likewise, openEO clients SHOULD only use JWT when the openEO backend\n   lists the conformance class.\n\n2. **openEO Tokens - DEPRECATED**\n\n   - Conformance class: *None*\n\n   The Bearer Token is constructed from the authentication method, a\n   provider ID (if available) and the access token. All separated by a\n   forward slash `/`.\n\n   Examples (replace `TOKEN` with the actual access token):\n\n   - Basic authentication (no provider ID available): `basic//TOKEN`\n   - OpenID Connect (provider ID is `ms`): `oidc/ms/TOKEN`.\n     For OpenID Connect, the provider ID corresponds to the value\n     specified for `id` for each provider in `GET /credentials/oidc`.\n\n   All openEO backends MUST accept this method for backward compatibility\n   until version 2.0 of the specification.\n\n   The access tokens provided by the identity provider do not include\n   the prefix that includes the authentication method and provider ID.\n   The Bearer Token sent to the openEO backend MUST have the prefix, e.g. `basic//` for Basic authentication.\n   This means that the clients have to prepend the prefix.\n\nJWT and openEO tokens can be distinguished by the presence of a slash `/` in the token, which JWT can never contain due to the Base64 encoding."
+    Basic:
+      type: http
+      scheme: basic
+externalDocs:
+  description: openEO Documentation
+  url: https://openeo.org/documentation/1.0/
+x-refined-from:
+- openeo-api-openapi.yaml
+- openeo-openapi.yml

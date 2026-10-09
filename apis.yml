@@ -1,23 +1,648 @@
 aid: openeo
+
 name: openEO
-description: 'openEO is a company surfaced via the API Evangelist harvest backlog (source: spectral-ruleset-github)
-  and added to the network as a stub for full-pipeline profiling.'
+
+description: openEO develops an open application programming interface (API) that connects clients like R, Python and JavaScript to big Earth
+  observation (EO) cloud back-ends in a simple and unified way, so each client can work with every back-end and back-ends can be compared on capacity,
+  cost and results. The openEO API specification, process definitions, client libraries (Python, R, JavaScript, Julia, QGIS plugin) and web editor
+  are open source under Apache 2.0, governed by a Project Steering Committee, and openEO is recognised as an OGC Community Standard.
+
 url: https://raw.githubusercontent.com/api-evangelist/openeo/refs/heads/main/apis.yml
+
 x-type: company
+
 x-source: harvest:spectral-ruleset-github
-x-tier: stub
-x-tier-reason: harvest
+
+x-tier: profiled
+x-tier-reason: enrichment pass 2026-10-09 (modular-v1; was harvest)
+
 specificationVersion: '0.20'
+
 created: '2026-10-09'
+
 modified: '2026-10-09'
+
 tags:
 - Company
-apis: []
+- Earth Observation
+- Geospatial
+- Remote Sensing
+- Cloud Processing
+- Open Source
+- API Specification
+- Data Cubes
+
 maintainers:
 - FN: Kin Lane
   email: kin@apievangelist.com
 - FN: APIs.json
   email: info@apis.io
+
+image: https://openeo.org/images/openeo_logo.png
+
 common:
+- type: AgenticAccess
+  url: agentic-access/openeo-agentic-access.yml
+- type: Spectral
+  url: rules/openeo-rules.yml
+- type: Spectral
+  url: rules/openeo-openeo-api-spectral-rules.yml
+- type: JSONLD
+  url: json-ld/openeo-context.jsonld
+- type: Vocabulary
+  url: vocabulary/openeo-vocabulary.yml
+- type: AgentSkill
+  url: skills/_index.yml
+- type: DataModel
+  url: data-model/openeo-data-model.yml
+- type: CLI
+  url: cli/openeo-cli.yml
+- type: ChangeLog
+  url: changelog/openeo-changelog.yml
+- type: Conventions
+  url: conventions/openeo-conventions.yml
+- type: Deprecation
+  url: lifecycle/openeo-lifecycle.yml
+- type: Lifecycle
+  url: lifecycle/openeo-lifecycle.yml
+- type: ErrorCatalog
+  url: errors/openeo-error-codes.yml
+- type: ErrorCatalog
+  url: errors/openeo-problem-types.yml
+- type: Conformance
+  url: conformance/openeo-conformance.yml
+- type: Overlay
+  url: overlays/openeo-commercial-data-overlay.yaml
+- type: SecurityTxt
+  url: well-known/openeo-bsky-security.txt
+- type: WellKnown
+  url: well-known/openeo-well-known.yml
+- type: Hosts
+  url: hosts/openeo-hosts.yml
+- type: Vendors
+  url: vendors/openeo-vendors.yml
+- type: SDKs
+  url: packages/openeo-packages.yml
+- type: Packages
+  url: packages/openeo-packages.yml
+- type: ChangeLog
+  url: https://github.com/radiantearth/stac-spec/releases
+- type: Authentication
+  url: authentication/openeo-authentication.yml
+- type: DomainSecurity
+  url: security/openeo-domain-security.yml
 - type: Website
   url: https://openeo.org/
+- type: SpectralRules
+  url: https://github.com/Open-EO/openeo-api/blob/1881dae18b3c2c417f1305774cf295c81d60d400/.spectral.yml
+- type: APIReference
+  url: https://api.openeo.org/
+- type: Documentation
+  url: https://openeo.org/documentation/1.0/
+- type: DeveloperPortal
+  url: https://openeo.org/documentation/1.0/developers/
+- type: GettingStarted
+  url: https://openeo.org/documentation/1.0/developers/clients/getting-started.html
+- type: Authentication
+  url: https://openeo.org/documentation/1.0/authentication.html
+- type: ProcessesReference
+  url: https://processes.openeo.org/
+- type: Hub
+  url: https://hub.openeo.org/
+- type: WebEditor
+  url: https://editor.openeo.org/
+- type: Software
+  url: https://openeo.org/software.html
+- type: About
+  url: https://openeo.org/about.html
+- type: Support
+  url: https://openeo.org/contact.html
+- type: Blog
+  url: https://openeo.org/news/
+- type: GitHubOrganization
+  url: https://github.com/Open-EO
+- type: LinkedIn
+  url: https://www.linkedin.com/company/openeospec/
+- type: YouTube
+  url: https://www.youtube.com/channel/UCMJQil8j9sHBQkcSlSaEsvQ
+- type: Bluesky
+  url: https://bsky.app/profile/openeo.org
+
+apis:
+- aid: openeo:openeo-account-management-api
+  name: openEO Account Management API
+  description: "The following endpoints handle user profiles, accounting and authentication. See also\
+    \ [Authentication](#section/Authentication). In general, the openEO API only defines a minimum subset\
+    \ of user management and accounting functionality. It allows to\n\n* [authenticate and authorize](http://www.differencebetween.net/technology/difference-between-authentication-and-authorization/)\
+    \ a user, which may include [user registration with OpenID Connect](http://openid.net/specs/openid-connect-registration-1_0.html),\n\
+    * handle storage space limits (disk quota),\n* manage billing, which includes to\n    * query the\
+    \ credit a user has available,\n    * estimate costs for certain operations (data processing and downloading),\n\
+    \    * get information about produced costs,\n    * limit costs of certain operations.\n\nTherefore,\
+    \ the API leaves some aspects open that have to be handled by the back-ends separately, including\
+    \ \n\n* credentials recovery, e.g. retrieving a forgotten password\n* user data management, e.g. changing\
+    \ the users payment details or email address\n* payments, i.e. topping up credits for pre-paid services\
+    \ or paying for post-paid services\n* other accounting related tasks, e.g. creating invoices,\n* user\
+    \ registration (except for [user registration with OpenID Connect](http://openid.net/specs/openid-connect-registration-1_0.html))."
+  humanURL: https://api.openeo.org/
+  tags:
+  - Account Management
+  properties:
+  - type: OpenAPI
+    url: openapi/openeo-account-management-api-openapi.yml
+  - type: JSONSchema
+    url: json-schema/openeo-collection-schema.json
+  - type: JSONSchema
+    url: json-schema/openeo-batch-job-result-schema.json
+  - type: JSONSchema
+    url: json-schema/openeo-batch-job-schema.json
+  - type: JSONSchema
+    url: json-schema/openeo-json-schema-schema.json
+  - type: JSONSchema
+    url: json-schema/openeo-process-schema.json
+  - type: JSONSchema
+    url: json-schema/openeo-resource-parameter-schema.json
+  - type: JSONSchema
+    url: json-schema/openeo-workspace-schema.json
+  - type: JSONSchema
+    url: json-schema/openeo-create-workspace-schema.json
+  - type: JSONSchema
+    url: json-schema/openeo-register-workspace-schema.json
+  - type: JSONSchema
+    url: json-schema/openeo-workspace-description-schema.json
+  - type: JSONSchema
+    url: json-schema/openeo-workspace-id-schema.json
+  - type: JSONSchema
+    url: json-schema/openeo-workspace-title-schema.json
+  - type: JSONSchema
+    url: json-schema/openeo-order-schema.json
+  - type: JSONSchema
+    url: json-schema/openeo-order-parameters-schema.json
+  - type: JSONSchema
+    url: json-schema/openeo-order-id-schema.json
+  - type: JSONSchema
+    url: json-schema/openeo-processing-create-parameters-schema.json
+- aid: openeo:openeo-batch-jobs-api
+  name: openEO Batch Jobs API
+  description: Management of batch processing tasks (jobs) and their results.
+  humanURL: https://api.openeo.org/
+  tags:
+  - Batch Jobs
+  properties:
+  - type: OpenAPI
+    url: openapi/openeo-batch-jobs-api-openapi.yml
+  - type: JSONSchema
+    url: json-schema/openeo-collection-schema.json
+  - type: JSONSchema
+    url: json-schema/openeo-batch-job-result-schema.json
+  - type: JSONSchema
+    url: json-schema/openeo-batch-job-schema.json
+  - type: JSONSchema
+    url: json-schema/openeo-json-schema-schema.json
+  - type: JSONSchema
+    url: json-schema/openeo-process-schema.json
+  - type: JSONSchema
+    url: json-schema/openeo-resource-parameter-schema.json
+  - type: JSONSchema
+    url: json-schema/openeo-workspace-schema.json
+  - type: JSONSchema
+    url: json-schema/openeo-create-workspace-schema.json
+  - type: JSONSchema
+    url: json-schema/openeo-register-workspace-schema.json
+  - type: JSONSchema
+    url: json-schema/openeo-workspace-description-schema.json
+  - type: JSONSchema
+    url: json-schema/openeo-workspace-id-schema.json
+  - type: JSONSchema
+    url: json-schema/openeo-workspace-title-schema.json
+  - type: JSONSchema
+    url: json-schema/openeo-order-schema.json
+  - type: JSONSchema
+    url: json-schema/openeo-order-parameters-schema.json
+  - type: JSONSchema
+    url: json-schema/openeo-order-id-schema.json
+  - type: JSONSchema
+    url: json-schema/openeo-processing-create-parameters-schema.json
+- aid: openeo:openeo-capabilities-api
+  name: openEO Capabilities API
+  description: >-
+    General information about the API implementation and other supported capabilities provided by the
+    back-end.
+  humanURL: https://api.openeo.org/
+  tags:
+  - Capabilities
+  properties:
+  - type: OpenAPI
+    url: openapi/openeo-capabilities-api-openapi.yml
+  - type: JSONSchema
+    url: json-schema/openeo-collection-schema.json
+  - type: JSONSchema
+    url: json-schema/openeo-batch-job-result-schema.json
+  - type: JSONSchema
+    url: json-schema/openeo-batch-job-schema.json
+  - type: JSONSchema
+    url: json-schema/openeo-json-schema-schema.json
+  - type: JSONSchema
+    url: json-schema/openeo-process-schema.json
+  - type: JSONSchema
+    url: json-schema/openeo-resource-parameter-schema.json
+  - type: JSONSchema
+    url: json-schema/openeo-workspace-schema.json
+  - type: JSONSchema
+    url: json-schema/openeo-create-workspace-schema.json
+  - type: JSONSchema
+    url: json-schema/openeo-register-workspace-schema.json
+  - type: JSONSchema
+    url: json-schema/openeo-workspace-description-schema.json
+  - type: JSONSchema
+    url: json-schema/openeo-workspace-id-schema.json
+  - type: JSONSchema
+    url: json-schema/openeo-workspace-title-schema.json
+  - type: JSONSchema
+    url: json-schema/openeo-order-schema.json
+  - type: JSONSchema
+    url: json-schema/openeo-order-parameters-schema.json
+  - type: JSONSchema
+    url: json-schema/openeo-order-id-schema.json
+  - type: JSONSchema
+    url: json-schema/openeo-processing-create-parameters-schema.json
+- aid: openeo:openeo-data-processing-api
+  name: openEO Data Processing API
+  description: >-
+    Organizes and manages data processing on the back-end, either as synchronous on-demand computation
+    or batch jobs.
+  humanURL: https://api.openeo.org/
+  tags:
+  - Data Processing
+  properties:
+  - type: OpenAPI
+    url: openapi/openeo-data-processing-api-openapi.yml
+  - type: JSONSchema
+    url: json-schema/openeo-collection-schema.json
+  - type: JSONSchema
+    url: json-schema/openeo-batch-job-result-schema.json
+  - type: JSONSchema
+    url: json-schema/openeo-batch-job-schema.json
+  - type: JSONSchema
+    url: json-schema/openeo-json-schema-schema.json
+  - type: JSONSchema
+    url: json-schema/openeo-process-schema.json
+  - type: JSONSchema
+    url: json-schema/openeo-resource-parameter-schema.json
+  - type: JSONSchema
+    url: json-schema/openeo-workspace-schema.json
+  - type: JSONSchema
+    url: json-schema/openeo-create-workspace-schema.json
+  - type: JSONSchema
+    url: json-schema/openeo-register-workspace-schema.json
+  - type: JSONSchema
+    url: json-schema/openeo-workspace-description-schema.json
+  - type: JSONSchema
+    url: json-schema/openeo-workspace-id-schema.json
+  - type: JSONSchema
+    url: json-schema/openeo-workspace-title-schema.json
+  - type: JSONSchema
+    url: json-schema/openeo-order-schema.json
+  - type: JSONSchema
+    url: json-schema/openeo-order-parameters-schema.json
+  - type: JSONSchema
+    url: json-schema/openeo-order-id-schema.json
+  - type: JSONSchema
+    url: json-schema/openeo-processing-create-parameters-schema.json
+- aid: openeo:openeo-eo-data-discovery-api
+  name: openEO EO Data Discovery API
+  description: "These endpoints allow to list the collections that are available at the back-end and can\
+    \ be used as data cubes for data processing.\n\n## STAC\n\nFor data discovery of Earth Observation\
+    \ Collections at the back-ends, openEO strives for compatibility with the specifications [SpatioTemporal\
+    \ Asset Catalog (STAC)](https://stacspec.org/) and [OGC API - Features - Part 1: Core](http://docs.opengeospatial.org/is/17-069r3/17-069r3.html)\
+    \ as far as possible. Implementing the data discovery endpoints of openEO also produces valid STAC\
+    \ API 1.x and OGC API - Features 1.x responses, including ([partial](#provide-data-for-download))\
+    \ compatibility with their APIs. \n\nThe data discovery endpoints `GET /collections` and `GET /collections/{collection_id}`\
+    \ are compatible with OGC API - Features and STAC. Both specifications define additional endpoints\
+    \ that need to be implemented to be fully compatible. The additional endpoints can easily be integrated\
+    \ into an openEO API implementation. A rough list of actions for compatibility is available below,\
+    \ but please refer to their specifications to find out the full details.\n\n**Important:** [STAC specification](https://github.com/radiantearth/stac-spec)\
+    \ and [STAC API](https://github.com/radiantearth/stac-api-spec) are different specifications and have\
+    \ different version numbers.\n\nThe openEO API allows for the\n- STAC versions 1.x.x (RECOMMENDED)\
+    \ and 0.9.x (DEPRECATED), and\n- STAC API versions 1.x.x (RECOMMENDED) and 0.9.x (DEPRECATED).\n\n\
+    ### Content Extensions\n\nSTAC has several [extensions](https://stac-extensions.github.io) that can\
+    \ be used to better describe your data. Clients and server are not required to implement all of them,\
+    \ so be aware that some clients may not be able to read all your metadata.\n\nSome commonly used extensions\
+    \ that are relevant for datasets exposed through the openEO API are:\n\n- [Classification extension](https://github.com/stac-extensions/classification)\n\
+    - [Data Cube extension](https://github.com/stac-extensions/datacube) (part of the openEO API)\n- [EO\
+    \ (Electro-Optical) extension](https://github.com/stac-extensions/eo)\n- [Processing extension](https://github.com/stac-extensions/processing)\n\
+    - [Projection extension](https://github.com/stac-extensions/projection)\n- [Raster extension](https://github.com/stac-extensions/raster)\n\
+    - [SAR extension](https://github.com/stac-extensions/sar)\n- [Satellite extension](https://github.com/stac-extensions/sat)\n\
+    - [Scientific Citation extension](https://github.com/stac-extensions/scientific)\n\n### Provide data\
+    \ for download\n\nIf you'd like to provide your data for download in addition to offering the cloud\
+    \ processing service, you can implement the full STAC API. Therefore, you can implement the endpoints\
+    \ `GET /collections/{collection_id}/items` and `GET /collections/{collection_id}/items/{feature_id}`\
+    \ to support retrieval of individual items. To benefit from the STAC ecosystem and allow searching\
+    \ for items you can also implement `POST /search` and `GET /search`. Further information can be found\
+    \ in the [STAC API repository](https://github.com/radiantearth/stac-api-spec).\n\n### API Extensions\n\
+    \nSTAC API has several [extensions](https://stac-api-extensions.github.io) that can be implemented\
+    \ on top of the openEO API to enrich the API functionality, e.g. for searching."
+  humanURL: https://api.openeo.org/
+  tags:
+  - EO Data Discovery
+  properties:
+  - type: OpenAPI
+    url: openapi/openeo-eo-data-discovery-api-openapi.yml
+  - type: JSONSchema
+    url: json-schema/openeo-collection-schema.json
+  - type: JSONSchema
+    url: json-schema/openeo-batch-job-result-schema.json
+  - type: JSONSchema
+    url: json-schema/openeo-batch-job-schema.json
+  - type: JSONSchema
+    url: json-schema/openeo-json-schema-schema.json
+  - type: JSONSchema
+    url: json-schema/openeo-process-schema.json
+  - type: JSONSchema
+    url: json-schema/openeo-resource-parameter-schema.json
+  - type: JSONSchema
+    url: json-schema/openeo-workspace-schema.json
+  - type: JSONSchema
+    url: json-schema/openeo-create-workspace-schema.json
+  - type: JSONSchema
+    url: json-schema/openeo-register-workspace-schema.json
+  - type: JSONSchema
+    url: json-schema/openeo-workspace-description-schema.json
+  - type: JSONSchema
+    url: json-schema/openeo-workspace-id-schema.json
+  - type: JSONSchema
+    url: json-schema/openeo-workspace-title-schema.json
+  - type: JSONSchema
+    url: json-schema/openeo-order-schema.json
+  - type: JSONSchema
+    url: json-schema/openeo-order-parameters-schema.json
+  - type: JSONSchema
+    url: json-schema/openeo-order-id-schema.json
+  - type: JSONSchema
+    url: json-schema/openeo-processing-create-parameters-schema.json
+- aid: openeo:openeo-file-storage-api
+  name: openEO File Storage API
+  description: Management of user-uploaded assets and processed data.
+  humanURL: https://api.openeo.org/
+  tags:
+  - File Storage
+  properties:
+  - type: OpenAPI
+    url: openapi/openeo-file-storage-api-openapi.yml
+  - type: JSONSchema
+    url: json-schema/openeo-collection-schema.json
+  - type: JSONSchema
+    url: json-schema/openeo-batch-job-result-schema.json
+  - type: JSONSchema
+    url: json-schema/openeo-batch-job-schema.json
+  - type: JSONSchema
+    url: json-schema/openeo-json-schema-schema.json
+  - type: JSONSchema
+    url: json-schema/openeo-process-schema.json
+  - type: JSONSchema
+    url: json-schema/openeo-resource-parameter-schema.json
+  - type: JSONSchema
+    url: json-schema/openeo-workspace-schema.json
+  - type: JSONSchema
+    url: json-schema/openeo-create-workspace-schema.json
+  - type: JSONSchema
+    url: json-schema/openeo-register-workspace-schema.json
+  - type: JSONSchema
+    url: json-schema/openeo-workspace-description-schema.json
+  - type: JSONSchema
+    url: json-schema/openeo-workspace-id-schema.json
+  - type: JSONSchema
+    url: json-schema/openeo-workspace-title-schema.json
+  - type: JSONSchema
+    url: json-schema/openeo-order-schema.json
+  - type: JSONSchema
+    url: json-schema/openeo-order-parameters-schema.json
+  - type: JSONSchema
+    url: json-schema/openeo-order-id-schema.json
+  - type: JSONSchema
+    url: json-schema/openeo-processing-create-parameters-schema.json
+- aid: openeo:openeo-orders-api
+  name: openEO Orders API
+  description: Management of commercial data orders
+  humanURL: https://api.openeo.org/
+  tags:
+  - Orders
+  properties:
+  - type: OpenAPI
+    url: openapi/openeo-orders-api-openapi.yml
+  - type: JSONSchema
+    url: json-schema/openeo-collection-schema.json
+  - type: JSONSchema
+    url: json-schema/openeo-batch-job-result-schema.json
+  - type: JSONSchema
+    url: json-schema/openeo-batch-job-schema.json
+  - type: JSONSchema
+    url: json-schema/openeo-json-schema-schema.json
+  - type: JSONSchema
+    url: json-schema/openeo-process-schema.json
+  - type: JSONSchema
+    url: json-schema/openeo-resource-parameter-schema.json
+  - type: JSONSchema
+    url: json-schema/openeo-workspace-schema.json
+  - type: JSONSchema
+    url: json-schema/openeo-create-workspace-schema.json
+  - type: JSONSchema
+    url: json-schema/openeo-register-workspace-schema.json
+  - type: JSONSchema
+    url: json-schema/openeo-workspace-description-schema.json
+  - type: JSONSchema
+    url: json-schema/openeo-workspace-id-schema.json
+  - type: JSONSchema
+    url: json-schema/openeo-workspace-title-schema.json
+  - type: JSONSchema
+    url: json-schema/openeo-order-schema.json
+  - type: JSONSchema
+    url: json-schema/openeo-order-parameters-schema.json
+  - type: JSONSchema
+    url: json-schema/openeo-order-id-schema.json
+  - type: JSONSchema
+    url: json-schema/openeo-processing-create-parameters-schema.json
+- aid: openeo:openeo-process-discovery-api
+  name: openEO Process Discovery API
+  description: >-
+    The process discovery endpoints provide details about the predefined processes that are available
+    at the back-end. To list user-defined processes see '[User-Defined Processes](#tag/User-Defined-Processes)'.
+  humanURL: https://api.openeo.org/
+  tags:
+  - Process Discovery
+  properties:
+  - type: OpenAPI
+    url: openapi/openeo-process-discovery-api-openapi.yml
+  - type: JSONSchema
+    url: json-schema/openeo-collection-schema.json
+  - type: JSONSchema
+    url: json-schema/openeo-batch-job-result-schema.json
+  - type: JSONSchema
+    url: json-schema/openeo-batch-job-schema.json
+  - type: JSONSchema
+    url: json-schema/openeo-json-schema-schema.json
+  - type: JSONSchema
+    url: json-schema/openeo-process-schema.json
+  - type: JSONSchema
+    url: json-schema/openeo-resource-parameter-schema.json
+  - type: JSONSchema
+    url: json-schema/openeo-workspace-schema.json
+  - type: JSONSchema
+    url: json-schema/openeo-create-workspace-schema.json
+  - type: JSONSchema
+    url: json-schema/openeo-register-workspace-schema.json
+  - type: JSONSchema
+    url: json-schema/openeo-workspace-description-schema.json
+  - type: JSONSchema
+    url: json-schema/openeo-workspace-id-schema.json
+  - type: JSONSchema
+    url: json-schema/openeo-workspace-title-schema.json
+  - type: JSONSchema
+    url: json-schema/openeo-order-schema.json
+  - type: JSONSchema
+    url: json-schema/openeo-order-parameters-schema.json
+  - type: JSONSchema
+    url: json-schema/openeo-order-id-schema.json
+  - type: JSONSchema
+    url: json-schema/openeo-processing-create-parameters-schema.json
+- aid: openeo:openeo-secondary-services-api
+  name: openEO Secondary Services API
+  description: On-demand access to data using other web service protocols.
+  humanURL: https://api.openeo.org/
+  tags:
+  - Secondary Services
+  properties:
+  - type: OpenAPI
+    url: openapi/openeo-secondary-services-api-openapi.yml
+  - type: JSONSchema
+    url: json-schema/openeo-collection-schema.json
+  - type: JSONSchema
+    url: json-schema/openeo-batch-job-result-schema.json
+  - type: JSONSchema
+    url: json-schema/openeo-batch-job-schema.json
+  - type: JSONSchema
+    url: json-schema/openeo-json-schema-schema.json
+  - type: JSONSchema
+    url: json-schema/openeo-process-schema.json
+  - type: JSONSchema
+    url: json-schema/openeo-resource-parameter-schema.json
+  - type: JSONSchema
+    url: json-schema/openeo-workspace-schema.json
+  - type: JSONSchema
+    url: json-schema/openeo-create-workspace-schema.json
+  - type: JSONSchema
+    url: json-schema/openeo-register-workspace-schema.json
+  - type: JSONSchema
+    url: json-schema/openeo-workspace-description-schema.json
+  - type: JSONSchema
+    url: json-schema/openeo-workspace-id-schema.json
+  - type: JSONSchema
+    url: json-schema/openeo-workspace-title-schema.json
+  - type: JSONSchema
+    url: json-schema/openeo-order-schema.json
+  - type: JSONSchema
+    url: json-schema/openeo-order-parameters-schema.json
+  - type: JSONSchema
+    url: json-schema/openeo-order-id-schema.json
+  - type: JSONSchema
+    url: json-schema/openeo-processing-create-parameters-schema.json
+- aid: openeo:openeo-user-defined-processes-api
+  name: openEO User-Defined Processes API
+  description: >-
+    These endpoints allow to store and manage user-defined processes with their process graphs at the
+    back-end.
+  humanURL: https://api.openeo.org/
+  tags:
+  - User-Defined Processes
+  properties:
+  - type: OpenAPI
+    url: openapi/openeo-user-defined-processes-api-openapi.yml
+  - type: JSONSchema
+    url: json-schema/openeo-collection-schema.json
+  - type: JSONSchema
+    url: json-schema/openeo-batch-job-result-schema.json
+  - type: JSONSchema
+    url: json-schema/openeo-batch-job-schema.json
+  - type: JSONSchema
+    url: json-schema/openeo-json-schema-schema.json
+  - type: JSONSchema
+    url: json-schema/openeo-process-schema.json
+  - type: JSONSchema
+    url: json-schema/openeo-resource-parameter-schema.json
+  - type: JSONSchema
+    url: json-schema/openeo-workspace-schema.json
+  - type: JSONSchema
+    url: json-schema/openeo-create-workspace-schema.json
+  - type: JSONSchema
+    url: json-schema/openeo-register-workspace-schema.json
+  - type: JSONSchema
+    url: json-schema/openeo-workspace-description-schema.json
+  - type: JSONSchema
+    url: json-schema/openeo-workspace-id-schema.json
+  - type: JSONSchema
+    url: json-schema/openeo-workspace-title-schema.json
+  - type: JSONSchema
+    url: json-schema/openeo-order-schema.json
+  - type: JSONSchema
+    url: json-schema/openeo-order-parameters-schema.json
+  - type: JSONSchema
+    url: json-schema/openeo-order-id-schema.json
+  - type: JSONSchema
+    url: json-schema/openeo-processing-create-parameters-schema.json
+- aid: openeo:openeo-workspaces-api
+  name: openEO Workspaces API
+  description: Management of User Workspaces
+  humanURL: https://api.openeo.org/
+  tags:
+  - Workspaces
+  properties:
+  - type: OpenAPI
+    url: openapi/openeo-workspaces-api-openapi.yml
+  - type: JSONSchema
+    url: json-schema/openeo-collection-schema.json
+  - type: JSONSchema
+    url: json-schema/openeo-batch-job-result-schema.json
+  - type: JSONSchema
+    url: json-schema/openeo-batch-job-schema.json
+  - type: JSONSchema
+    url: json-schema/openeo-json-schema-schema.json
+  - type: JSONSchema
+    url: json-schema/openeo-process-schema.json
+  - type: JSONSchema
+    url: json-schema/openeo-resource-parameter-schema.json
+  - type: JSONSchema
+    url: json-schema/openeo-workspace-schema.json
+  - type: JSONSchema
+    url: json-schema/openeo-create-workspace-schema.json
+  - type: JSONSchema
+    url: json-schema/openeo-register-workspace-schema.json
+  - type: JSONSchema
+    url: json-schema/openeo-workspace-description-schema.json
+  - type: JSONSchema
+    url: json-schema/openeo-workspace-id-schema.json
+  - type: JSONSchema
+    url: json-schema/openeo-workspace-title-schema.json
+  - type: JSONSchema
+    url: json-schema/openeo-order-schema.json
+  - type: JSONSchema
+    url: json-schema/openeo-order-parameters-schema.json
+  - type: JSONSchema
+    url: json-schema/openeo-order-id-schema.json
+  - type: JSONSchema
+    url: json-schema/openeo-processing-create-parameters-schema.json
+x-enrichment:
+  date: '2026-10-09'
+  status: enriched
+  artifacts_added: 60
+  pass: modular-v1
+  engine: identity=anthropic,contract=anthropic,surfaces=anthropic,docs=anthropic,regulatory=anthropic
+x-coverage:
+  state: covered
+  reason: identity-verified
+  detail: 'Enriched 2026-10-09: website and identity verified (verified) from the provider''s own pages; probed URLs below.'
+  evidence:
+  - url: https://openeo.org/
+    status: 200
+  - url: https://openeo.org/about.html
+    status: 200
+  - url: https://openeo.org/documentation/1.0/developers/api/reference.html
+    status: 404

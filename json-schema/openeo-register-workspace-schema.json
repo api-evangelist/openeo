@@ -1,0 +1,45 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/api-evangelist/openeo/main/json-schema/openeo-register-workspace-schema.json",
+  "title": "register_workspace",
+  "x-generated": "2026-10-09",
+  "x-method": "derived",
+  "x-generator": "derive-json-schema.py",
+  "x-source": "openapi/openeo-workspaces-openapi.yml#/components/schemas/register_workspace",
+  "required": [
+    "type",
+    "url",
+    "parameters"
+  ],
+  "properties": {
+    "intent": {
+      "enum": [
+        "register"
+      ]
+    },
+    "type": {
+      "type": "string",
+      "description": "The workspace provider name as defined in `GET /workspace_providers`."
+    },
+    "url": {
+      "$ref": "#/$defs/workspace_url"
+    },
+    "parameters": {
+      "$ref": "#/$defs/workspace_parameters"
+    }
+  },
+  "$defs": {
+    "workspace_parameters": {
+      "type": "object",
+      "description": "Additional parameters to register the workspace as defined in `GET /workspace_providers`. The structure is not specified by the API.",
+      "additionalProperties": {
+        "description": "Any type"
+      }
+    },
+    "workspace_url": {
+      "type": "string",
+      "format": "uri",
+      "description": "The URL of the actual workspace, e.g. a bucket URL."
+    }
+  }
+}

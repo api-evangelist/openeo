@@ -1,0 +1,946 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/api-evangelist/openeo/main/json-schema/openeo-batch-job-schema.json",
+  "title": "Batch Job",
+  "description": "The metadata of a batch jobs that has been submitted by the authenticated user.",
+  "x-generated": "2026-10-09",
+  "x-method": "derived",
+  "x-generator": "derive-json-schema.py",
+  "x-source": "openapi/openeo-openapi.yml#/components/schemas/batch_job",
+  "type": "object",
+  "required": [
+    "id",
+    "status",
+    "created"
+  ],
+  "properties": {
+    "id": {
+      "$ref": "#/$defs/job_id"
+    },
+    "title": {
+      "$ref": "#/$defs/eo_title"
+    },
+    "description": {
+      "$ref": "#/$defs/eo_description"
+    },
+    "process": {
+      "$ref": "#/$defs/process_graph_with_metadata"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "created",
+        "queued",
+        "running",
+        "canceled",
+        "finished",
+        "error"
+      ],
+      "description": "The current status of a batch job.\n\nThe following status changes can occur:\n\n* `POST /jobs`: The status is initialized as `created`.\n* `POST /jobs/{job_id}/results`: The status is set to `queued`, if\nprocessing does not start instantly.\n    * Once the processing starts the status is set to `running`.\n    * Once the data is available to download the status is set to `finished`.\n    * Whenever an error occurs during processing, the status MUST be set to `error`.\n* `DELETE /jobs/{job_id}/results`: The status is set to `canceled` if\nthe status was `running` beforehand and partial or preliminary results\nare available to be downloaded. Otherwise the status is set to\n`created`.\n\nThe following state diagram shows the possible status changes:\n\n![State diagram](assets/status-diagram.png)",
+      "default": "created"
+    },
+    "progress": {
+      "type": "number",
+      "description": "Indicates the process of a running batch job, in percent.\nCan also be set for a job which stopped due to an error or was canceled by the user. In this case, the value indicates the progress at which the job stopped. This property may not be available for the status codes `created` and `queued`.\nSubmitted and queued jobs only allow the value `0`, finished jobs only allow the value `100`.",
+      "minimum": 0,
+      "maximum": 100
+    },
+    "created": {
+      "$ref": "#/$defs/created"
+    },
+    "updated": {
+      "$ref": "#/$defs/updated"
+    },
+    "queued": {
+      "$ref": "#/$defs/queued"
+    },
+    "started": {
+      "$ref": "#/$defs/started"
+    },
+    "unpublished": {
+      "$ref": "#/$defs/unpublished"
+    },
+    "plan": {
+      "$ref": "#/$defs/billing_plan"
+    },
+    "costs": {
+      "$ref": "#/$defs/money"
+    },
+    "budget": {
+      "$ref": "#/$defs/budget"
+    },
+    "usage": {
+      "description": "Metrics about the resource usage of the batch job.\n\nBack-ends are not expected to update the metrics while processing data,\nso the metrics can only be available after the job has finished\nor has stopped due to an error.\nFor usage metrics during processing, metrics can better be added to the\nlogs (e.g. `GET /jobs/{job_id}/logs`) with the same schema.",
+      "allOf": [
+        {
+          "$ref": "#/$defs/usage"
+        }
+      ]
+    },
+    "log_level": {
+      "$ref": "#/$defs/min_log_level_default"
+    },
+    "links": {
+      "type": "array",
+      "description": "Links related to this batch job such as links to \ninvoices, log files or results.\n\nProviding links with the following `rel` (relation) types is RECOMMENDED:\n\n1. `monitor`: If logs are available, a link to the [logs endpoint](#tag/Batch-Jobs/operation/debug-job).\n2. `result`: If batch job results are available, a link to the [results endpoint](#tag/Batch-Jobs/operation/list-results).\n\nThe relation types `monitor` and `result` may occur for various batch job states:\n\n1. `created`: When the batch job was executed before and has been reset to `created` after an\n   [update](#tag/Batch-Jobs/operation/update-job) there could still be results and logs available\n   until they get discarded by [queueing the batch job again](#tag/Batch-Jobs/operation/start-job).\n2. `finished`: The full log and results are expected to be available.\n3. `error` / `canceled`: Partial results and logs may be available.\n\nFor more relation types see the lists of\n[common relation types in openEO](#section/API-Principles/Web-Linking).",
+      "items": {
+        "$ref": "#/$defs/link"
+      }
+    }
+  },
+  "$defs": {
+    "base_parameter": {
+      "type": "object",
+      "required": [
+        "name",
+        "description"
+      ],
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "A unique name for the parameter. \n\nUsing [snake case](https://en.wikipedia.org/wiki/Snake_case) (e.g. `window_size` or `scale_factor`) is RECOMMENDED.",
+          "pattern": "^\\w+$"
+        },
+        "description": {
+          "$ref": "#/$defs/process_description"
+        },
+        "optional": {
+          "type": "boolean",
+          "description": "Determines whether this parameter is optional to be specified even when no default is specified.\nClients SHOULD automatically set this parameter to `true`, if a default value is specified. Back-ends SHOULD NOT fail, if a default value is specified and this flag is missing.",
+          "default": false
+        },
+        "deprecated": {
+          "$ref": "#/$defs/deprecated"
+        },
+        "experimental": {
+          "$ref": "#/$defs/experimental"
+        },
+        "default": {
+          "description": "The default value for this parameter. Required parameters SHOULD NOT specify a default value. Optional parameters SHOULD always specify a default value."
+        }
+      }
+    },
+    "billing_plan": {
+      "type": "string",
+      "description": "The billing plan to process and charge the job or service with.\n\nBilling plans MUST be handled in a *case insensitive* manner.\n\nThe plans can be retrieved from `GET /`, but the value returned here may\nnot be in the list of plans any longer."
+    },
+    "budget": {
+      "type": [
+        "number",
+        "null"
+      ],
+      "minimum": 0,
+      "description": "Maximum amount of costs the request is allowed to produce.\nThe value MUST be specified in the currency of the back-end.\nNo limits apply, if the value is `null` or the back-end has no currency\nset in `GET /`.",
+      "default": null
+    },
+    "created": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Date and time of creation (for batch jobs: the status 'created' was set), formatted as a [RFC 3339](https://www.rfc-editor.org/rfc/rfc3339.html) date-time."
+    },
+    "data_type_schema": {
+      "title": "Data Types",
+      "description": "Either a single data type or a list of data types.",
+      "oneOf": [
+        {
+          "$ref": "#/$defs/process_json_schema"
+        },
+        {
+          "title": "Multiple data types",
+          "description": "A list of data types this parameter supports, specified as JSON Schemas.",
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/process_json_schema"
+          }
+        }
+      ]
+    },
+    "datacube_json_schema": {
+      "title": "Datacube",
+      "properties": {
+        "subtype": {
+          "type": "string",
+          "enum": [
+            "datacube"
+          ]
+        },
+        "dimensions": {
+          "title": "Datacube constraints",
+          "description": "Allows to specify requirements the data cube has to fulfill.\nRight now, it only allows to specify the dimension types and \nadds for specific dimension types:\n* axes for `spatial` dimensions in raster datacubes\n* geometry types for `geometry` dimensions in vector datacubes",
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "type"
+            ],
+            "properties": {
+              "type": {
+                "type": "string"
+              }
+            },
+            "oneOf": [
+              {
+                "title": "Spatial (raster)",
+                "properties": {
+                  "type": {
+                    "type": "string",
+                    "enum": [
+                      "spatial"
+                    ]
+                  },
+                  "axis": {
+                    "type": "array",
+                    "minItems": 1,
+                    "items": {
+                      "$ref": "#/$defs/dimension_axis_xyz"
+                    }
+                  }
+                }
+              },
+              {
+                "title": "Spatial (vector)",
+                "properties": {
+                  "type": {
+                    "type": "string",
+                    "enum": [
+                      "geometry"
+                    ]
+                  },
+                  "geometry_type": {
+                    "type": "array",
+                    "minItems": 1,
+                    "items": {
+                      "$ref": "#/$defs/geometry_type"
+                    }
+                  }
+                }
+              },
+              {
+                "title": "Other",
+                "properties": {
+                  "type": {
+                    "type": "string",
+                    "enum": [
+                      "bands",
+                      "temporal",
+                      "other"
+                    ]
+                  }
+                }
+              }
+            ]
+          }
+        }
+      }
+    },
+    "deprecated": {
+      "type": "boolean",
+      "description": "Declares that the specified entity is deprecated with the potential\nto be removed in any of the next versions. It should be transitioned out\nof usage as soon as possible and users should refrain from using it in\nnew implementations.",
+      "default": false
+    },
+    "dimension_axis_xyz": {
+      "title": "Axis",
+      "description": "Axis of a geometry or dimension (`x`, `y` or `z`)",
+      "type": "string",
+      "enum": [
+        "x",
+        "y",
+        "z"
+      ]
+    },
+    "eo_description": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "commonmark",
+      "description": "Detailed multi-line description to explain the entity.\n\n[CommonMark 0.29](http://commonmark.org/) syntax MAY be used for rich text representation."
+    },
+    "eo_title": {
+      "description": "A short description to easily distinguish entities.",
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "experimental": {
+      "type": "boolean",
+      "description": "Declares that the specified entity is experimental, which means that it is likely to change or may produce unpredictable behavior. Users should refrain from using it in production, but still feel encouraged to try it out and give feedback.",
+      "default": false
+    },
+    "geometry_type": {
+      "title": "Geometry type",
+      "type": "string",
+      "enum": [
+        "Point",
+        "MultiPoint",
+        "LineString",
+        "MultiLineString",
+        "Polygon",
+        "MultiPolygon",
+        "GeometryCollection"
+      ]
+    },
+    "job_id": {
+      "type": "string",
+      "description": "Per-back-end unique identifier of the batch job, generated by the back-end during creation. MUST match the specified pattern.",
+      "pattern": "^[\\w\\-\\.~]+$"
+    },
+    "json_schema": {
+      "type": "object",
+      "title": "JSON Schema",
+      "description": "A JSON Schema compliant to [JSON Schema draft-07](https://json-schema.org/draft-07/json-schema-validation.html) or later.\n\nJSON Schemas SHOULD always be dereferenced (i.e. all `$refs` should be resolved).\nThis allows clients to consume the schemas much better.\nClients are not expected to support dereferencing `$refs`.\n\nNote: The specified schema in the OpenAPI document is only a common subset of JSON Schema.\nAdditional keywords from the JSON Schema specification MAY be used.",
+      "properties": {
+        "$schema": {
+          "description": "The JSON Schema version. If not given in the context of openEO,\ndefaults to JSON Schema draft-07: `http://json-schema.org/draft-07/schema#`\n\nThe default value for `$schema` property may have to be added to the JSON Schema\nobject before passing it to a JSON Schema validator.",
+          "type": "string",
+          "format": "uri",
+          "default": "http://json-schema.org/draft-07/schema#"
+        },
+        "$id": {
+          "description": "ID of your JSON Schema.",
+          "type": "string",
+          "format": "uri"
+        },
+        "type": {
+          "description": "The allowed data type(s) for a value.\n\nIf this property is not present, all data types are allowed.",
+          "oneOf": [
+            {
+              "$ref": "#/$defs/json_schema_type"
+            },
+            {
+              "type": "array",
+              "minItems": 1,
+              "uniqueItems": true,
+              "items": {
+                "$ref": "#/$defs/json_schema_type"
+              }
+            }
+          ]
+        },
+        "pattern": {
+          "type": "string",
+          "format": "regex",
+          "description": "The regular expression a string value must match against."
+        },
+        "enum": {
+          "type": "array",
+          "items": {},
+          "description": "An exclusive list of allowed values."
+        },
+        "minimum": {
+          "type": "number",
+          "description": "The minimum value (inclusive) allowed for a numerical value."
+        },
+        "maximum": {
+          "type": "number",
+          "description": "The maximum value (inclusive) allowed for a numerical value."
+        },
+        "minItems": {
+          "type": "number",
+          "minimum": 0,
+          "default": 0,
+          "description": "The minimum number of items required in an array."
+        },
+        "maxItems": {
+          "type": "number",
+          "minimum": 0,
+          "description": "The maximum number of items required in an array."
+        },
+        "items": {
+          "description": "Specifies schemas for the items in an array.",
+          "anyOf": [
+            {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "$ref": "#/$defs/json_schema"
+              }
+            },
+            {
+              "$ref": "#/$defs/json_schema"
+            }
+          ]
+        }
+      },
+      "additionalProperties": {
+        "description": "Any other property supported by the JSON Schema version that is given through the property `$schema` are allowed. Defaults to JSON Schema [draft-07](https://json-schema.org/draft-07/json-schema-validation.html), but can also be any later version of JSON Schema."
+      }
+    },
+    "json_schema_type": {
+      "type": "string",
+      "enum": [
+        "array",
+        "boolean",
+        "integer",
+        "null",
+        "number",
+        "object",
+        "string"
+      ]
+    },
+    "link": {
+      "title": "Link",
+      "description": "A link to another resource on the web. Bases on [RFC 5899](https://www.rfc-editor.org/rfc/rfc5988.html).",
+      "type": "object",
+      "required": [
+        "href",
+        "rel"
+      ],
+      "properties": {
+        "rel": {
+          "type": "string",
+          "description": "Relationship between the current document and the linked document. SHOULD be a [registered link relation type](https://www.iana.org/assignments/link-relations/link-relations.xml) whenever feasible."
+        },
+        "href": {
+          "type": "string",
+          "description": "The value MUST be a valid URL.",
+          "format": "uri"
+        },
+        "type": {
+          "type": "string",
+          "description": "The value MUST be a string that hints at the format used to represent data at the provided URI, preferably a media (MIME) type."
+        },
+        "title": {
+          "type": "string",
+          "description": "Used as a human-readable label for a link."
+        }
+      }
+    },
+    "min_log_level_default": {
+      "description": "The minimum severity level for log entries that the back-end stores for the processing request.\n\nThe order of the levels is as follows (from low to high severity): `debug`, `info`, `warning`, `error`.\nThat means if `warning` is set, the back-end will only store log entries with the level `warning` and `error`.\n\nThe default minimum log level is `info`.\nUsers need to specifically set this property to `debug` to capture *all* log entries.\nIt is RECOMMENDED that users set the level at least to \"warning\" in production workflows.",
+      "type": "string",
+      "enum": [
+        "error",
+        "warning",
+        "info",
+        "debug"
+      ],
+      "default": "info"
+    },
+    "money": {
+      "description": "An amount of money or credits. The value MUST be specified in the currency the back-end is working with. The currency can be retrieved by calling `GET /`. If no currency is set, this field MUST be `null`.",
+      "type": [
+        "number",
+        "null"
+      ],
+      "minimum": 0,
+      "default": null
+    },
+    "parameter": {
+      "title": "Parameter",
+      "type": "object",
+      "required": [
+        "schema"
+      ],
+      "properties": {
+        "schema": {
+          "$ref": "#/$defs/data_type_schema"
+        }
+      },
+      "allOf": [
+        {
+          "$ref": "#/$defs/base_parameter"
+        }
+      ]
+    },
+    "process": {
+      "title": "Process",
+      "type": "object",
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/process_id"
+        },
+        "summary": {
+          "$ref": "#/$defs/process_summary"
+        },
+        "description": {
+          "$ref": "#/$defs/process_description"
+        },
+        "categories": {
+          "$ref": "#/$defs/process_categories"
+        },
+        "parameters": {
+          "$ref": "#/$defs/process_parameters"
+        },
+        "returns": {
+          "$ref": "#/$defs/process_return_value"
+        },
+        "deprecated": {
+          "$ref": "#/$defs/deprecated"
+        },
+        "experimental": {
+          "$ref": "#/$defs/experimental"
+        },
+        "exceptions": {
+          "$ref": "#/$defs/process_exceptions"
+        },
+        "links": {
+          "type": "array",
+          "description": "Links related to this process, e.g. additional external documentation.\n\nProviding links with the following `rel` (relation) types is RECOMMENDED:\n\n1. `latest-version`: If a process has been marked as deprecated, a link SHOULD\npoint to the preferred version of the process. The relation types `predecessor-version`\n(link to older version) and `successor-version` (link to newer version) can also be used\nto show the relation between versions.\n\n2. `version-history`: A link to a changelog and/or a list of versions of the process\n(see also the relation types `latest-version` etc.).\n\n3. `example`: Links to examples of other processes that use this process.\n\n4. `cite-as`: For all DOIs associated with the process, the respective DOI\nlinks SHOULD be added.\n\n5. `license`: Links to applicable license(s). The link titles should reflect the license names.\n\n6. `author`: Links to authors of the process. The `href` can use the `mailto:` protocol to\nlink to an email address. The link titles should reflect the author names and affiliations.\n\n7. `canonical`: Points to a publicly accessible and more long-lived URL.\n\nFor additional relation types see also the lists of\n[common relation types in openEO](#section/API-Principles/Web-Linking).",
+          "items": {
+            "$ref": "#/$defs/link"
+          }
+        },
+        "process_graph": {
+          "$ref": "#/$defs/process_graph"
+        }
+      }
+    },
+    "process_argument_value": {
+      "title": "Process Argument Value",
+      "description": "Arguments for a process. See the API documentation for more information.",
+      "anyOf": [
+        {
+          "type": [
+            "object",
+            "null"
+          ],
+          "title": "Object (restricted)",
+          "properties": {
+            "from_parameter": {
+              "not": {}
+            },
+            "from_node": {
+              "not": {}
+            },
+            "process_graph": {
+              "not": {}
+            }
+          }
+        },
+        {
+          "type": "string",
+          "title": "String"
+        },
+        {
+          "type": "number",
+          "title": "Number (incl. integers)"
+        },
+        {
+          "type": "boolean",
+          "title": "Boolean"
+        },
+        {
+          "type": "array",
+          "title": "Array",
+          "items": {
+            "$ref": "#/$defs/process_argument_value"
+          }
+        },
+        {
+          "$ref": "#/$defs/process_graph_with_metadata"
+        },
+        {
+          "type": "object",
+          "title": "Result Reference",
+          "description": "Data that is expected to be passed from another process.",
+          "required": [
+            "from_node"
+          ],
+          "properties": {
+            "from_node": {
+              "description": "The ID of the node that data is expected to come from.",
+              "type": "string"
+            }
+          },
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "title": "Parameter Reference",
+          "description": "A parameter for a process graph. Data that is expected to be passed to a process graph either from the user directly or from the process that is executing the process graph.",
+          "required": [
+            "from_parameter"
+          ],
+          "properties": {
+            "from_parameter": {
+              "description": "The name of the parameter that data is expected to come from.",
+              "type": "string"
+            }
+          },
+          "additionalProperties": false
+        }
+      ]
+    },
+    "process_arguments": {
+      "title": "Process Arguments",
+      "type": "object",
+      "additionalProperties": {
+        "$ref": "#/$defs/process_argument_value"
+      }
+    },
+    "process_categories": {
+      "type": "array",
+      "description": "A list of categories.",
+      "items": {
+        "type": "string",
+        "description": "Name of the category."
+      }
+    },
+    "process_description": {
+      "type": "string",
+      "format": "commonmark",
+      "description": "Detailed description to explain the entity.\n\n[CommonMark 0.29](http://commonmark.org/) syntax MAY be used for rich text representation. In addition to the CommonMark syntax, clients can convert process IDs that are formatted as in the following example into links instead of code blocks: ``` ``process_id()`` ```"
+    },
+    "process_exceptions": {
+      "type": "object",
+      "title": "Process Exceptions",
+      "description": "Declares exceptions (errors) that might occur during execution\nof this process. This list is just for informative purposes and may be\nincomplete. This list MUST only contain exceptions that stop the\nexecution of a process and MUST NOT contain warnings, notices or\ndebugging messages. It is meant to primarily contain errors that\nhave been caused by the user. It is RECOMMENDED that exceptions\nare referred to and explained in process or parameter descriptions.\n\nThe keys define the error code and MUST match the following pattern:\n`^\\w+$`\n\nThis schema follows the schema of the general openEO error list (see\nerrors.json).",
+      "additionalProperties": {
+        "x-additionalPropertiesName": "Error Code",
+        "title": "Process Exception",
+        "type": "object",
+        "required": [
+          "message"
+        ],
+        "properties": {
+          "description": {
+            "type": "string",
+            "format": "commonmark",
+            "description": "Detailed description to explain the error to client\nusers and back-end developers. This should not be shown in the\nclients directly, but MAY be linked to in the errors `url`\nproperty.\n\n[CommonMark 0.29](http://commonmark.org/) syntax MAY be used\nfor rich text representation."
+          },
+          "message": {
+            "type": "string",
+            "description": "Explains the reason the server is rejecting the request. This message is intended to be displayed to the client user. For \"4xx\" error codes the message SHOULD explain shortly how the client needs to modify the request.\n\nThe message MAY contain variables, which are enclosed by curly brackets. Example: `{variable_name}`"
+          },
+          "http": {
+            "type": "integer",
+            "description": "HTTP Status Code, following the [error handling conventions in openEO](#section/API-Principles/Error-Handling). Defaults to `400`.",
+            "default": 400
+          }
+        }
+      }
+    },
+    "process_graph": {
+      "title": "Process Graph",
+      "description": "A process graph defines a graph-like structure as a connected set of executable processes. Each key is a unique identifier (node ID) that is used to refer to the process in the graph.",
+      "type": "object",
+      "additionalProperties": {
+        "x-additionalPropertiesName": "Node ID",
+        "title": "Process Node",
+        "type": "object",
+        "required": [
+          "process_id",
+          "arguments"
+        ],
+        "properties": {
+          "process_id": {
+            "$ref": "#/$defs/process_id"
+          },
+          "namespace": {
+            "$ref": "#/$defs/process_namespace"
+          },
+          "result": {
+            "type": "boolean",
+            "description": "Used to specify which node is the last in the chain and returns the result to return to the requesting context. This flag MUST only be set once in each list of process nodes.",
+            "default": false
+          },
+          "description": {
+            "description": "Optional description about the process and its arguments.",
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "arguments": {
+            "$ref": "#/$defs/process_arguments"
+          }
+        }
+      }
+    },
+    "process_graph_json_schema": {
+      "title": "Process Graph",
+      "type": "object",
+      "properties": {
+        "subtype": {
+          "type": "string",
+          "enum": [
+            "process-graph"
+          ]
+        },
+        "parameters": {
+          "type": "array",
+          "title": "Process Graph Parameters",
+          "description": "A list of parameters passed to the child process graph.\n\nThe order in the array corresponds to the parameter order to\nbe used in clients that do not support named parameters.",
+          "items": {
+            "$ref": "#/$defs/parameter"
+          }
+        },
+        "returns": {
+          "type": "object",
+          "title": "Process Graph Return Value",
+          "description": "Description of the data that is returned by the child process graph.",
+          "required": [
+            "schema"
+          ],
+          "properties": {
+            "description": {
+              "$ref": "#/$defs/process_description"
+            },
+            "schema": {
+              "$ref": "#/$defs/data_type_schema"
+            }
+          },
+          "allOf": [
+            {
+              "$ref": "#/$defs/process_json_schema"
+            }
+          ]
+        }
+      }
+    },
+    "process_graph_with_metadata": {
+      "title": "Process Graph with metadata",
+      "description": "A process graph, optionally enriched with process metadata.",
+      "type": "object",
+      "required": [
+        "process_graph"
+      ],
+      "properties": {
+        "id": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "summary": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "description": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "parameters": {
+          "type": [
+            "array",
+            "null"
+          ],
+          "items": {}
+        },
+        "returns": {
+          "type": [
+            "object",
+            "null"
+          ]
+        }
+      },
+      "allOf": [
+        {
+          "$ref": "#/$defs/process"
+        }
+      ]
+    },
+    "process_id": {
+      "type": "string",
+      "description": "The identifier for the process. It MUST be unique across its namespace\n(e.g. predefined processes or user-defined processes).\n\nClients SHOULD warn the user if a user-defined process is added with the \nsame identifier as one of the predefined process.",
+      "pattern": "^\\w+$"
+    },
+    "process_json_schema": {
+      "type": "object",
+      "title": "Single Data Type",
+      "description": "Specifies a data type supported by a parameter or return value.\n\nThe data types are specified according to the [JSON Schema draft-07](http://json-schema.org/) specification.\nSee the chapter ['Schemas' in 'Defining Processes'](#section/Processes/Defining-Processes) for more information.\n\nJSON Schemas SHOULD NOT contain `default`, `anyOf`, `oneOf`, `allOf` or `not` at the top-level of the schema.\nInstead specify each data type in a separate array element.\n\nThe following more complex JSON Schema keywords SHOULD NOT be used:\n`if`, `then`, `else`, `readOnly`, `writeOnly`, `dependencies`, `minProperties`, `maxProperties`, `patternProperties`.\n\nJSON Schemas SHOULD always be dereferenced (i.e. all `$refs` should be resolved). This allows clients to consume the schemas much better.\nClients are not expected to support dereferencing `$refs`.\n\nNote: The specified schema is only a common subset of JSON Schema. Additional keywords MAY be used.",
+      "properties": {
+        "subtype": {
+          "type": "string",
+          "description": "The allowed sub data type for a value. See the chapter on [subtypes](#section/Processes/Defining-Processes) for more information."
+        },
+        "deprecated": {
+          "$ref": "#/$defs/deprecated"
+        }
+      },
+      "allOf": [
+        {
+          "$ref": "#/$defs/json_schema"
+        }
+      ],
+      "oneOf": [
+        {
+          "title": "Generic"
+        },
+        {
+          "$ref": "#/$defs/process_graph_json_schema"
+        },
+        {
+          "$ref": "#/$defs/datacube_json_schema"
+        }
+      ]
+    },
+    "process_namespace": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "default": null,
+      "description": "The namespace the `process_id` is valid for.\n\nThe following options are predefined by the openEO API, but additional\nnamespaces may be introduced by back-ends or in a future version of the API.\n\n* `null` (default): Checks both user-defined and predefined processes,\n   but prefers user-defined processes if both are available.\n   This allows users to add missing predefined processes for portability,\n   e.g. common processes from [processes.openeo.org](https://processes.openeo.org)\n   that have a process graph included.\n   Logging the namespace selected by the back-end for debugging purposes is RECOMMENDED.\n* `backend`: Uses exclusively the predefined processes listed at `GET /processes`.\n* `user`: Uses exclusively the user-defined processes listed at `GET /process_graphs`.\n\nIf multiple processes with the same identifier exist, Clients SHOULD\ninform the user that it's recommended to select a namespace."
+    },
+    "process_parameter": {
+      "title": "Process Parameter",
+      "type": "object",
+      "required": [
+        "schema"
+      ],
+      "properties": {
+        "schema": {
+          "$ref": "#/$defs/process_schema"
+        }
+      },
+      "allOf": [
+        {
+          "$ref": "#/$defs/base_parameter"
+        }
+      ]
+    },
+    "process_parameters": {
+      "type": "array",
+      "description": "A list of parameters.\n\nThe order in the array corresponds to the parameter order to\nbe used in clients that do not support named parameters.\n\n**Note:** Specifying an empty array is different from (if allowed)\n`null` or the property being absent.\nAn empty array means the process has no parameters.\n`null` / property absent means that the parameters are unknown as\nthe user has not specified them. There could still be parameters in the\nprocess graph, if one is specified.",
+      "items": {
+        "$ref": "#/$defs/process_parameter"
+      }
+    },
+    "process_return_value": {
+      "type": "object",
+      "title": "Process Return Value",
+      "description": "Description of the data that is returned by this process.",
+      "required": [
+        "schema"
+      ],
+      "properties": {
+        "description": {
+          "$ref": "#/$defs/process_description"
+        },
+        "schema": {
+          "$ref": "#/$defs/process_schema"
+        }
+      }
+    },
+    "process_schema": {
+      "title": "Process Data types",
+      "description": "Either a single data type or a list of data types for process parameter or process return values.",
+      "oneOf": [
+        {
+          "$ref": "#/$defs/process_json_schema"
+        },
+        {
+          "title": "Multiple data types",
+          "description": "A list of data types supported, specified as JSON Schemas.",
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/process_json_schema"
+          }
+        }
+      ]
+    },
+    "process_summary": {
+      "type": "string",
+      "description": "A short summary of what the process does."
+    },
+    "queued": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Date and time of queueing the batch job (i.e., when the status 'queued' was set), formatted as a [RFC 3339](https://www.rfc-editor.org/rfc/rfc3339.html) date-time."
+    },
+    "started": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Date and time when the batch job started processing (i.e., when the status 'running' was set), formatted as a [RFC 3339](https://www.rfc-editor.org/rfc/rfc3339.html) date-time."
+    },
+    "unpublished": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Time until which the batch job results are stored on the back-end, in UTC. Formatted as a [RFC 3339](https://www.rfc-editor.org/rfc/rfc3339.html) date-time."
+    },
+    "updated": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Date and time of the last status change, formatted as a [RFC 3339](https://www.rfc-editor.org/rfc/rfc3339.html) date-time. If the status is `error`, `canceled` or `finished`, this is the time when the job has ended."
+    },
+    "usage": {
+      "title": "Resource usage metrics",
+      "type": "object",
+      "properties": {
+        "cpu": {
+          "description": "Specifies the CPU usage, usually in a unit such as `cpu-seconds`.",
+          "allOf": [
+            {
+              "$ref": "#/$defs/usage_metric"
+            }
+          ]
+        },
+        "memory": {
+          "description": "Specifies the memory usage, usually in a unit such as `mb-seconds` or `gb-hours`.",
+          "allOf": [
+            {
+              "$ref": "#/$defs/usage_metric"
+            }
+          ]
+        },
+        "duration": {
+          "description": "Specifies the wall time, usually in a unit such as `seconds`, `minutes` or `hours`.",
+          "allOf": [
+            {
+              "$ref": "#/$defs/usage_metric"
+            }
+          ]
+        },
+        "network": {
+          "description": "Specifies the network transfer usage (incoming and outgoing), usually in a unit such as `b` (bytes), `kb` (kilobytes), `mb` (megabytes) or `gb` (gigabytes).",
+          "allOf": [
+            {
+              "$ref": "#/$defs/usage_metric"
+            }
+          ]
+        },
+        "disk": {
+          "description": "Specifies the amount of input (read) and output (write) operations on the storage such as disks, usually in a unit such as `b` (bytes), `kb` (kilobytes), `mb` (megabytes) or `gb` (gigabytes).",
+          "allOf": [
+            {
+              "$ref": "#/$defs/usage_metric"
+            }
+          ]
+        },
+        "storage": {
+          "description": "Specifies the usage of storage space, usually in a unit such as `b` (bytes), `kb` (kilobytes), `mb` (megabytes) or `gb` (gigabytes).",
+          "allOf": [
+            {
+              "$ref": "#/$defs/usage_metric"
+            }
+          ]
+        }
+      },
+      "additionalProperties": {
+        "description": "Additional metrics.",
+        "allOf": [
+          {
+            "$ref": "#/$defs/usage_metric"
+          }
+        ]
+      }
+    },
+    "usage_metric": {
+      "type": "object",
+      "required": [
+        "value",
+        "unit"
+      ],
+      "properties": {
+        "value": {
+          "type": "number",
+          "minimum": 0
+        },
+        "unit": {
+          "type": "string"
+        }
+      }
+    }
+  }
+}

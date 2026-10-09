@@ -1,0 +1,13 @@
+generated: '2026-10-09'
+method: none
+name: openEO
+audience: unclear
+pricing_basis: none
+published: false
+delivery:
+  mode: unclear
+plan_count: 0
+plans: []
+note: openEO publishes an open specification, not a priced service; pricing is set
+  by each implementing back-end (cost is signalled per request via the OpenEO-Costs
+  header / budget fields).

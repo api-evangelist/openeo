@@ -1,0 +1,385 @@
+name: openEO MCP Server (candidate)
+type: MCPServer
+generated: '2026-10-09'
+method: derived
+source:
+- openapi/openeo-openapi.yml
+- openapi/openeo-commercial-data-openapi.yml
+- openapi/openeo-processing-parameters-openapi.yml
+- openapi/openeo-workspaces-openapi.yml
+status: candidate
+description: No official openEO MCP server was found. This is a candidate tool list derived one-to-one from the operations of the openEO API v1.3.0 specification and its three draft extensions. openEO is
+  a specification implemented by independent back-ends, each at its own base URL, so any server built from this would be configured per back-end.
+deployment:
+  mode: none
+  auth: unknown
+  verified: derived
+search:
+  checked:
+  - web search "openEO MCP server model context protocol" (no openEO result)
+  - GitHub search "openeo mcp"
+  - Open-EO GitHub org repository names (no mcp/agent/llm repo)
+  third_party:
+  - url: https://github.com/MatMatt/openeo-mcp
+    description: Accessing openEO backends via LLMs
+    official: false
+    note: Community repository found by GitHub search, not in the Open-EO organization; not verified or installed.
+auth_note: The spec declares Bearer (token from OIDC or HTTP Basic via /credentials/*) and Basic security schemes.
+tools:
+- name: capabilities
+  description: Information about the back-end
+  operationId: capabilities
+  method: GET
+  path: /
+  spec: openapi/openeo-openapi.yml
+  readOnly: true
+- name: connect
+  description: Supported openEO versions
+  operationId: connect
+  method: GET
+  path: /.well-known/openeo
+  spec: openapi/openeo-openapi.yml
+  readOnly: true
+- name: list_file_types
+  description: Supported file formats
+  operationId: list-file-types
+  method: GET
+  path: /file_formats
+  spec: openapi/openeo-openapi.yml
+  readOnly: true
+- name: conformance
+  description: Conformance classes this API implements
+  operationId: conformance
+  method: GET
+  path: /conformance
+  spec: openapi/openeo-openapi.yml
+  readOnly: true
+- name: list_collections
+  description: Basic metadata for all datasets
+  operationId: list-collections
+  method: GET
+  path: /collections
+  spec: openapi/openeo-openapi.yml
+  readOnly: true
+- name: describe_collection
+  description: Full metadata for a specific dataset
+  operationId: describe-collection
+  method: GET
+  path: /collections/{collection_id}
+  spec: openapi/openeo-openapi.yml
+  readOnly: true
+- name: list_collection_queryables
+  description: Metadata filters for a specific dataset
+  operationId: list-collection-queryables
+  method: GET
+  path: /collections/{collection_id}/queryables
+  spec: openapi/openeo-openapi.yml
+  readOnly: true
+- name: list_processes
+  description: Supported predefined processes
+  operationId: list-processes
+  method: GET
+  path: /processes
+  spec: openapi/openeo-openapi.yml
+  readOnly: true
+- name: list_udf_runtimes
+  description: Supported UDF runtimes
+  operationId: list-udf-runtimes
+  method: GET
+  path: /udf_runtimes
+  spec: openapi/openeo-openapi.yml
+  readOnly: true
+- name: authenticate_oidc
+  description: OpenID Connect authentication
+  operationId: authenticate-oidc
+  method: GET
+  path: /credentials/oidc
+  spec: openapi/openeo-openapi.yml
+  readOnly: true
+- name: authenticate_basic
+  description: HTTP Basic authentication
+  operationId: authenticate-basic
+  method: GET
+  path: /credentials/basic
+  spec: openapi/openeo-openapi.yml
+  readOnly: true
+- name: validate_custom_process
+  description: Validate a user-defined process (graph)
+  operationId: validate-custom-process
+  method: POST
+  path: /validation
+  spec: openapi/openeo-openapi.yml
+  readOnly: false
+- name: compute_result
+  description: Process and download data synchronously
+  operationId: compute-result
+  method: POST
+  path: /result
+  spec: openapi/openeo-openapi.yml
+  readOnly: false
+- name: list_custom_processes
+  description: List all user-defined processes
+  operationId: list-custom-processes
+  method: GET
+  path: /process_graphs
+  spec: openapi/openeo-openapi.yml
+  readOnly: true
+- name: describe_custom_process
+  description: Full metadata for a user-defined process
+  operationId: describe-custom-process
+  method: GET
+  path: /process_graphs/{process_graph_id}
+  spec: openapi/openeo-openapi.yml
+  readOnly: true
+- name: store_custom_process
+  description: Store a user-defined process
+  operationId: store-custom-process
+  method: PUT
+  path: /process_graphs/{process_graph_id}
+  spec: openapi/openeo-openapi.yml
+  readOnly: false
+- name: delete_custom_process
+  description: Delete a user-defined process
+  operationId: delete-custom-process
+  method: DELETE
+  path: /process_graphs/{process_graph_id}
+  spec: openapi/openeo-openapi.yml
+  readOnly: false
+- name: list_service_types
+  description: Supported secondary web service protocols
+  operationId: list-service-types
+  method: GET
+  path: /service_types
+  spec: openapi/openeo-openapi.yml
+  readOnly: true
+- name: list_services
+  description: List all web services
+  operationId: list-services
+  method: GET
+  path: /services
+  spec: openapi/openeo-openapi.yml
+  readOnly: true
+- name: create_service
+  description: Publish a new service
+  operationId: create-service
+  method: POST
+  path: /services
+  spec: openapi/openeo-openapi.yml
+  readOnly: false
+- name: update_service
+  description: Modify a service
+  operationId: update-service
+  method: PATCH
+  path: /services/{service_id}
+  spec: openapi/openeo-openapi.yml
+  readOnly: false
+- name: describe_service
+  description: Full metadata for a service
+  operationId: describe-service
+  method: GET
+  path: /services/{service_id}
+  spec: openapi/openeo-openapi.yml
+  readOnly: true
+- name: delete_service
+  description: Delete a service
+  operationId: delete-service
+  method: DELETE
+  path: /services/{service_id}
+  spec: openapi/openeo-openapi.yml
+  readOnly: false
+- name: debug_service
+  description: Logs for a secondary service
+  operationId: debug-service
+  method: GET
+  path: /services/{service_id}/logs
+  spec: openapi/openeo-openapi.yml
+  readOnly: true
+- name: list_jobs
+  description: List all batch jobs
+  operationId: list-jobs
+  method: GET
+  path: /jobs
+  spec: openapi/openeo-openapi.yml
+  readOnly: true
+- name: create_job
+  description: Create a new batch job
+  operationId: create-job
+  method: POST
+  path: /jobs
+  spec: openapi/openeo-openapi.yml
+  readOnly: false
+- name: update_job
+  description: Modify a batch job
+  operationId: update-job
+  method: PATCH
+  path: /jobs/{job_id}
+  spec: openapi/openeo-openapi.yml
+  readOnly: false
+- name: describe_job
+  description: Full metadata for a batch job
+  operationId: describe-job
+  method: GET
+  path: /jobs/{job_id}
+  spec: openapi/openeo-openapi.yml
+  readOnly: true
+- name: delete_job
+  description: Delete a batch job
+  operationId: delete-job
+  method: DELETE
+  path: /jobs/{job_id}
+  spec: openapi/openeo-openapi.yml
+  readOnly: false
+- name: estimate_job
+  description: Get an estimate for a batch job
+  operationId: estimate-job
+  method: GET
+  path: /jobs/{job_id}/estimate
+  spec: openapi/openeo-openapi.yml
+  readOnly: true
+- name: debug_job
+  description: Logs for a batch job
+  operationId: debug-job
+  method: GET
+  path: /jobs/{job_id}/logs
+  spec: openapi/openeo-openapi.yml
+  readOnly: true
+- name: list_results
+  description: List batch job results
+  operationId: list-results
+  method: GET
+  path: /jobs/{job_id}/results
+  spec: openapi/openeo-openapi.yml
+  readOnly: true
+- name: start_job
+  description: Start processing a batch job
+  operationId: start-job
+  method: POST
+  path: /jobs/{job_id}/results
+  spec: openapi/openeo-openapi.yml
+  readOnly: false
+- name: stop_job
+  description: Cancel processing a batch job
+  operationId: stop-job
+  method: DELETE
+  path: /jobs/{job_id}/results
+  spec: openapi/openeo-openapi.yml
+  readOnly: false
+- name: list_files
+  description: List all files in the workspace
+  operationId: list-files
+  method: GET
+  path: /files
+  spec: openapi/openeo-openapi.yml
+  readOnly: true
+- name: download_file
+  description: Download a file from the workspace
+  operationId: download-file
+  method: GET
+  path: /files/{path}
+  spec: openapi/openeo-openapi.yml
+  readOnly: true
+- name: upload_file
+  description: Upload a file to the workspace
+  operationId: upload-file
+  method: PUT
+  path: /files/{path}
+  spec: openapi/openeo-openapi.yml
+  readOnly: false
+- name: delete_file
+  description: Delete a file from the workspace
+  operationId: delete-file
+  method: DELETE
+  path: /files/{path}
+  spec: openapi/openeo-openapi.yml
+  readOnly: false
+- name: describe_account
+  description: Information about the authenticated user
+  operationId: describe-account
+  method: GET
+  path: /me
+  spec: openapi/openeo-openapi.yml
+  readOnly: true
+- name: list_orders
+  description: List all commercial data orders
+  operationId: list-orders
+  method: GET
+  path: /orders
+  spec: openapi/openeo-commercial-data-openapi.yml
+  readOnly: true
+- name: create_order
+  description: Create a new order
+  operationId: create-order
+  method: POST
+  path: /orders
+  spec: openapi/openeo-commercial-data-openapi.yml
+  readOnly: false
+- name: describe_order
+  description: Full metadata for an order
+  operationId: describe-order
+  method: GET
+  path: /orders/{order_id}
+  spec: openapi/openeo-commercial-data-openapi.yml
+  readOnly: true
+- name: confirm_order
+  description: Confirm an order
+  operationId: confirm-order
+  method: POST
+  path: /orders/{order_id}
+  spec: openapi/openeo-commercial-data-openapi.yml
+  readOnly: false
+- name: delete_order
+  description: Delete an order
+  operationId: delete-order
+  method: DELETE
+  path: /orders/{order_id}
+  spec: openapi/openeo-commercial-data-openapi.yml
+  readOnly: false
+- name: list_processing_parameters
+  description: Additional processing parameters
+  operationId: list-processing-parameters
+  method: GET
+  path: /processing_parameters
+  spec: openapi/openeo-processing-parameters-openapi.yml
+  readOnly: true
+- name: list_workspace_providers
+  description: Supported workspace providers
+  operationId: list-workspace-providers
+  method: GET
+  path: /workspace_providers
+  spec: openapi/openeo-workspaces-openapi.yml
+  readOnly: true
+- name: list_workspaces
+  description: List all workspaces
+  operationId: list-workspaces
+  method: GET
+  path: /workspaces
+  spec: openapi/openeo-workspaces-openapi.yml
+  readOnly: true
+- name: create_workspace
+  description: Create Workspace
+  operationId: create-workspace
+  method: POST
+  path: /workspaces
+  spec: openapi/openeo-workspaces-openapi.yml
+  readOnly: false
+- name: describe_workspace
+  description: Full metadata for a workspace
+  operationId: describe-workspace
+  method: GET
+  path: /workspaces/{workspace_id}
+  spec: openapi/openeo-workspaces-openapi.yml
+  readOnly: true
+- name: delete_workspace
+  description: Delete Workspace
+  operationId: delete-workspace
+  method: DELETE
+  path: /workspaces/{workspace_id}
+  spec: openapi/openeo-workspaces-openapi.yml
+  readOnly: false
+- name: update_workspace
+  description: Update workspace details
+  operationId: update-workspace
+  method: PATCH
+  path: /workspaces/{workspace_id}
+  spec: openapi/openeo-workspaces-openapi.yml
+  readOnly: false

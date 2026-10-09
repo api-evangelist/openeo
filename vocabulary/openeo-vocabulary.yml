@@ -1,0 +1,476 @@
+generated: '2026-10-09'
+method: derived
+generator: derive-vocabulary.py
+source:
+- openapi/openeo-commercial-data-openapi.yml
+- openapi/openeo-openapi.yml
+- openapi/openeo-processing-parameters-openapi.yml
+- openapi/openeo-workspaces-openapi.yml
+vocabulary:
+  name: openEO Domain Vocabulary
+  description: 'Terms declared by openEO''s own API contract: its resource groups, objects and enumerations, with the contract''s definitions.
+    Derived, not authored.'
+  version: '2026-10-09'
+  terms:
+  - term: Orders
+    definition: Management of commercial data orders
+    tags:
+    - Resource Group
+    source: openapi/openeo-commercial-data-openapi.yml
+  - term: Capabilities
+    definition: General information about the API implementation and other supported capabilities provided by the back-end.
+    tags:
+    - Resource Group
+    source: openapi/openeo-openapi.yml
+  - term: Account Management
+    definition: The following endpoints handle user profiles, accounting and authentication. See also [Authentication](#section/Authentication).
+      In general, the openEO API only defines a minimum subset of user management and accounting functionality. It allows to * [authenticate and
+      authorize](http://www.differencebetween.net/technology/difference-between-authentication-and-authorization/) a user, which may inclu
+    tags:
+    - Resource Group
+    source: openapi/openeo-openapi.yml
+  - term: EO Data Discovery
+    definition: 'These endpoints allow to list the collections that are available at the back-end and can be used as data cubes for data processing.
+      ## STAC For data discovery of Earth Observation Collections at the back-ends, openEO strives for compatibility with the specifications [SpatioTemporal
+      Asset Catalog (STAC)](https://stacspec.org/) and [OGC API - Features - Part 1: Core](http://docs.opengeospatial.org/i'
+    tags:
+    - Resource Group
+    source: openapi/openeo-openapi.yml
+  - term: Process Discovery
+    definition: The process discovery endpoints provide details about the predefined processes that are available at the back-end. To list user-defined
+      processes see '[User-Defined Processes](#tag/User-Defined-Processes)'.
+    tags:
+    - Resource Group
+    source: openapi/openeo-openapi.yml
+  - term: User-Defined Processes
+    definition: These endpoints allow to store and manage user-defined processes with their process graphs at the back-end.
+    tags:
+    - Resource Group
+    source: openapi/openeo-openapi.yml
+  - term: Data Processing
+    definition: Organizes and manages data processing on the back-end, either as synchronous on-demand computation or batch jobs.
+    tags:
+    - Resource Group
+    source: openapi/openeo-openapi.yml
+  - term: Batch Jobs
+    definition: Management of batch processing tasks (jobs) and their results.
+    tags:
+    - Resource Group
+    source: openapi/openeo-openapi.yml
+  - term: Secondary Services
+    definition: On-demand access to data using other web service protocols.
+    tags:
+    - Resource Group
+    source: openapi/openeo-openapi.yml
+  - term: File Storage
+    definition: Management of user-uploaded assets and processed data.
+    tags:
+    - Resource Group
+    source: openapi/openeo-openapi.yml
+  - term: Workspaces
+    definition: Management of User Workspaces
+    tags:
+    - Resource Group
+    source: openapi/openeo-workspaces-openapi.yml
+  - term: order_id
+    definition: Unique identifier of the order at the back-end, which MUST match the specified pattern.
+    tags:
+    - Object
+    source: openapi/openeo-commercial-data-openapi.yml#/components/schemas/order_id
+  - term: item_id
+    definition: Unique identifier of the item. Must be unique within a collection.
+    tags:
+    - Object
+    source: openapi/openeo-commercial-data-openapi.yml#/components/schemas/item_id
+  - term: order_parameters
+    definition: Key-value pairs of available `order_parameters` as listed at `GET /collections/{collection_id}` for filtering available items.
+    tags:
+    - Object
+    source: openapi/openeo-commercial-data-openapi.yml#/components/schemas/order_parameters
+  - term: Order
+    definition: Information about an order. The properties with the `order:` prefix follow the fields defined in the [STAC Order Extension](https://github.com/stac-extensions/order/tree/v1.0.0).
+    tags:
+    - Object
+    source: openapi/openeo-commercial-data-openapi.yml#/components/schemas/order
+  - term: conformsTo
+    definition: Lists all conformance classes specified in various standards that the implementation conforms to. Conformance classes are commonly
+      used in all OGC API standards and the STAC API specification. The general openEO conformance class is `https://api.openeo.org/1.3.0`. See
+      the individual openEO API extensions for their conformance classes.
+    tags:
+    - Object
+    source: openapi/openeo-openapi.yml#/components/schemas/conformsTo
+  - term: udf_runtime
+    definition: 'Object declared by the contract with fields: title, description, type, default, deprecated, experimental, links.'
+    tags:
+    - Object
+    source: openapi/openeo-openapi.yml#/components/schemas/udf_runtime
+  - term: result_status
+    definition: The status of a batch job. This field is REQUIRED if the `partial` parameter is given. This field is strongly RECOMMENDED if the
+      job has stopped due to an error.
+    tags:
+    - Enumeration
+    source: openapi/openeo-openapi.yml#/components/schemas/result_status
+  - term: Batch Job Results Response as STAC Item
+    definition: The STAC specification should be the main guidance for implementing this. Specifying the `bbox` is strongly RECOMMENDED for STAC
+      compliance, but can be omitted if the result is unlocated and the `geometry` is set to `null`.
+    tags:
+    - Object
+    source: openapi/openeo-openapi.yml#/components/schemas/batch_job_result
+  - term: File Format
+    definition: Describes a specific file format.
+    tags:
+    - Object
+    source: openapi/openeo-openapi.yml#/components/schemas/file_format
+  - term: production
+    definition: Specifies whether the implementation is ready to be used in production use (`true`) or not (`false`). Clients SHOULD only connect
+      to non-production implementations if the user explicitly confirmed to use a non-production implementation. This flag is part of `GET /.well-known/openeo`
+      and `GET /`. It MUST be used consistently in both endpoints.
+    tags:
+    - Object
+    source: openapi/openeo-openapi.yml#/components/schemas/production
+  - term: links_pagination
+    definition: 'Links related to this list of resources, for example links for pagination or alternative formats such as a human-readable HTML
+      version. The links array MUST NOT be paginated. If pagination is implemented, the following `rel` (relation) types apply: 1. `next` (REQUIRED):
+      A link to the next page, except on the last page. 2. `prev` (OPTIONAL): A link to the previous page, except on the first page. 3.'
+    tags:
+    - Object
+    source: openapi/openeo-openapi.yml#/components/schemas/links_pagination
+  - term: Link
+    definition: A link to another resource on the web. Bases on [RFC 5899](https://www.rfc-editor.org/rfc/rfc5988.html).
+    tags:
+    - Object
+    source: openapi/openeo-openapi.yml#/components/schemas/link
+  - term: STAC Asset
+    definition: 'Object declared by the contract with fields: href, title, description, type, roles.'
+    tags:
+    - Object
+    source: openapi/openeo-openapi.yml#/components/schemas/asset
+  - term: money
+    definition: An amount of money or credits. The value MUST be specified in the currency the back-end is working with. The currency can be retrieved
+      by calling `GET /`. If no currency is set, this field MUST be `null`.
+    tags:
+    - Object
+    source: openapi/openeo-openapi.yml#/components/schemas/money
+  - term: budget
+    definition: Maximum amount of costs the request is allowed to produce. The value MUST be specified in the currency of the back-end. No limits
+      apply, if the value is `null` or the back-end has no currency set in `GET /`.
+    tags:
+    - Object
+    source: openapi/openeo-openapi.yml#/components/schemas/budget
+  - term: budget_update
+    definition: Maximum amount of costs the request is allowed to produce. The value MUST be specified in the currency of the back-end. No limits
+      apply, if the value is `null`.
+    tags:
+    - Object
+    source: openapi/openeo-openapi.yml#/components/schemas/budget_update
+  - term: billing_plan
+    definition: The billing plan to process and charge the job or service with. Billing plans MUST be handled in a *case insensitive* manner.
+      The plans can be retrieved from `GET /`, but the value returned here may not be in the list of plans any longer.
+    tags:
+    - Object
+    source: openapi/openeo-openapi.yml#/components/schemas/billing_plan
+  - term: billing_plan_null
+    definition: 'The billing plan to process and charge the job or service with. Billing plans MUST be accepted in a *case insensitive* manner.
+      Back-ends MUST resolve the billing plan in the following way if billing is supported: * If a value is given and it is not `null`: Persist
+      the `plan` that has been provided in the request. * Otherwise, do not change the billing plan. Billing plans not on the list of availab'
+    tags:
+    - Object
+    source: openapi/openeo-openapi.yml#/components/schemas/billing_plan_null
+  - term: billing_plan_null_default
+    definition: 'The billing plan to process and charge the job or service with. Billing plans MUST be accepted in a *case insensitive* manner.
+      Back-ends MUST resolve the billing plan in the following way: * If a non-`null` value is given: Persist the `plan` that has been provided
+      in the request. * Otherwise: 1. Persist the `default_plan` exposed through `GET /me`, if available. 2. Persist the `default_plan` expos'
+    tags:
+    - Object
+    source: openapi/openeo-openapi.yml#/components/schemas/billing_plan_null_default
+  - term: storage_quota_free
+    definition: Free storage space in bytes, which is still available to the user. Effectively, this is the disk quota minus the used space by
+      the user, e.g. user-uploaded files and job results.
+    tags:
+    - Object
+    source: openapi/openeo-openapi.yml#/components/schemas/storage_quota_free
+  - term: max_storage_quota
+    definition: Maximum storage space (disk quota) in bytes available to the user.
+    tags:
+    - Object
+    source: openapi/openeo-openapi.yml#/components/schemas/max_storage_quota
+  - term: Collection
+    definition: 'Object declared by the contract with fields: stac_version, stac_extensions, type, id, title, description, keywords, version,
+      deprecated, license, providers, extent. (4 more)'
+    tags:
+    - Object
+    source: openapi/openeo-openapi.yml#/components/schemas/collection
+  - term: stac_version
+    definition: The [version of the STAC specification](https://github.com/radiantearth/stac-spec/releases), which MAY not be equal to the [STAC
+      API version](#tag/EO-Data-Discovery/STAC). The openEO API allows for the STAC versions 1.x.x (RECOMMENDED) and 0.9.x (DEPRECATED).
+    tags:
+    - Object
+    source: openapi/openeo-openapi.yml#/components/schemas/stac_version
+  - term: stac_extensions
+    definition: A list of implemented STAC extensions. The list contains URLs to the JSON Schema files it can be validated against.
+    tags:
+    - Object
+    source: openapi/openeo-openapi.yml#/components/schemas/stac_extensions
+  - term: stac_license
+    definition: License(s) of the data as a SPDX [License identifier](https://spdx.org/licenses/). Alternatively, use `proprietary` if the license
+      is not on the SPDX license list or `various` if multiple licenses apply. In these two cases links to the license texts SHOULD be added,
+      see the `license` link relation type. Non-SPDX licenses SHOULD add a link to the license text with the `license` relation in the link
+    tags:
+    - Object
+    source: openapi/openeo-openapi.yml#/components/schemas/stac_license
+  - term: stac_providers
+    definition: A list of providers, which MAY include all organizations capturing or processing the data or the hosting provider. Providers SHOULD
+      be listed in chronological order with the most recent provider being the last element of the list.
+    tags:
+    - Object
+    source: openapi/openeo-openapi.yml#/components/schemas/stac_providers
+  - term: Assets
+    definition: Dictionary of asset objects for data that can be downloaded, each with a unique key. The keys MAY be used by clients as file names.
+    tags:
+    - Object
+    source: openapi/openeo-openapi.yml#/components/schemas/stac_assets
+  - term: Statistics / Range
+    definition: 'By default, only ranges with a minimum and a maximum value can be specified. Ranges can be specified for ordinal values only,
+      which means they need to have a rank order. Therefore, ranges can only be specified for numbers and some special types of strings. Examples:
+      grades (A to F), dates or times. Implementors are free to add other derived statistical values to the object, for example `mean` or `'
+    tags:
+    - Object
+    source: openapi/openeo-openapi.yml#/components/schemas/collection_summary_stats
+  - term: bbox
+    definition: 'Each bounding box is provided as four or six numbers, depending on whether the coordinate reference system includes a vertical
+      axis (height or depth): * West (lower left corner, coordinate axis 1) * South (lower left corner, coordinate axis 2) * Base (optional, minimum
+      value, coordinate axis 3) * East (upper right corner, coordinate axis 1) * North (upper right corner, coordinate axis 2) * Height '
+    tags:
+    - Object
+    source: openapi/openeo-openapi.yml#/components/schemas/bbox
+  - term: collection_id
+    definition: A unique identifier for the collection, which MUST match the specified pattern.
+    tags:
+    - Object
+    source: openapi/openeo-openapi.yml#/components/schemas/collection_id
+  - term: Dimension
+    definition: A dimension, each object represents a distinct dimension with the key being the dimension name.
+    tags:
+    - Object
+    source: openapi/openeo-openapi.yml#/components/schemas/dimension
+  - term: Axis
+    definition: Axis of a geometry or dimension (`x`, `y` or `z`)
+    tags:
+    - Enumeration
+    source: openapi/openeo-openapi.yml#/components/schemas/dimension_axis_xyz
+  - term: Spatial reference system
+    definition: The spatial reference system for the data, specified as [EPSG code](http://www.epsg-registry.org/), [WKT2 (ISO 19162) string](http://docs.opengeospatial.org/is/18-010r7/18-010r7.html),
+      [PROJJSON object](https://proj.org/specifications/projjson.html) or [PROJ definition (deprecated)](https://proj.org/usage/quickstart.html).
+      Defaults to EPSG code 4326.
+    tags:
+    - Object
+    source: openapi/openeo-openapi.yml#/components/schemas/collection_dimension_srs
+  - term: collection_dimension_extent_open
+    definition: If the dimension consists of [ordinal](https://en.wikipedia.org/wiki/Level_of_measurement#Ordinal_scale) values, the extent (lower
+      and upper bounds) of the values as two-dimensional array. Use `null` for open intervals.
+    tags:
+    - Object
+    source: openapi/openeo-openapi.yml#/components/schemas/collection_dimension_extent_open
+  - term: collection_dimension_values
+    definition: A set of all potential values, especially useful for [nominal](https://en.wikipedia.org/wiki/Level_of_measurement#Nominal_level)
+      values. **Important:** The order of the values MUST be exactly how the dimension values are also ordered in the data (cube). If the values
+      specify band names, the values MUST be in the same order as they are in the corresponding band fields (i.e. `eo:bands` or `sar:bands
+    tags:
+    - Object
+    source: openapi/openeo-openapi.yml#/components/schemas/collection_dimension_values
+  - term: collection_dimension_step
+    definition: If the dimension consists of [interval](https://en.wikipedia.org/wiki/Level_of_measurement#Interval_scale) values, the space between
+      the values. Use `null` for irregularly spaced steps.
+    tags:
+    - Object
+    source: openapi/openeo-openapi.yml#/components/schemas/collection_dimension_step
+  - term: collection_dimension_unit
+    definition: The unit of measurement for the data, preferably compliant to [UDUNITS-2](https://ncics.org/portfolio/other-resources/udunits2/)
+      units (singular).
+    tags:
+    - Object
+    source: openapi/openeo-openapi.yml#/components/schemas/collection_dimension_unit
+  - term: Process Argument Value
+    definition: Arguments for a process. See the API documentation for more information.
+    tags:
+    - Object
+    source: openapi/openeo-openapi.yml#/components/schemas/process_argument_value
+  - term: Process Graph
+    definition: A process graph defines a graph-like structure as a connected set of executable processes. Each key is a unique identifier (node
+      ID) that is used to refer to the process in the graph.
+    tags:
+    - Object
+    source: openapi/openeo-openapi.yml#/components/schemas/process_graph
+  - term: Process
+    definition: 'Object declared by the contract with fields: id, summary, description, categories, parameters, returns, deprecated, experimental,
+      exceptions, examples, links, process_graph.'
+    tags:
+    - Object
+    source: openapi/openeo-openapi.yml#/components/schemas/process
+  - term: User-defined Process Metadata
+    definition: A user-defined process, may only contain metadata and no process graph.
+    tags:
+    - Object
+    source: openapi/openeo-openapi.yml#/components/schemas/user_defined_process_meta
+  - term: Process Graph with metadata
+    definition: A process graph, optionally enriched with process metadata.
+    tags:
+    - Object
+    source: openapi/openeo-openapi.yml#/components/schemas/process_graph_with_metadata
+  - term: process_namespace
+    definition: 'The namespace the `process_id` is valid for. The following options are predefined by the openEO API, but additional namespaces
+      may be introduced by back-ends or in a future version of the API. * `null` (default): Checks both user-defined and predefined processes,
+      but prefers user-defined processes if both are available. This allows users to add missing predefined processes for portability, e.g. co'
+    tags:
+    - Object
+    source: openapi/openeo-openapi.yml#/components/schemas/process_namespace
+  - term: process_id
+    definition: The identifier for the process. It MUST be unique across its namespace (e.g. predefined processes or user-defined processes).
+      Clients SHOULD warn the user if a user-defined process is added with the same identifier as one of the predefined process.
+    tags:
+    - Object
+    source: openapi/openeo-openapi.yml#/components/schemas/process_id
+  - term: process_summary
+    definition: A short summary of what the process does.
+    tags:
+    - Object
+    source: openapi/openeo-openapi.yml#/components/schemas/process_summary
+  - term: process_categories
+    definition: A list of categories.
+    tags:
+    - Object
+    source: openapi/openeo-openapi.yml#/components/schemas/process_categories
+  - term: Process Return Value
+    definition: Description of the data that is returned by this process.
+    tags:
+    - Object
+    source: openapi/openeo-openapi.yml#/components/schemas/process_return_value
+  - term: experimental
+    definition: Declares that the specified entity is experimental, which means that it is likely to change or may produce unpredictable behavior.
+      Users should refrain from using it in production, but still feel encouraged to try it out and give feedback.
+    tags:
+    - Object
+    source: openapi/openeo-openapi.yml#/components/schemas/experimental
+  - term: deprecated
+    definition: Declares that the specified entity is deprecated with the potential to be removed in any of the next versions. It should be transitioned
+      out of usage as soon as possible and users should refrain from using it in new implementations.
+    tags:
+    - Object
+    source: openapi/openeo-openapi.yml#/components/schemas/deprecated
+  - term: Process Exceptions
+    definition: Declares exceptions (errors) that might occur during execution of this process. This list is just for informative purposes and
+      may be incomplete. This list MUST only contain exceptions that stop the execution of a process and MUST NOT contain warnings, notices or
+      debugging messages. It is meant to primarily contain errors that have been caused by the user. It is RECOMMENDED that exceptions are ref
+    tags:
+    - Object
+    source: openapi/openeo-openapi.yml#/components/schemas/process_exceptions
+  - term: process_parameters
+    definition: A list of parameters. The order in the array corresponds to the parameter order to be used in clients that do not support named
+      parameters. **Note:** Specifying an empty array is different from (if allowed) `null` or the property being absent. An empty array means
+      the process has no parameters. `null` / property absent means that the parameters are unknown as the user has not specified them. There
+    tags:
+    - Object
+    source: openapi/openeo-openapi.yml#/components/schemas/process_parameters
+  - term: base_parameter
+    definition: 'Object declared by the contract with fields: name, description, optional, deprecated, experimental, default.'
+    tags:
+    - Object
+    source: openapi/openeo-openapi.yml#/components/schemas/base_parameter
+  - term: Parameter
+    definition: 'Object declared by the contract with fields: schema.'
+    tags:
+    - Object
+    source: openapi/openeo-openapi.yml#/components/schemas/parameter
+  - term: Process Parameter
+    definition: 'Object declared by the contract with fields: schema.'
+    tags:
+    - Object
+    source: openapi/openeo-openapi.yml#/components/schemas/process_parameter
+  - term: Batch Job
+    definition: The metadata of a batch jobs that has been submitted by the authenticated user.
+    tags:
+    - Object
+    source: openapi/openeo-openapi.yml#/components/schemas/batch_job
+  - term: job_id
+    definition: Per-back-end unique identifier of the batch job, generated by the back-end during creation. MUST match the specified pattern.
+    tags:
+    - Object
+    source: openapi/openeo-openapi.yml#/components/schemas/job_id
+  - term: created
+    definition: 'Date and time of creation (for batch jobs: the status ''created'' was set), formatted as a [RFC 3339](https://www.rfc-editor.org/rfc/rfc3339.html)
+      date-time.'
+    tags:
+    - Object
+    source: openapi/openeo-openapi.yml#/components/schemas/created
+  - term: updated
+    definition: Date and time of the last status change, formatted as a [RFC 3339](https://www.rfc-editor.org/rfc/rfc3339.html) date-time. If
+      the status is `error`, `canceled` or `finished`, this is the time when the job has ended.
+    tags:
+    - Object
+    source: openapi/openeo-openapi.yml#/components/schemas/updated
+  - term: queued
+    definition: Date and time of queueing the batch job (i.e., when the status 'queued' was set), formatted as a [RFC 3339](https://www.rfc-editor.org/rfc/rfc3339.html)
+      date-time.
+    tags:
+    - Object
+    source: openapi/openeo-openapi.yml#/components/schemas/queued
+  - term: started
+    definition: Date and time when the batch job started processing (i.e., when the status 'running' was set), formatted as a [RFC 3339](https://www.rfc-editor.org/rfc/rfc3339.html)
+      date-time.
+    tags:
+    - Object
+    source: openapi/openeo-openapi.yml#/components/schemas/started
+  - term: expires
+    definition: Time in UTC until which the assets and this document are accessible via the signed URL that is provided with the relation type
+      `canonical` in the links. Formatted as a [RFC 3339](https://www.rfc-editor.org/rfc/rfc3339.html) date-time. After expiration, a document
+      with new signed URLs can be retrieved through an authenticated request to this endpoint.
+    tags:
+    - Object
+    source: openapi/openeo-openapi.yml#/components/schemas/expires
+  - term: unpublished
+    definition: Time until which the batch job results are stored on the back-end, in UTC. Formatted as a [RFC 3339](https://www.rfc-editor.org/rfc/rfc3339.html)
+      date-time.
+    tags:
+    - Object
+    source: openapi/openeo-openapi.yml#/components/schemas/unpublished
+  - term: description
+    definition: Detailed description to explain the entity. [CommonMark 0.29](http://commonmark.org/) syntax MAY be used for rich text representation.
+    tags:
+    - Object
+    source: openapi/openeo-openapi.yml#/components/schemas/description
+  - term: object_title
+    definition: 'A human-readable short title to be displayed to users **in addition** to the names specified in the keys. This property is only
+      for better user experience so that users can understand the names better. Example titles could be `GeoTiff` for the key `GTiff` (for file
+      formats) or `OGC Web Map Service` for the key `WMS` (for service types). The title MUST NOT be used in communication (e.g. in process '
+    tags:
+    - Object
+    source: openapi/openeo-openapi.yml#/components/schemas/object_title
+  - term: eo_title
+    definition: A short description to easily distinguish entities.
+    tags:
+    - Object
+    source: openapi/openeo-openapi.yml#/components/schemas/eo_title
+  - term: eo_description
+    definition: Detailed multi-line description to explain the entity. [CommonMark 0.29](http://commonmark.org/) syntax MAY be used for rich text
+      representation.
+    tags:
+    - Object
+    source: openapi/openeo-openapi.yml#/components/schemas/eo_description
+  - term: process_description
+    definition: 'Detailed description to explain the entity. [CommonMark 0.29](http://commonmark.org/) syntax MAY be used for rich text representation.
+      In addition to the CommonMark syntax, clients can convert process IDs that are formatted as in the following example into links instead
+      of code blocks: ``` ``process_id()`` ```'
+    tags:
+    - Object
+    source: openapi/openeo-openapi.yml#/components/schemas/process_description
+  - term: Secondary Web Service
+    definition: The metadata of a secondary web service that has been submitted by the authenticated user.
+    tags:
+    - Object
+    source: openapi/openeo-openapi.yml#/components/schemas/service
+  - term: service_type
+    definition: Definition of the service type to access result data. All available service types can be retrieved via `GET /service_types`. Service
+      types MUST be accepted in a *case insensitive* manner.
+    tags:
+    - Object
+    source: openapi/openeo-openapi.yml#/components/schemas/service_type

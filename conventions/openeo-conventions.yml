@@ -1,0 +1,56 @@
+generated: '2026-10-09'
+method: derived
+source: openapi/openeo-openapi.yml (info.description API Principles, components.parameters.pagination_limit, components.schemas.error)
+auth:
+  style: HTTP Bearer (OIDC access token or Basic-derived token; JWT allowed since 1.3.0); HTTP Basic to obtain a
+    token
+  see: authentication/openeo-authentication.yml
+idempotency:
+  coverage: none
+  note: No idempotency key mechanism in the spec. PUT /process_graphs/{process_graph_id} and PUT /files/{path} are
+    idempotent by HTTP semantics; POST create-job/create-service/compute-result are not replay-protected.
+pagination:
+  style: limit + links
+  params:
+  - limit
+  response_fields:
+  - links
+  note: '`limit` enables pagination; next/prev/first/last are delivered as rel links in the `links` array (links_pagination
+    schema).'
+linking: Web Linking with rel types in `links` arrays; Link header exposed via CORS
+request_id:
+  header: OpenEO-Identifier
+  note: Returned on create endpoints and (since 1.3.0) on POST /result; error objects carry an `id` for tracing.
+costs:
+  header: OpenEO-Costs
+versioning:
+  see: lifecycle/openeo-lifecycle.yml
+errors:
+  envelope:
+  - id
+  - code
+  - message
+  - links
+  see: errors/openeo-error-codes.yml
+rate_limit_signaling:
+  documented: false
+  note: Spec states only that calls failing due to rate limiting or quota MUST NOT count as server errors; no headers
+    defined.
+reversibility:
+  grade: documented
+  surfaces:
+  - surface: batch jobs
+    reversal: stop-job (DELETE /jobs/{job_id}/results)
+    window: null
+    note: Cancels processing of a queued/running job; delete-job removes it. No window stated.
+  - surface: secondary web services
+    reversal: update-service (PATCH /services/{service_id}) / delete-service
+    window: null
+  - surface: user-defined processes
+    reversal: delete-custom-process
+    window: null
+    note: Delete is permanent; no restore operation.
+  - surface: files
+    reversal: delete-file
+    window: null
+  note: Reversal operations exist (stop/delete/update) but no reversal window is stated in the spec.

@@ -1,0 +1,137 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/api-evangelist/openeo/main/json-schema/openeo-resource-parameter-schema.json",
+  "title": "Resource Parameter",
+  "description": "Describes a parameter for various resources (e.g. file formats, service types).\n\nThe parameters are specified according to the [JSON Schema draft-07](http://json-schema.org/) specification.\nSee the chapter ['Schemas' in 'Defining Processes'](#section/Processes/Defining-Processes) for more information.\n\nThe following more complex JSON Schema keywords SHOULD NOT be used:\n`if`, `then`, `else`, `readOnly`, `writeOnly`, `dependencies`, `minProperties`, `maxProperties`, `patternProperties`.\n\nJSON Schemas SHOULD always be dereferenced (i.e. all `$refs` should be resolved). This allows clients to consume the schemas much better.\nClients are not expected to support dereferencing `$refs`.\n\nNote: The specified schema is only a common subset of JSON Schema. Additional keywords MAY be used.",
+  "x-generated": "2026-10-09",
+  "x-method": "derived",
+  "x-generator": "derive-json-schema.py",
+  "x-source": "openapi/openeo-openapi.yml#/components/schemas/resource_parameter",
+  "x-additionalPropertiesName": "Parameter Name",
+  "type": "object",
+  "required": [
+    "description"
+  ],
+  "properties": {
+    "description": {
+      "type": "string",
+      "description": "A brief description of the parameter according to [JSON Schema draft-07](https://json-schema.org/draft-07/json-schema-validation.html#rfc.section.10.1)."
+    },
+    "required": {
+      "type": "boolean",
+      "description": "Determines whether this parameter is mandatory.",
+      "default": false
+    },
+    "experimental": {
+      "$ref": "#/$defs/experimental"
+    },
+    "default": {
+      "description": "The default value represents what would be assumed by the consumer of the input as the value of the parameter if none is provided. The value MUST conform to the defined type for the parameter defined at the same level. For example, if type is string, then default can be \"foo\" but cannot be 1. See [JSON Schema draft-07](https://json-schema.org/draft-07/json-schema-validation.html#rfc.section.10.2)."
+    }
+  },
+  "allOf": [
+    {
+      "$ref": "#/$defs/json_schema"
+    }
+  ],
+  "$defs": {
+    "experimental": {
+      "type": "boolean",
+      "description": "Declares that the specified entity is experimental, which means that it is likely to change or may produce unpredictable behavior. Users should refrain from using it in production, but still feel encouraged to try it out and give feedback.",
+      "default": false
+    },
+    "json_schema": {
+      "type": "object",
+      "title": "JSON Schema",
+      "description": "A JSON Schema compliant to [JSON Schema draft-07](https://json-schema.org/draft-07/json-schema-validation.html) or later.\n\nJSON Schemas SHOULD always be dereferenced (i.e. all `$refs` should be resolved).\nThis allows clients to consume the schemas much better.\nClients are not expected to support dereferencing `$refs`.\n\nNote: The specified schema in the OpenAPI document is only a common subset of JSON Schema.\nAdditional keywords from the JSON Schema specification MAY be used.",
+      "properties": {
+        "$schema": {
+          "description": "The JSON Schema version. If not given in the context of openEO,\ndefaults to JSON Schema draft-07: `http://json-schema.org/draft-07/schema#`\n\nThe default value for `$schema` property may have to be added to the JSON Schema\nobject before passing it to a JSON Schema validator.",
+          "type": "string",
+          "format": "uri",
+          "default": "http://json-schema.org/draft-07/schema#"
+        },
+        "$id": {
+          "description": "ID of your JSON Schema.",
+          "type": "string",
+          "format": "uri"
+        },
+        "type": {
+          "description": "The allowed data type(s) for a value.\n\nIf this property is not present, all data types are allowed.",
+          "oneOf": [
+            {
+              "$ref": "#/$defs/json_schema_type"
+            },
+            {
+              "type": "array",
+              "minItems": 1,
+              "uniqueItems": true,
+              "items": {
+                "$ref": "#/$defs/json_schema_type"
+              }
+            }
+          ]
+        },
+        "pattern": {
+          "type": "string",
+          "format": "regex",
+          "description": "The regular expression a string value must match against."
+        },
+        "enum": {
+          "type": "array",
+          "items": {},
+          "description": "An exclusive list of allowed values."
+        },
+        "minimum": {
+          "type": "number",
+          "description": "The minimum value (inclusive) allowed for a numerical value."
+        },
+        "maximum": {
+          "type": "number",
+          "description": "The maximum value (inclusive) allowed for a numerical value."
+        },
+        "minItems": {
+          "type": "number",
+          "minimum": 0,
+          "default": 0,
+          "description": "The minimum number of items required in an array."
+        },
+        "maxItems": {
+          "type": "number",
+          "minimum": 0,
+          "description": "The maximum number of items required in an array."
+        },
+        "items": {
+          "description": "Specifies schemas for the items in an array.",
+          "anyOf": [
+            {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "$ref": "#/$defs/json_schema"
+              }
+            },
+            {
+              "$ref": "#/$defs/json_schema"
+            }
+          ]
+        }
+      },
+      "additionalProperties": {
+        "description": "Any other property supported by the JSON Schema version that is given through the property `$schema` are allowed. Defaults to JSON Schema [draft-07](https://json-schema.org/draft-07/json-schema-validation.html), but can also be any later version of JSON Schema."
+      }
+    },
+    "json_schema_type": {
+      "type": "string",
+      "enum": [
+        "array",
+        "boolean",
+        "integer",
+        "null",
+        "number",
+        "object",
+        "string"
+      ]
+    }
+  }
+}

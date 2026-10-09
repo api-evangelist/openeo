@@ -1,0 +1,15 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/api-evangelist/openeo/main/json-schema/openeo-order-parameters-schema.json",
+  "title": "order_parameters",
+  "description": "Key-value pairs of available `order_parameters` as listed at `GET /collections/{collection_id}` for filtering available items.",
+  "x-generated": "2026-10-09",
+  "x-method": "derived",
+  "x-generator": "derive-json-schema.py",
+  "x-source": "openapi/openeo-commercial-data-openapi.yml#/components/schemas/order_parameters",
+  "type": "object",
+  "additionalProperties": {
+    "x-additionalPropertiesName": "Order Parameter Name",
+    "description": "Value of the order parameter for the request."
+  }
+}

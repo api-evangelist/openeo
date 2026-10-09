@@ -1,0 +1,32 @@
+overlay: 1.0.0
+info:
+  title: API Evangelist overlay for openEO API - Commercial Data Extension
+  version: 1.0.0
+extends: ../openapi/_original/openeo-commercial-data-openapi.yml
+x-generated: '2026-10-09'
+x-method: generated
+actions:
+- target: $.info
+  update:
+    x-provider: openeo
+    x-apis-json: https://raw.githubusercontent.com/api-evangelist/openeo/refs/heads/main/apis.yml
+- target: $.paths['/orders'].get
+  update:
+    x-agent-readonly: true
+    x-mcp-tool: list_orders
+- target: $.paths['/orders'].post
+  update:
+    x-agent-readonly: false
+    x-mcp-tool: create_order
+- target: $.paths['/orders/{order_id}'].get
+  update:
+    x-agent-readonly: true
+    x-mcp-tool: describe_order
+- target: $.paths['/orders/{order_id}'].post
+  update:
+    x-agent-readonly: false
+    x-mcp-tool: confirm_order
+- target: $.paths['/orders/{order_id}'].delete
+  update:
+    x-agent-readonly: false
+    x-mcp-tool: delete_order

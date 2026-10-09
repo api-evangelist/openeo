@@ -1,0 +1,14 @@
+name: openEO Agent Skills
+type: AgentSkill
+generated: '2026-10-09'
+method: generated
+source: openapi/openeo-openapi.yml
+note: No provider-published skills or AGENTS.md were found (https://openeo.org/AGENTS.md returned 404); skills are generated from the openEO API v1.3.0 operations.
+skills:
+- {name: openeo-discover-backend, file: skills/openeo-discover-backend.md}
+- {name: openeo-authenticate, file: skills/openeo-authenticate.md}
+- {name: openeo-synchronous-processing, file: skills/openeo-synchronous-processing.md}
+- {name: openeo-batch-job, file: skills/openeo-batch-job.md}
+- {name: openeo-user-defined-processes, file: skills/openeo-user-defined-processes.md}
+- {name: openeo-secondary-services, file: skills/openeo-secondary-services.md}
+- {name: openeo-file-workspace, file: skills/openeo-file-workspace.md}

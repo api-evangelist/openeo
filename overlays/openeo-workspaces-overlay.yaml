@@ -1,0 +1,36 @@
+overlay: 1.0.0
+info:
+  title: API Evangelist overlay for openEO API - Workspaces Extension
+  version: 1.0.0
+extends: ../openapi/_original/openeo-workspaces-openapi.yml
+x-generated: '2026-10-09'
+x-method: generated
+actions:
+- target: $.info
+  update:
+    x-provider: openeo
+    x-apis-json: https://raw.githubusercontent.com/api-evangelist/openeo/refs/heads/main/apis.yml
+- target: $.paths['/workspace_providers'].get
+  update:
+    x-agent-readonly: true
+    x-mcp-tool: list_workspace_providers
+- target: $.paths['/workspaces'].get
+  update:
+    x-agent-readonly: true
+    x-mcp-tool: list_workspaces
+- target: $.paths['/workspaces'].post
+  update:
+    x-agent-readonly: false
+    x-mcp-tool: create_workspace
+- target: $.paths['/workspaces/{workspace_id}'].get
+  update:
+    x-agent-readonly: true
+    x-mcp-tool: describe_workspace
+- target: $.paths['/workspaces/{workspace_id}'].delete
+  update:
+    x-agent-readonly: false
+    x-mcp-tool: delete_workspace
+- target: $.paths['/workspaces/{workspace_id}'].patch
+  update:
+    x-agent-readonly: false
+    x-mcp-tool: update_workspace

@@ -1,0 +1,62 @@
+generated: '2026-10-09'
+method: searched
+source: https://pypi.org/pypi/openeo/json; https://registry.npmjs.org/@openeo/js-client; https://crandb.r-pkg.org/openeo
+packages:
+- name: openeo
+  registry: pypi
+  url: https://pypi.org/project/openeo/
+  language: Python
+  official: true
+  version: 0.53.0
+  published: '2026-10-06'
+  source_code: https://github.com/Open-EO/openeo-python-client
+  ownership_audit: metadata names openeo.org
+- name: '@openeo/js-client'
+  registry: npm
+  url: https://www.npmjs.com/package/@openeo/js-client
+  language: JavaScript
+  official: true
+  version: 2.12.0
+  published: '2026-04-17'
+  ownership_audit: metadata names openeo.org
+- name: '@openeo/js-commons'
+  registry: npm
+  url: https://www.npmjs.com/package/@openeo/js-commons
+  language: JavaScript
+  official: true
+  version: 1.5.0
+  published: '2024-08-12'
+  ownership_audit: metadata names openeo.org
+- name: '@openeo/js-processgraphs'
+  registry: npm
+  url: https://www.npmjs.com/package/@openeo/js-processgraphs
+  language: JavaScript
+  official: true
+  version: 1.4.2
+  published: '2026-02-26'
+  ownership_audit: metadata names openeo.org
+- name: openeo
+  registry: cran
+  url: https://cran.r-project.org/package=openeo
+  language: R
+  official: true
+  version: 1.4.1
+  published: '2025-07-29'
+- name: openeo-processes-dask
+  registry: pypi
+  url: https://pypi.org/project/openeo-processes-dask/
+  language: Python
+  official: true
+  version: 2026.9.1
+  published: '2026-09-30'
+  note: Back-end-side process implementations (Dask), published from the Open-EO GitHub org.
+  ownership_audit: metadata names openeo.org
+- name: openeo-pg-parser-networkx
+  registry: pypi
+  url: https://pypi.org/project/openeo-pg-parser-networkx/
+  language: Python
+  official: false
+  version: 2026.3.3
+  published: '2026-03-30'
+  note: Back-end-side process graph parser, published from the Open-EO GitHub org.
+  ownership_audit: 'registry metadata names neither the provider''s domain nor its GitHub org: official downgraded (harvest-packages.py --audit)'

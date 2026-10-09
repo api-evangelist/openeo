@@ -1,0 +1,38 @@
+generated: '2026-10-09'
+method: derived
+generator: derive-problem-types.py
+source:
+- openapi/openeo-commercial-data-openapi.yml
+- openapi/openeo-openapi.yml
+- openapi/openeo-processing-parameters-openapi.yml
+- openapi/openeo-workspaces-openapi.yml
+format: custom
+envelope:
+  media_type: application/json
+  schema: error
+coverage:
+  operations: 51
+  statuses_declared: 3
+problems:
+- status: 424
+  title: Failed Dependency
+  description: The request can not be fulfilled as the batch job failed. This request will deliver the last error
+    message that was produced by the batch jo
+  operations: 1
+  media_types:
+  - application/json
+  schema: log_entry
+- status: 4XX
+  title: null
+  description: The request can not be fulfilled due to an error on client-side, i.e. the
+  operations: 51
+  media_types:
+  - application/json
+  schema: error
+- status: 5XX
+  title: null
+  description: The request can not be fulfilled due to an error at the back-end. The
+  operations: 51
+  media_types:
+  - application/json
+  schema: error

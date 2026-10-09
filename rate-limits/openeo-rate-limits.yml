@@ -1,0 +1,7 @@
+generated: '2026-10-09'
+method: none
+name: openEO
+limit_count: 0
+limits: []
+note: The openEO API spec defines no rate limits or rate-limit headers; limits are back-end specific. It defines
+  StorageQuotaExceeded and PaymentRequired error codes and a per-user disk quota on GET /files.

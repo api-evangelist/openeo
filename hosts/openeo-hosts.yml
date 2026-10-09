@@ -1,0 +1,162 @@
+generated: '2026-10-09'
+method: derived
+source: the pre-flight dossier, apis.yml pointers, spec servers, well-known, vendors -- nothing fetched here
+generator: derive-hosts.py
+summary:
+  hosts: 11
+  own: 6
+  other_domain: 2
+  platform: 3
+  roles:
+  - api
+  - docs
+  - other
+  - source
+  - website
+hosts:
+- host: api.bsky.app
+  found_by:
+  - contract-discovery
+  types: []
+  serves: []
+  registrable_domain: bsky.app
+  role: api
+  relation: other-domain
+- host: api.openeo.org
+  found_by:
+  - pointer
+  - apis[]
+  - probed
+  - site-links
+  - docs-index
+  - contract-discovery
+  - well-known
+  - vendor-detect
+  types:
+  - APIReference
+  serves:
+  - docs
+  - documentation
+  - hosting
+  vendor: redocly
+  registrable_domain: openeo.org
+  role: docs
+  relation: own
+- host: bsky.app
+  found_by:
+  - pointer
+  - probed
+  - well-known
+  types:
+  - Bluesky
+  serves: []
+  registrable_domain: bsky.app
+  role: other
+  relation: other-domain
+- host: docs.openeo.org
+  found_by:
+  - probed
+  - site-links
+  - namespace-probe
+  - well-known
+  types: []
+  serves: []
+  title: Introduction | openEO
+  status: 200
+  registrable_domain: openeo.org
+  role: docs
+  relation: own
+- host: editor.openeo.org
+  found_by:
+  - pointer
+  - probed
+  - site-links
+  - well-known
+  types:
+  - WebEditor
+  serves: []
+  registrable_domain: openeo.org
+  role: other
+  relation: own
+- host: github.com
+  found_by:
+  - pointer
+  - apis[]
+  types:
+  - ChangeLog
+  - SpectralRules
+  - GitHubOrganization
+  serves:
+  - docs
+  registrable_domain: github.com
+  role: source
+  relation: platform
+- host: hub.openeo.org
+  found_by:
+  - pointer
+  - probed
+  - site-links
+  - contract-discovery
+  - well-known
+  types:
+  - Hub
+  serves: []
+  registrable_domain: openeo.org
+  role: other
+  relation: own
+- host: openeo.org
+  found_by:
+  - pointer
+  - probed
+  - docs-index
+  - contract-discovery
+  - well-known
+  - vendor-detect
+  types:
+  - Website
+  - Documentation
+  - DeveloperPortal
+  - GettingStarted
+  - Authentication
+  - Software
+  - About
+  - Support
+  - Blog
+  serves:
+  - docs
+  - cdn
+  vendor: fastly
+  registrable_domain: openeo.org
+  role: website
+  relation: own
+- host: processes.openeo.org
+  found_by:
+  - pointer
+  - probed
+  - site-links
+  - contract-discovery
+  - well-known
+  types:
+  - ProcessesReference
+  serves: []
+  registrable_domain: openeo.org
+  role: other
+  relation: own
+- host: www.linkedin.com
+  found_by:
+  - pointer
+  types:
+  - LinkedIn
+  serves: []
+  registrable_domain: linkedin.com
+  role: other
+  relation: platform
+- host: www.youtube.com
+  found_by:
+  - pointer
+  types:
+  - YouTube
+  serves: []
+  registrable_domain: youtube.com
+  role: other
+  relation: platform

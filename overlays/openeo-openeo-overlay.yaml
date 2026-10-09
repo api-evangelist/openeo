@@ -1,0 +1,168 @@
+overlay: 1.0.0
+info:
+  title: API Evangelist overlay for openEO API
+  version: 1.0.0
+extends: ../openapi/_original/openeo-openapi.yml
+x-generated: '2026-10-09'
+x-method: generated
+actions:
+- target: $.info
+  update:
+    x-provider: openeo
+    x-apis-json: https://raw.githubusercontent.com/api-evangelist/openeo/refs/heads/main/apis.yml
+- target: $.paths['/'].get
+  update:
+    x-agent-readonly: true
+    x-mcp-tool: capabilities
+- target: $.paths['/.well-known/openeo'].get
+  update:
+    x-agent-readonly: true
+    x-mcp-tool: connect
+- target: $.paths['/file_formats'].get
+  update:
+    x-agent-readonly: true
+    x-mcp-tool: list_file_types
+- target: $.paths['/conformance'].get
+  update:
+    x-agent-readonly: true
+    x-mcp-tool: conformance
+- target: $.paths['/collections'].get
+  update:
+    x-agent-readonly: true
+    x-mcp-tool: list_collections
+- target: $.paths['/collections/{collection_id}'].get
+  update:
+    x-agent-readonly: true
+    x-mcp-tool: describe_collection
+- target: $.paths['/collections/{collection_id}/queryables'].get
+  update:
+    x-agent-readonly: true
+    x-mcp-tool: list_collection_queryables
+- target: $.paths['/processes'].get
+  update:
+    x-agent-readonly: true
+    x-mcp-tool: list_processes
+- target: $.paths['/udf_runtimes'].get
+  update:
+    x-agent-readonly: true
+    x-mcp-tool: list_udf_runtimes
+- target: $.paths['/credentials/oidc'].get
+  update:
+    x-agent-readonly: true
+    x-mcp-tool: authenticate_oidc
+- target: $.paths['/credentials/basic'].get
+  update:
+    x-agent-readonly: true
+    x-mcp-tool: authenticate_basic
+- target: $.paths['/validation'].post
+  update:
+    x-agent-readonly: false
+    x-mcp-tool: validate_custom_process
+- target: $.paths['/result'].post
+  update:
+    x-agent-readonly: false
+    x-mcp-tool: compute_result
+- target: $.paths['/process_graphs'].get
+  update:
+    x-agent-readonly: true
+    x-mcp-tool: list_custom_processes
+- target: $.paths['/process_graphs/{process_graph_id}'].get
+  update:
+    x-agent-readonly: true
+    x-mcp-tool: describe_custom_process
+- target: $.paths['/process_graphs/{process_graph_id}'].put
+  update:
+    x-agent-readonly: false
+    x-mcp-tool: store_custom_process
+- target: $.paths['/process_graphs/{process_graph_id}'].delete
+  update:
+    x-agent-readonly: false
+    x-mcp-tool: delete_custom_process
+- target: $.paths['/service_types'].get
+  update:
+    x-agent-readonly: true
+    x-mcp-tool: list_service_types
+- target: $.paths['/services'].get
+  update:
+    x-agent-readonly: true
+    x-mcp-tool: list_services
+- target: $.paths['/services'].post
+  update:
+    x-agent-readonly: false
+    x-mcp-tool: create_service
+- target: $.paths['/services/{service_id}'].patch
+  update:
+    x-agent-readonly: false
+    x-mcp-tool: update_service
+- target: $.paths['/services/{service_id}'].get
+  update:
+    x-agent-readonly: true
+    x-mcp-tool: describe_service
+- target: $.paths['/services/{service_id}'].delete
+  update:
+    x-agent-readonly: false
+    x-mcp-tool: delete_service
+- target: $.paths['/services/{service_id}/logs'].get
+  update:
+    x-agent-readonly: true
+    x-mcp-tool: debug_service
+- target: $.paths['/jobs'].get
+  update:
+    x-agent-readonly: true
+    x-mcp-tool: list_jobs
+- target: $.paths['/jobs'].post
+  update:
+    x-agent-readonly: false
+    x-mcp-tool: create_job
+- target: $.paths['/jobs/{job_id}'].patch
+  update:
+    x-agent-readonly: false
+    x-mcp-tool: update_job
+- target: $.paths['/jobs/{job_id}'].get
+  update:
+    x-agent-readonly: true
+    x-mcp-tool: describe_job
+- target: $.paths['/jobs/{job_id}'].delete
+  update:
+    x-agent-readonly: false
+    x-mcp-tool: delete_job
+- target: $.paths['/jobs/{job_id}/estimate'].get
+  update:
+    x-agent-readonly: true
+    x-mcp-tool: estimate_job
+- target: $.paths['/jobs/{job_id}/logs'].get
+  update:
+    x-agent-readonly: true
+    x-mcp-tool: debug_job
+- target: $.paths['/jobs/{job_id}/results'].get
+  update:
+    x-agent-readonly: true
+    x-mcp-tool: list_results
+- target: $.paths['/jobs/{job_id}/results'].post
+  update:
+    x-agent-readonly: false
+    x-mcp-tool: start_job
+- target: $.paths['/jobs/{job_id}/results'].delete
+  update:
+    x-agent-readonly: false
+    x-mcp-tool: stop_job
+- target: $.paths['/files'].get
+  update:
+    x-agent-readonly: true
+    x-mcp-tool: list_files
+- target: $.paths['/files/{path}'].get
+  update:
+    x-agent-readonly: true
+    x-mcp-tool: download_file
+- target: $.paths['/files/{path}'].put
+  update:
+    x-agent-readonly: false
+    x-mcp-tool: upload_file
+- target: $.paths['/files/{path}'].delete
+  update:
+    x-agent-readonly: false
+    x-mcp-tool: delete_file
+- target: $.paths['/me'].get
+  update:
+    x-agent-readonly: true
+    x-mcp-tool: describe_account

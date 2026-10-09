@@ -1,0 +1,100 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/api-evangelist/openeo/main/json-schema/openeo-order-schema.json",
+  "title": "Order",
+  "description": "Information about an order.\nThe properties with the `order:` prefix follow the fields defined in the [STAC Order Extension](https://github.com/stac-extensions/order/tree/v1.0.0).",
+  "x-generated": "2026-10-09",
+  "x-method": "derived",
+  "x-generator": "derive-json-schema.py",
+  "x-source": "openapi/openeo-commercial-data-openapi.yml#/components/schemas/order",
+  "type": "object",
+  "required": [
+    "id",
+    "order:status",
+    "order:date",
+    "source_collection_id",
+    "target_collection_id",
+    "costs"
+  ],
+  "properties": {
+    "id": {
+      "$ref": "#/$defs/order_id"
+    },
+    "order:id": {
+      "type": "string",
+      "description": "Identifier of the order at the data provider."
+    },
+    "order:status": {
+      "type": "string",
+      "description": "The status of the order.\n* `orderable`: The item or asset is orderable via the provider scenario.\n* `ordered`: The item or asset is ordered and the provider is preparing to make it available.\n* `pending`: The item or asset is ordered but wait for an activation before being able for shipping.\n* `shipping` The item or asset order are being processed by the provider to provide you with the asset(s).\n* `succeeded`: The provider has delivered your order and asset(s) are available.\n* `failed`: The provider is not able to deliver the order.\n* `canceled` The order has been canceled.",
+      "enum": [
+        "orderable",
+        "ordered",
+        "pending",
+        "shipping",
+        "succeeded",
+        "failed",
+        "canceled"
+      ]
+    },
+    "order:date": {
+      "type": "string",
+      "format": "date-time",
+      "description": "The order time. Formatted as a [RFC 3339](https://www.rfc-editor.org/rfc/rfc3339.html) date-time."
+    },
+    "order:expiration_date": {
+      "type": "string",
+      "format": "date-time",
+      "description": "The validity time of the order. Formatted as a [RFC 3339](https://www.rfc-editor.org/rfc/rfc3339.html) date-time."
+    },
+    "source_collection_id": {
+      "type": "string",
+      "description": "Unique identifier of the source collection.",
+      "pattern": "^[\\w\\-\\.~\\/]+$"
+    },
+    "target_collection_id": {
+      "type": "string",
+      "description": "Unique identifier of the target collection. Can be the same as `source_collection_id`.",
+      "pattern": "^[\\w\\-\\.~\\/]+$"
+    },
+    "costs": {
+      "$ref": "../../openapi.yaml#/components/schemas/money"
+    },
+    "parameters": {
+      "$ref": "#/$defs/order_parameters"
+    },
+    "items": {
+      "type": "array",
+      "description": "List of ordered item IDs.",
+      "items": {
+        "$ref": "#/$defs/item_id"
+      }
+    },
+    "links": {
+      "type": "array",
+      "description": "Links related to this order, e.g. to metadata for ordered items\nlisted in `items`.\n\nIt is highly RECOMMENDED to provide links with the\nfollowing `rel` (relation) types:\n\n1. `item`: A link back to a valid STAC Item that has been ordered.\nCould be a link to `GET /collections/{collection_id}/items/{item_id}`.\n\n2. `order`: A link pointing to a dcoument describing the ordering\nterms and conditions of the data provider.\n\nFor additional relation types see also the lists of\n[common relation types in openEO](#section/API-Principles/Web-Linking).",
+      "items": {
+        "$ref": "../../openapi.yaml#/components/schemas/link"
+      }
+    }
+  },
+  "$defs": {
+    "item_id": {
+      "type": "string",
+      "description": "Unique identifier of the item. Must be unique within a collection."
+    },
+    "order_id": {
+      "type": "string",
+      "description": "Unique identifier of the order at the back-end, which MUST match the specified pattern.",
+      "pattern": "^[\\w\\-\\.~]+$"
+    },
+    "order_parameters": {
+      "type": "object",
+      "description": "Key-value pairs of available `order_parameters` as listed at `GET /collections/{collection_id}` for filtering available items.",
+      "additionalProperties": {
+        "x-additionalPropertiesName": "Order Parameter Name",
+        "description": "Value of the order parameter for the request."
+      }
+    }
+  }
+}

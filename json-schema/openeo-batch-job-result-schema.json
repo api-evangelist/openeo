@@ -1,0 +1,370 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/api-evangelist/openeo/main/json-schema/openeo-batch-job-result-schema.json",
+  "title": "Batch Job Results Response as STAC Item",
+  "description": "The STAC specification should be the main guidance for implementing this.\nSpecifying the `bbox` is strongly RECOMMENDED for STAC compliance, but can be omitted if the result is unlocated and the `geometry` is set to `null`.",
+  "x-generated": "2026-10-09",
+  "x-method": "derived",
+  "x-generator": "derive-json-schema.py",
+  "x-source": "openapi/openeo-openapi.yml#/components/schemas/batch_job_result",
+  "type": "object",
+  "required": [
+    "stac_version",
+    "id",
+    "type",
+    "geometry",
+    "properties",
+    "assets",
+    "links"
+  ],
+  "properties": {
+    "stac_version": {
+      "$ref": "#/$defs/stac_version"
+    },
+    "stac_extensions": {
+      "$ref": "#/$defs/stac_extensions"
+    },
+    "id": {
+      "$ref": "#/$defs/job_id"
+    },
+    "type": {
+      "type": "string",
+      "description": "The GeoJSON type that applies to this metadata document, which MUST always be a \"Feature\" according to the STAC specification.\nThis type does **not** describe the spatial data type of the assets.",
+      "enum": [
+        "Feature"
+      ]
+    },
+    "bbox": {
+      "$ref": "#/$defs/bbox"
+    },
+    "geometry": {
+      "type": [
+        "object",
+        "null"
+      ],
+      "description": "Defines the full footprint of the asset represented by this item as\nGeoJSON Geometry.\n\nResults without a known location can set this value to `null`.",
+      "allOf": [
+        {
+          "$ref": "#/$defs/GeoJsonGeometry"
+        }
+      ]
+    },
+    "properties": {
+      "type": "object",
+      "title": "Item Properties",
+      "description": "MAY contain additional properties other than the required property `datetime`, e.g. custom properties or properties from the STAC specification or STAC extensions.",
+      "required": [
+        "datetime"
+      ],
+      "additionalProperties": true,
+      "properties": {
+        "datetime": {
+          "title": "Date and Time",
+          "description": "The searchable date/time of the data, in UTC. Formatted as a [RFC 3339](https://www.rfc-editor.org/rfc/rfc3339.html) date-time.\n\nIf this field is set to `null` (usually for larger time ranges), it is STRONGLY RECOMMENDED to specify both `start_datetime` and `end_datetime` for STAC compliance.",
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "date-time"
+        },
+        "start_datetime": {
+          "type": "string",
+          "format": "date-time",
+          "description": "For time series: The first or start date and time for the data, in UTC. Formatted as a [RFC 3339](https://www.rfc-editor.org/rfc/rfc3339.html) date-time."
+        },
+        "end_datetime": {
+          "type": "string",
+          "format": "date-time",
+          "description": "For time series: The last or end date and time for the data, in UTC. Formatted as a [RFC 3339](https://www.rfc-editor.org/rfc/rfc3339.html) date-time."
+        },
+        "title": {
+          "$ref": "#/$defs/eo_title"
+        },
+        "description": {
+          "$ref": "#/$defs/eo_description"
+        },
+        "license": {
+          "$ref": "#/$defs/stac_license"
+        },
+        "providers": {
+          "$ref": "#/$defs/stac_providers"
+        },
+        "created": {
+          "$ref": "#/$defs/created"
+        },
+        "updated": {
+          "$ref": "#/$defs/updated"
+        },
+        "queued": {
+          "$ref": "#/$defs/queued"
+        },
+        "started": {
+          "$ref": "#/$defs/started"
+        },
+        "expires": {
+          "$ref": "#/$defs/expires"
+        },
+        "unpublished": {
+          "$ref": "#/$defs/unpublished"
+        },
+        "openeo:status": {
+          "$ref": "#/$defs/result_status"
+        }
+      }
+    },
+    "assets": {
+      "$ref": "#/$defs/stac_assets"
+    },
+    "links": {
+      "type": "array",
+      "description": "Links related to this batch job result, e.g. a link to an \ninvoice, additional log files or external documentation.\n\nThe links MUST NOT contain links to the processed and\ndownloadable data. Instead specify these in the `assets` property.\nClients MUST NOT download the data referenced in the links by\ndefault.\n\nIt is **strongly recommended** to add a link with relation type\n`canonical` pointing to this STAC document using a signed URL.\nNote that query parameters that influence the response of the current request\n(like `partial`) MUST also be included or encoded within the signed URL\nin order to give a consistent response when the signed URL is used.\nThis signed URL allows consumption of the STAC metadata\nby (possibly non-openEO) clients and tools\nwithout additional authentication steps.\nIt is recommended to regenerate the signed URL (and its expiry) with each request.\n\nFor relation types see the lists of\n[common relation types in openEO](#section/API-Principles/Web-Linking).",
+      "items": {
+        "$ref": "#/$defs/link"
+      }
+    }
+  },
+  "$defs": {
+    "GeoJsonGeometry": {
+      "title": "GeoJSON Geometry",
+      "type": "object",
+      "required": [
+        "type"
+      ],
+      "properties": {
+        "type": {
+          "$ref": "#/$defs/geometry_type"
+        }
+      }
+    },
+    "asset": {
+      "title": "STAC Asset",
+      "type": "object",
+      "required": [
+        "href"
+      ],
+      "properties": {
+        "href": {
+          "title": "Asset location",
+          "description": "URL to the downloadable asset.\nThe URLs SHOULD be available without authentication so that external clients can download them easily. If the data is confidential, signed URLs SHOULD be used to protect against unauthorized access from third parties.",
+          "type": "string"
+        },
+        "title": {
+          "description": "The displayed title for clients and users.",
+          "type": "string"
+        },
+        "description": {
+          "type": "string",
+          "format": "commonmark",
+          "description": "Multi-line description to explain the asset.\n\n[CommonMark 0.29](http://commonmark.org/) syntax MAY be used for rich\ntext representation."
+        },
+        "type": {
+          "title": "Media Type",
+          "description": "Media type of the asset.",
+          "type": "string"
+        },
+        "roles": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Purposes of the asset. Can be any value, but commonly used values are:\n\n* `thumbnail`: A visualization of the data, usually a lower-resolution true color image in JPEG or PNG format.\n* `reproducibility`: Information how the data was produced and/or can be reproduced, e.g. the process graph used to compute the data in JSON format.\n* `data`: The computed data in the format specified by the user in the process graph (applicable in `GET /jobs/{job_id}/results` only).\n* `metadata`: Additional metadata available for the computed data."
+        }
+      }
+    },
+    "bbox": {
+      "description": "Each bounding box is provided as four or six numbers,\ndepending on whether the coordinate reference system\nincludes a vertical axis (height or depth):\n\n* West (lower left corner, coordinate axis 1)\n* South (lower left corner, coordinate axis 2)\n* Base (optional, minimum value, coordinate axis 3)\n* East (upper right corner, coordinate axis 1)\n* North (upper right corner, coordinate axis 2)\n* Height (optional, maximum value, coordinate axis 3)\n\nThe coordinate reference system of the values is WGS 84\nlongitude/latitude (http://www.opengis.net/def/crs/OGC/1.3/CRS84).\n\nFor WGS 84 longitude/latitude the values are in most cases\nthe sequence of minimum longitude, minimum latitude, maximum\nlongitude and maximum latitude.\n\nHowever, in cases where the box spans the antimeridian the\nfirst value (west-most box edge) is larger than the third value\n(east-most box edge).\n\nIf the vertical axis is included, the third and the sixth\nnumber are the bottom and the top of the 3-dimensional bounding box.",
+      "type": "array",
+      "oneOf": [
+        {
+          "title": "4 elements",
+          "minItems": 4,
+          "maxItems": 4
+        },
+        {
+          "title": "6 elements",
+          "minItems": 6,
+          "maxItems": 6
+        }
+      ],
+      "items": {
+        "type": "number"
+      }
+    },
+    "created": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Date and time of creation (for batch jobs: the status 'created' was set), formatted as a [RFC 3339](https://www.rfc-editor.org/rfc/rfc3339.html) date-time."
+    },
+    "eo_description": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "commonmark",
+      "description": "Detailed multi-line description to explain the entity.\n\n[CommonMark 0.29](http://commonmark.org/) syntax MAY be used for rich text representation."
+    },
+    "eo_title": {
+      "description": "A short description to easily distinguish entities.",
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "expires": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Time in UTC until which the assets and this document are accessible via the signed URL that is provided with the relation type `canonical` in the links. Formatted as a [RFC 3339](https://www.rfc-editor.org/rfc/rfc3339.html) date-time. After expiration, a document with new signed URLs can be retrieved through an authenticated request to this endpoint."
+    },
+    "geometry_type": {
+      "title": "Geometry type",
+      "type": "string",
+      "enum": [
+        "Point",
+        "MultiPoint",
+        "LineString",
+        "MultiLineString",
+        "Polygon",
+        "MultiPolygon",
+        "GeometryCollection"
+      ]
+    },
+    "job_id": {
+      "type": "string",
+      "description": "Per-back-end unique identifier of the batch job, generated by the back-end during creation. MUST match the specified pattern.",
+      "pattern": "^[\\w\\-\\.~]+$"
+    },
+    "link": {
+      "title": "Link",
+      "description": "A link to another resource on the web. Bases on [RFC 5899](https://www.rfc-editor.org/rfc/rfc5988.html).",
+      "type": "object",
+      "required": [
+        "href",
+        "rel"
+      ],
+      "properties": {
+        "rel": {
+          "type": "string",
+          "description": "Relationship between the current document and the linked document. SHOULD be a [registered link relation type](https://www.iana.org/assignments/link-relations/link-relations.xml) whenever feasible."
+        },
+        "href": {
+          "type": "string",
+          "description": "The value MUST be a valid URL.",
+          "format": "uri"
+        },
+        "type": {
+          "type": "string",
+          "description": "The value MUST be a string that hints at the format used to represent data at the provided URI, preferably a media (MIME) type."
+        },
+        "title": {
+          "type": "string",
+          "description": "Used as a human-readable label for a link."
+        }
+      }
+    },
+    "queued": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Date and time of queueing the batch job (i.e., when the status 'queued' was set), formatted as a [RFC 3339](https://www.rfc-editor.org/rfc/rfc3339.html) date-time."
+    },
+    "result_status": {
+      "type": "string",
+      "enum": [
+        "running",
+        "canceled",
+        "finished",
+        "error"
+      ],
+      "description": "The status of a batch job.\n\nThis field is REQUIRED if the `partial` parameter is given.\nThis field is strongly RECOMMENDED if the job has stopped due to an error.",
+      "default": "finished"
+    },
+    "stac_assets": {
+      "type": "object",
+      "title": "Assets",
+      "description": "Dictionary of asset objects for data that can be downloaded, each with a\nunique key. The keys MAY be used by clients as file names.",
+      "additionalProperties": {
+        "$ref": "#/$defs/asset"
+      }
+    },
+    "stac_extensions": {
+      "type": "array",
+      "description": "A list of implemented STAC extensions. The list contains URLs to the JSON Schema files it can be validated against.",
+      "uniqueItems": true,
+      "items": {
+        "anyOf": [
+          {
+            "title": "Reference to a JSON Schema",
+            "type": "string",
+            "format": "uri"
+          },
+          {
+            "title": "Reference to a core extension (STAC < 1.0.0-rc.1 only, DEPRECATED)",
+            "type": "string"
+          }
+        ]
+      }
+    },
+    "stac_license": {
+      "type": "string",
+      "description": "License(s) of the data as a SPDX [License identifier](https://spdx.org/licenses/).\nAlternatively, use `proprietary` if the license is not on the SPDX\nlicense list or `various` if multiple licenses apply. In these two cases\nlinks to the license texts SHOULD be added, see the `license` link\nrelation type.\n\nNon-SPDX licenses SHOULD add a link to the license text with the\n`license` relation in the links section. The license text MUST NOT be\nprovided as a value of this field. If there is no public license URL\navailable, it is RECOMMENDED to host the license text and link to it."
+    },
+    "stac_providers": {
+      "type": "array",
+      "description": "A list of providers, which MAY include all organizations capturing or processing the data or the hosting provider. Providers SHOULD be listed in chronological order with the most recent provider being the last element of the list.",
+      "items": {
+        "type": "object",
+        "title": "Provider",
+        "required": [
+          "name"
+        ],
+        "properties": {
+          "name": {
+            "description": "The name of the organization or the individual.",
+            "type": "string"
+          },
+          "description": {
+            "description": "Multi-line description to add further provider information such as processing details for processors and producers, hosting details for hosts or basic contact information.\n\nCommonMark 0.29 syntax MAY be used for rich text representation.",
+            "type": "string"
+          },
+          "roles": {
+            "description": "Roles of the provider.\n\nThe provider's role(s) can be one or more of the following\nelements:\n* `licensor`: The organization that is licensing the dataset under\nthe license specified in the collection's license field.\n* `producer`: The producer of the data is the provider that\ninitially captured and processed the source data, e.g. ESA for\nSentinel-2 data.\n* `processor`: A processor is any provider who processed data to a\nderived product.\n* `host`: The host is the actual provider offering the data on their\nstorage. There SHOULD be no more than one host, specified as last\nelement of the list.",
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "producer",
+                "licensor",
+                "processor",
+                "host"
+              ]
+            }
+          },
+          "url": {
+            "description": "Homepage on which the provider describes the dataset and publishes contact information.",
+            "type": "string",
+            "format": "uri"
+          }
+        }
+      }
+    },
+    "stac_version": {
+      "type": "string",
+      "description": "The [version of the STAC specification](https://github.com/radiantearth/stac-spec/releases), which MAY not be equal to the [STAC API version](#tag/EO-Data-Discovery/STAC).\nThe openEO API allows for the STAC versions 1.x.x (RECOMMENDED) and 0.9.x (DEPRECATED).",
+      "pattern": "^(0\\.9.\\d+|1\\.\\d+.\\d+)"
+    },
+    "started": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Date and time when the batch job started processing (i.e., when the status 'running' was set), formatted as a [RFC 3339](https://www.rfc-editor.org/rfc/rfc3339.html) date-time."
+    },
+    "unpublished": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Time until which the batch job results are stored on the back-end, in UTC. Formatted as a [RFC 3339](https://www.rfc-editor.org/rfc/rfc3339.html) date-time."
+    },
+    "updated": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Date and time of the last status change, formatted as a [RFC 3339](https://www.rfc-editor.org/rfc/rfc3339.html) date-time. If the status is `error`, `canceled` or `finished`, this is the time when the job has ended."
+    }
+  }
+}

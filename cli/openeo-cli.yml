@@ -1,0 +1,22 @@
+generated: '2026-10-09'
+method: searched
+source: https://open-eo.github.io/openeo-python-client/auth.html
+name: openeo-auth
+install:
+- method: pip
+  command: pip install openeo
+  note: openeo-auth ships with the openeo Python client package
+commands:
+- group: config
+  commands:
+  - openeo-auth paths
+  - openeo-auth config-dump
+  - openeo-auth add-basic
+  - openeo-auth add-oidc
+- group: tokens
+  commands:
+  - openeo-auth oidc-auth
+  - openeo-auth token-dump
+  - openeo-auth token-clear
+scope: Authentication/config helper only - manages Basic and OpenID Connect credentials and refresh tokens for back-ends;
+  not a full API CLI.

@@ -1,0 +1,36 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/api-evangelist/openeo/main/json-schema/openeo-create-workspace-schema.json",
+  "title": "Create workspace",
+  "x-generated": "2026-10-09",
+  "x-method": "derived",
+  "x-generator": "derive-json-schema.py",
+  "x-source": "openapi/openeo-workspaces-openapi.yml#/components/schemas/create_workspace",
+  "properties": {
+    "intent": {
+      "enum": [
+        "create"
+      ]
+    },
+    "type": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "The workspace provider name as defined in `GET /workspace_providers`. If not provided or `null`, the back-end chooses a default provider.",
+      "default": null
+    },
+    "parameters": {
+      "$ref": "#/$defs/workspace_parameters"
+    }
+  },
+  "$defs": {
+    "workspace_parameters": {
+      "type": "object",
+      "description": "Additional parameters to register the workspace as defined in `GET /workspace_providers`. The structure is not specified by the API.",
+      "additionalProperties": {
+        "description": "Any type"
+      }
+    }
+  }
+}

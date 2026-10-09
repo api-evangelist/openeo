@@ -1,0 +1,490 @@
+openapi: 3.2.0
+info:
+  title: Openeo File Storage API
+  version: 1.3.0
+  contact:
+    name: openEO Project Steering Committee
+    url: https://openeo.org
+    email: openeo.psc@uni-muenster.de
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  description: 'Operations tagged File Storage across 2 of this provider''s published API definitions: openeo-api-openapi.yaml, openeo-openapi.yml. Each path carries the servers of the definition it was published in.'
+servers:
+- url: https://openeo.example/api/{version}
+  description: The URL of the API MAY freely be chosen by the back-end providers. The path, including API versioning, is a *recommendation* only. Nevertheless, all servers MUST support HTTPS as the authentication methods are not secure with HTTP only!
+  variables:
+    version:
+      default: v1
+      description: 'API versioning is RECOMMENDED. As the openEO API is following
+
+        [SemVer](https://semver.org/) only the **major** part of the version
+
+        numbers SHOULD be used for API versioning in the URL. To make clear
+
+        that it is a version number, it is RECOMMENDED to add the prefix `v`.
+
+
+        Example: API version `1.2.3` is recommended to use `v1`.
+
+
+        The reason to only consider the major part is that backward-incompatible
+
+        changes are introduced by major changes only. All changes from minor
+
+        and patch releases can usually be integrated without breakages and thus
+
+        a change in the URL is not really needed.
+
+
+        The version number in the URL MUST not be used by the clients to detect
+
+        the version number of the API. Use the version number returned in the
+
+        property `api_version` from `GET /` instead.'
+tags:
+- name: File Storage
+  description: Management of user-uploaded assets and processed data.
+paths:
+  /files:
+    get:
+      summary: List all files in the workspace
+      operationId: list-files
+      description: Lists all user-uploaded files that are stored at the back-end.
+      tags:
+      - File Storage
+      security:
+      - Bearer: []
+      parameters:
+      - $ref: '#/components/parameters/pagination_limit'
+      responses:
+        '200':
+          description: Flattened file tree with path relative to the user's root directory and some basic properties such as the file size and the timestamp of the last modification. All properties except the name are optional. Folders MUST NOT be listed separately so each element in the list MUST be a downloadable file.
+          content:
+            application/json:
+              schema:
+                title: Workspace Files
+                type: object
+                required:
+                - files
+                - links
+                properties:
+                  files:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/file'
+                  links:
+                    $ref: '#/components/schemas/links_pagination'
+              example:
+                files:
+                - path: test.txt
+                  size: 182
+                  modified: '2015-10-20T17:22:10Z'
+                - path: test.tif
+                  size: 183142
+                  modified: '2017-01-01T09:36:18Z'
+                - path: Sentinel2/S2A_MSIL1C_20170819T082011_N0205_R121_T34KGD_20170819T084427.zip
+                  size: 4183353142
+                  modified: '2018-01-03T10:55:29Z'
+                links: []
+        4XX:
+          $ref: '#/components/responses/client_error_auth'
+        5XX:
+          $ref: '#/components/responses/server_error'
+    servers:
+    - url: https://openeo.example/api/{version}
+      description: The URL of the API MAY freely be chosen by the back-end providers. The path, including API versioning, is a *recommendation* only. Nevertheless, all servers MUST support HTTPS as the authentication methods are not secure with HTTP only!
+      variables:
+        version:
+          default: v1
+          description: 'API versioning is RECOMMENDED. As the openEO API is following
+
+            [SemVer](https://semver.org/) only the **major** part of the version
+
+            numbers SHOULD be used for API versioning in the URL. To make clear
+
+            that it is a version number, it is RECOMMENDED to add the prefix `v`.
+
+
+            Example: API version `1.2.3` is recommended to use `v1`.
+
+
+            The reason to only consider the major part is that backward-incompatible
+
+            changes are introduced by major changes only. All changes from minor
+
+            and patch releases can usually be integrated without breakages and thus
+
+            a change in the URL is not really needed.
+
+
+            The version number in the URL MUST not be used by the clients to detect
+
+            the version number of the API. Use the version number returned in the
+
+            property `api_version` from `GET /` instead.'
+  /files/{path}:
+    parameters:
+    - name: path
+      in: path
+      description: 'Path of the file, relative to the user''s root directory. MAY include folders, but MUST not include relative references such as `.` and `..`.
+
+
+        Folder and file names in the path MUST be url-encoded. The path separator `/` and the file extension separator `.` MUST NOT be url-encoded.
+
+
+        The URL-encoding may be shown incorrectly in rendered versions due to [OpenAPI 3 not supporting path parameters which contain slashes](https://github.com/OAI/OpenAPI-Specification/issues/892). This may also lead to OpenAPI validators not validating paths containing folders correctly.'
+      required: true
+      schema:
+        type: string
+      examples:
+        normal:
+          description: A path without special chars. It describes a file `europe.geojson` in a folder called `borders`.
+          value: borders/europe.geojson
+        specialchars:
+          description: A path with special chars. It describes a file `münster.shp` in folders called `europe` and `österreich`.
+          value: europe/%C3%B6sterreich/m%C3%BCnster.shp
+    get:
+      summary: Download a file from the workspace
+      operationId: download-file
+      description: 'Offers a file from the user workspace for download. The file is identified by its path relative to the user''s root directory.
+
+        If a folder is specified as path a `FileOperationUnsupported` error MUST be sent as response.'
+      tags:
+      - File Storage
+      security:
+      - Bearer: []
+      responses:
+        '200':
+          description: A file from the workspace.
+          content:
+            application/octet-stream:
+              schema:
+                type: string
+                format: binary
+        4XX:
+          $ref: '#/components/responses/client_error_auth'
+        5XX:
+          $ref: '#/components/responses/server_error'
+    put:
+      summary: Upload a file to the workspace
+      operationId: upload-file
+      description: 'Uploads a new file to the given path or updates an existing file if a file at the path exists.
+
+
+        Folders are created once required by a file upload. Empty folders can not be created.'
+      tags:
+      - File Storage
+      security:
+      - Bearer: []
+      responses:
+        '200':
+          description: The file has been uploaded successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/file'
+        4XX:
+          $ref: '#/components/responses/client_error_auth'
+        5XX:
+          $ref: '#/components/responses/server_error'
+      requestBody:
+        required: true
+        content:
+          application/octet-stream:
+            schema:
+              type: string
+              format: binary
+    delete:
+      summary: Delete a file from the workspace
+      operationId: delete-file
+      description: 'Deletes an existing user-uploaded file specified by its path. Resulting empty folders MUST be deleted automatically.
+
+
+        Back-ends MAY support deleting folders including its files and sub-folders. If not supported by the back-end a `FileOperationUnsupported` error MUST be sent as response.'
+      tags:
+      - File Storage
+      security:
+      - Bearer: []
+      responses:
+        '204':
+          description: The file has been successfully deleted at the back-end.
+        4XX:
+          $ref: '#/components/responses/client_error_auth'
+        5XX:
+          $ref: '#/components/responses/server_error'
+    servers:
+    - url: https://openeo.example/api/{version}
+      description: The URL of the API MAY freely be chosen by the back-end providers. The path, including API versioning, is a *recommendation* only. Nevertheless, all servers MUST support HTTPS as the authentication methods are not secure with HTTP only!
+      variables:
+        version:
+          default: v1
+          description: 'API versioning is RECOMMENDED. As the openEO API is following
+
+            [SemVer](https://semver.org/) only the **major** part of the version
+
+            numbers SHOULD be used for API versioning in the URL. To make clear
+
+            that it is a version number, it is RECOMMENDED to add the prefix `v`.
+
+
+            Example: API version `1.2.3` is recommended to use `v1`.
+
+
+            The reason to only consider the major part is that backward-incompatible
+
+            changes are introduced by major changes only. All changes from minor
+
+            and patch releases can usually be integrated without breakages and thus
+
+            a change in the URL is not really needed.
+
+
+            The version number in the URL MUST not be used by the clients to detect
+
+            the version number of the API. Use the version number returned in the
+
+            property `api_version` from `GET /` instead.'
+components:
+  responses:
+    server_error:
+      description: 'The request can not be fulfilled due to an error at the back-end. The
+
+        error is never the client’s fault and therefore it is reasonable for the
+
+        client to retry the exact same request that triggered this response.
+
+
+        The response body SHOULD contain a JSON error object. MUST be any HTTP
+
+        status code specified in [RFC 7231](https://www.rfc-editor.org/rfc/rfc7231.html#section-6.6).
+
+
+        See also:
+
+        * [Error Handling](#section/API-Principles/Error-Handling) in the API in general.
+
+        * [Common Error Codes](errors.json)'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/error'
+    client_error_auth:
+      description: 'The request can not be fulfilled due to an error on client-side, i.e. the
+
+        request is invalid. The client SHOULD NOT repeat the request without
+
+        modifications.
+
+
+        The response body SHOULD contain a JSON error object.
+
+        MUST be any HTTP status code specified in [RFC 7231](https://www.rfc-editor.org/rfc/rfc7231.html#section-6.6).
+
+        This request MUST respond with HTTP status codes 401 if authorization is required or
+
+        403 if the authorization failed or access is forbidden in general to the
+
+        authenticated user. HTTP status code 404 SHOULD be used if the value of
+
+        a path parameter is invalid.
+
+
+        See also:
+
+        * [Error Handling](#section/API-Principles/Error-Handling) in the API in general.
+
+        * [Common Error Codes](errors.json)'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/error'
+  schemas:
+    log_links:
+      description: 'Links related to this log entry / error, e.g. to a resource that
+
+        provides further explanations.
+
+
+        For relation types see the lists of
+
+        [common relation types in openEO](#section/API-Principles/Web-Linking).'
+      type: array
+      items:
+        $ref: '#/components/schemas/link'
+      example:
+      - href: https://openeo.example/docs/errors/SampleError
+        rel: about
+    log_code:
+      type: string
+      description: The code is either one of the standardized error codes or a custom code, for example specified by a user in the `inspect` process.
+      example: SampleError
+    link:
+      title: Link
+      description: A link to another resource on the web. Bases on [RFC 5899](https://www.rfc-editor.org/rfc/rfc5988.html).
+      type: object
+      required:
+      - href
+      - rel
+      properties:
+        rel:
+          type: string
+          description: Relationship between the current document and the linked document. SHOULD be a [registered link relation type](https://www.iana.org/assignments/link-relations/link-relations.xml) whenever feasible.
+          example: related
+        href:
+          type: string
+          description: The value MUST be a valid URL.
+          format: uri
+          example: https://openeo.example
+        type:
+          type: string
+          description: The value MUST be a string that hints at the format used to represent data at the provided URI, preferably a media (MIME) type.
+          example: text/html
+        title:
+          type: string
+          description: Used as a human-readable label for a link.
+          example: openEO
+    file:
+      title: Workspace File
+      type: object
+      required:
+      - path
+      properties:
+        path:
+          type: string
+          description: 'Path of the file, relative to the root directory of the user''s server-side workspace.
+
+            MUST NOT start with a slash `/` and MUST NOT be url-encoded.
+
+
+            The Windows-style path name component separator `\` is not supported,
+
+            always use `/` instead.
+
+
+            Note: The pattern only specifies a minimal subset of invalid characters.
+
+            The back-ends MAY enforce additional restrictions depending on their OS/environment.'
+          example: folder/file.txt
+          pattern: ^[^/\r\n\t\\:'"][^\r\n\t\\:'"]*$
+        size:
+          type: integer
+          description: File size in bytes.
+          example: 1024
+        modified:
+          type: string
+          format: date-time
+          description: Date and time the file has lastly been modified, formatted as a [RFC 3339](https://www.rfc-editor.org/rfc/rfc3339.html) date-time.
+          example: '2018-01-03T10:55:29Z'
+    error:
+      title: General Error
+      description: 'An error object declares additional information about a client-side or server-side error.
+
+        See also: * [Error Handling](#section/API-Principles/Error-Handling) in the API in general. * [Common Error Codes](errors.json)'
+      type: object
+      required:
+      - code
+      - message
+      properties:
+        id:
+          type: string
+          description: A back-end MAY add a unique identifier to the error response to be able to log and track errors with further non-disclosable details. A client could communicate this id to a back-end provider to get further information.
+          example: 550e8400-e29b-11d4-a716-446655440000
+        code:
+          $ref: '#/components/schemas/log_code'
+        message:
+          type: string
+          description: A message explaining what the client may need to change or what difficulties the server is facing.
+          example: Parameter 'sample' is missing.
+        links:
+          $ref: '#/components/schemas/log_links'
+    links_pagination:
+      description: 'Links related to this list of resources, for example links for pagination
+
+        or alternative formats such as a human-readable HTML version.
+
+        The links array MUST NOT be paginated.
+
+
+        If pagination is implemented, the following `rel` (relation) types apply:
+
+
+        1. `next` (REQUIRED): A link to the next page, except on the last page.
+
+
+        2. `prev` (OPTIONAL): A link to the previous page, except on the first page.
+
+
+        3. `first` (OPTIONAL): A link to the first page, except on the first page.
+
+
+        4. `last` (OPTIONAL): A link to the last page, except on the last page.
+
+
+        For additional relation types see also the lists of
+
+        [common relation types in openEO](#section/API-Principles/Web-Linking).'
+      type: array
+      items:
+        $ref: '#/components/schemas/link'
+  parameters:
+    pagination_limit:
+      name: limit
+      description: 'This parameter enables pagination for the endpoint and specifies the maximum number of
+
+        elements that arrays in the top-level object (e.g. collections, processes, batch jobs,
+
+        secondary services, log entries, etc.) are allowed to contain.
+
+        The `links` array MUST NOT be paginated like the resources,
+
+        but instead contain links related to the paginated resources
+
+        or the pagination itself (e.g. a link to the next page).
+
+        If the parameter is not provided or empty, all elements are returned.
+
+
+        Pagination is OPTIONAL: back-ends or clients may not support it.
+
+        Therefore, it MUST be implemented in a way that clients not supporting
+
+        pagination get all resources regardless. Back-ends not supporting
+
+        pagination MUST return all resources.
+
+
+        If the response is paginated, the `links` array MUST be used to communicate the
+
+        links for browsing the pagination with predefined `rel` types. See the `links` array schema
+
+        for supported `rel` types.
+
+        Back-end implementations can, unless specified otherwise, use any kind of pagination technique,
+
+        depending on what is supported best by their infrastructure: page-based, offset-based, token-based
+
+        or something else. The clients SHOULD use whatever is specified
+
+        in the links with the corresponding `rel` types.'
+      in: query
+      allowEmptyValue: true
+      example: 10
+      schema:
+        type: integer
+        minimum: 1
+  securitySchemes:
+    Bearer:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT or openEO
+      description: "A Bearer token can be provided in two different formats:\n1. **JSON Web Token (JWT) - RECOMMENDED**\n\n   - Conformance class: `https://api.openeo.org/1.3.0/authentication/jwt`\n   \n   The Bearer token is an access token in [JWT](https://datatracker.ietf.org/doc/html/rfc7519) format\n   as defined in RFC 7519. For openEO, it MUST include the issuer in the\n   `iss` claim although being optional in RFC 7519.\n   If the concept of an issuer does not exist in an authentication method (e.g. in HTTP Basic),\n   implementations could use the endpoint for Basic Authentication as the issuer, for example.\n\n   openEO backend implementations MUST signal their support for JWT by listing the given\n   conformance class. Likewise, openEO clients SHOULD only use JWT when the openEO backend\n   lists the conformance class.\n\n2. **openEO Tokens - DEPRECATED**\n\n   - Conformance class: *None*\n\n   The Bearer Token is constructed from the authentication method, a\n   provider ID (if available) and the access token. All separated by a\n   forward slash `/`.\n\n   Examples (replace `TOKEN` with the actual access token):\n\n   - Basic authentication (no provider ID available): `basic//TOKEN`\n   - OpenID Connect (provider ID is `ms`): `oidc/ms/TOKEN`.\n     For OpenID Connect, the provider ID corresponds to the value\n     specified for `id` for each provider in `GET /credentials/oidc`.\n\n   All openEO backends MUST accept this method for backward compatibility\n   until version 2.0 of the specification.\n\n   The access tokens provided by the identity provider do not include\n   the prefix that includes the authentication method and provider ID.\n   The Bearer Token sent to the openEO backend MUST have the prefix, e.g. `basic//` for Basic authentication.\n   This means that the clients have to prepend the prefix.\n\nJWT and openEO tokens can be distinguished by the presence of a slash `/` in the token, which JWT can never contain due to the Base64 encoding."
+    Basic:
+      type: http
+      scheme: basic
+externalDocs:
+  description: openEO Documentation
+  url: https://openeo.org/documentation/1.0/
+x-refined-from:
+- openeo-api-openapi.yaml
+- openeo-openapi.yml

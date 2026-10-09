@@ -1,0 +1,46 @@
+generated: '2026-10-09'
+method: none
+probe: true
+source:
+  - https://openeo.org/
+  - https://openeo.org/contact.html
+  - https://openeo.org/about.html
+  - https://openeo.org/psc.html
+  - https://api.openeo.org/
+signals: {}
+checked:
+  - url: https://openeo.org/
+    http_status: 200
+    note: Homepage links only to /contact.html among legal/contact-type pages; no privacy, imprint, terms, accessibility or security page is linked.
+  - url: https://openeo.org/contact.html
+    http_status: 200
+    note: Postal contact (University of Münster, Institute for Geoinformatics) and a general-topics email; no privacy or legal statements.
+  - url: https://openeo.org/about.html
+    http_status: 200
+    note: No regulatory-term matches (privacy, GDPR, accessibility, SBOM, subprocessor, retention).
+  - url: https://openeo.org/psc.html
+    http_status: 200
+    note: No regulatory-term matches.
+  - url: https://openeo.org/sitemap.xml
+    http_status: 404
+  - url: https://openeo.org/privacy.html
+    http_status: 404
+    note: Absence check only; not a pointer.
+  - url: https://openeo.org/imprint.html
+    http_status: 404
+    note: Absence check only; not a pointer.
+  - url: https://api.openeo.org/
+    http_status: 200
+    note: >-
+      The API specification defines a `privacy-policy` link relation that back-end implementers
+      may expose ("privacy-policy : A link to the privacy policy (GDPR). If a back-end provides a
+      link to a privacy policy, the clients MUST provide a way to read the privacy policy and only
+      connect to the back-end after the user agreed to them."). This is a requirement the openEO
+      standard places on implementing back-ends and clients, not a privacy posture published by
+      openEO itself, so it is not recorded as a signal.
+notes: >-
+  openEO is an open, community-governed API specification (Apache-2.0 documentation) hosted by
+  the University of Münster; it operates no data-processing service of its own and publishes no
+  privacy policy, subprocessor list, accessibility statement, SBOM, support-lifetime or other
+  regulatory-posture page on its own surfaces. Operating back-ends (e.g. openEO Platform, CDSE)
+  are separate providers.

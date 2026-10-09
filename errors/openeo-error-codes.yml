@@ -1,0 +1,356 @@
+generated: '2026-10-09'
+method: searched
+source: https://api.openeo.org/errors.json
+format: openeo-error-object
+envelope:
+  fields:
+  - id
+  - code
+  - message
+  - links
+  note: JSON error object defined in the openEO API spec (Error Handling section); `code` carries the identifiers
+    below.
+problem_count: 51
+problems:
+- status: 500
+  code: Internal
+  title: 'Server error: {message}'
+  description: An internal server error with a proprietary message.
+  tags:
+  - General
+- status: 404
+  code: NotFound
+  title: Resource not found.
+  description: 'To be used if the requested resource does not exist. Note: There are specialized errors for missing
+    jobs (JobNotFound), files (FileNotFound), etc. Unsupported endpoints MAY send an ''FeatureUnsupported'' (501)
+    error.'
+  tags:
+  - General
+- status: 501
+  code: FeatureUnsupported
+  title: Feature not supported.
+  description: The back-end responds with this error whenever an endpoint is specified in the openEO API, but is
+    not supported.
+  tags:
+  - General
+- status: 503
+  code: InfrastructureMaintenance
+  title: Service is not available at the moment due to maintenance work. Please try again later or contact our support.
+  description: Service is currently not available as the infrastructure is currently undergoing maintenance work.
+  tags:
+  - General
+- status: 503
+  code: InfrastructureBusy
+  title: Service is not available at the moment due to overloading. Please try again later or contact our support.
+  description: Service is generally available, but the infrastructure can't handle it at the moment as too many
+    requests are processed.
+  tags:
+  - General
+- status: 404
+  code: UnsupportedApiVersion
+  title: The requested API version '{version}' is not supported.
+  description: The service doesn't support the openEO API version specified in the request URL. Clients should check
+    well-known document for supported versions.
+  tags:
+  - General
+- status: 408
+  code: RequestTimeout
+  title: Request timed out.
+  description: The request took too long and timed out.
+  tags:
+  - General
+  - Data Processing
+- status: 400
+  code: BudgetInvalid
+  title: The specified budget is too low.
+  description: The budget is too low as it is either smaller than or equal to 0 or below the costs.
+  tags:
+  - Batch Jobs
+  - Secondary Services
+  - Data Processing
+- status: 500
+  code: EstimateComplexity
+  title: The process is too complex to calculate an estimate.
+  description: The process is too complex to calculate an estimate, e.g. due to a UDF or other processes that are
+    complex to estimate costs reliably.
+  tags:
+  - Batch Jobs
+- status: 400
+  code: NoDataForUpdate
+  title: No data specified to be updated.
+  description: 'For PATCH requests: No valid data specified at all.'
+  tags:
+  - Batch Jobs
+  - Secondary Services
+- status: 400
+  code: PropertyNotEditable
+  title: The specified property '{property}' is read-only.
+  description: 'For PATCH requests: The specified parameter can''t be updated. It is read-only.'
+  tags:
+  - Batch Jobs
+  - Secondary Services
+- status: 404
+  code: CollectionNotFound
+  title: Collection '{identifier}' does not exist.
+  description: The requested collection does not exist.
+  tags:
+  - EO Data Discovery
+- status: 500
+  code: StorageFailure
+  title: Unable to store files due to a server error. Please try again later or contact our support.
+  description: Server couldn't store file(s) due to server-side reasons.
+  tags:
+  - File Management
+  - Batch Jobs
+- status: 400
+  code: StorageQuotaExceeded
+  title: Your storage quota has been exceeded.
+  description: The storage quota has been exceeded by the user.
+  tags:
+  - File Management
+  - Batch Jobs
+- status: 404
+  code: FileNotFound
+  title: File '{file}' does not exist.
+  description: The requested file does not exist.
+  tags:
+  - File Management
+- status: 400
+  code: FilePathInvalid
+  title: 'File path is invalid: {reason}'
+  description: The specified path is invalid or not accessible. Path could contain invalid characters, point to
+    an existing folder or a location outside of the user folder.
+  tags:
+  - File Management
+- status: 400
+  code: FileOperationUnsupported
+  title: The file operation is not supported for the specified path.
+  description: null
+  tags:
+  - File Management
+- status: 400
+  code: FolderOperationUnsupported
+  title: Operation is only supported for files, not folders.
+  description: The specified path is a folder and the operation is only supported for files.
+  tags:
+  - File Management
+- status: 400
+  code: ContentTypeInvalid
+  title: 'The media type is not supported. Allowed: {types}'
+  description: The specified media (MIME) type used in the Content-Type header is not allowed.
+  tags:
+  - File Management
+  - General
+- status: 400
+  code: FileTypeInvalid
+  title: 'File format {type} not allowed. Allowed file formats: {types}'
+  description: File format or file extension is not allowed.
+  tags:
+  - File Management
+- status: 400
+  code: FileSizeExceeded
+  title: 'File size it too large. Maximum file size: {size}'
+  description: File exceeds allowed maximum file size.
+  tags:
+  - File Management
+- status: 400
+  code: FileContentInvalid
+  title: File content is invalid.
+  description: The content of the file is invalid.
+  tags:
+  - File Management
+- status: 400
+  code: FileLocked
+  title: File '{file}' is locked by another process.
+  description: The file is locked by a running job or another process.
+  tags:
+  - File Management
+- status: 404
+  code: ProcessGraphNotFound
+  title: User-defined process '{identifier}' does not exist.
+  description: The requested user-defined process does not exist. To be used for all endpoints starting with `/process_graphs`.
+  tags:
+  - User-Defined Processes
+- status: 400
+  code: ProcessInvalid
+  title: Invalid process specified.
+  description: The given process definition is invalid, which usually means that the process metadata is invalid.
+  tags:
+  - User-Defined Processes
+  - Batch Jobs
+  - Secondary Services
+  - Data Processing
+- status: 400
+  code: ProcessGraphMissing
+  title: Invalid process specified. It doesn't contain a process graph.
+  description: The process doesn't contain a process graph. For jobs, services, and sync. processing the parameter
+    `process` must contain a `process_graph`.
+  tags:
+  - User-Defined Processes
+  - Batch Jobs
+  - Secondary Services
+  - Data Processing
+- status: 400
+  code: ProcessGraphInvalid
+  title: Invalid process graph specified.
+  description: The process doesn't contain a valid process graph, which means it doesn't comply to the general structure
+    / schema.
+  tags:
+  - User-Defined Processes
+  - Batch Jobs
+  - Secondary Services
+  - Data Processing
+- status: 400
+  code: PredefinedProcessExists
+  title: A predefined process with the given identifier exists.
+  description: If a user wants to store a user-defined process with the id of a predefined process.
+  tags:
+  - User-Defined Processes
+- status: 400
+  code: ProcessGraphComplexity
+  title: The process graph is too demanding for synchronous processing. Please use a batch job instead.
+  description: The process graph is computationally too demanding for synchronous processing and will likely time
+    out. Please use a batch job instead.
+  tags:
+  - Data Processing
+- status: 400
+  code: ProcessUnsupported
+  title: Process with identifier '{process}' is not available in namespace '{namespace}'.
+  description: A process (predefined or user-defined) with the specified identifier is not available. To be used
+    when validating or executing process graphs.
+  tags:
+  - Data Processing
+- status: 400
+  code: ProcessParameterUnsupported
+  title: Process '{process}' does not support parameter '{parameter}'.
+  description: null
+  tags:
+  - Data Processing
+- status: 400
+  code: ProcessParameterInvalid
+  title: 'The value passed for parameter ''{parameter}'' in process ''{process}'' is invalid: {reason}'
+  description: null
+  tags:
+  - Data Processing
+- status: 400
+  code: ProcessParameterRequired
+  title: Process '{process}' parameter '{parameter}' is required.
+  description: null
+  tags:
+  - Data Processing
+- status: 404
+  code: JobNotFound
+  title: The batch job '{identifier}' does not exist.
+  description: The requested job does not exist.
+  tags:
+  - Batch Jobs
+- status: 400
+  code: JobLocked
+  title: Batch job is locked due to a queued or running batch computation.
+  description: The job is currently locked due to a running batch computation and can't be modified meanwhile.
+  tags:
+  - Batch Jobs
+- status: 400
+  code: JobNotFinished
+  title: Batch job has not finished computing the results yet. Please try again later or contact our support.
+  description: null
+  tags:
+  - Batch Jobs
+- status: 400
+  code: JobNotStarted
+  title: Batch job must be started first.
+  description: Job has not been queued or started yet or was canceled and not restarted by the user.
+  tags:
+  - Batch Jobs
+- status: 410
+  code: ResultLinkExpired
+  title: The link to the batch job result has expired. Please request the results again.
+  description: The signed URLs for batch job results have expired. Please send a request to `GET /jobs/{job_id}/results`
+    to refresh the links.
+  tags:
+  - Batch Jobs
+- status: 402
+  code: PaymentRequired
+  title: The budget required to fulfil the request is not sufficient. A payment is required first.
+  description: The budget required to fulfil the request is insufficient.
+  tags:
+  - Batch Jobs
+  - Secondary Services
+- status: 400
+  code: BillingPlanInvalid
+  title: The billing plan is invalid.
+  description: The billing plan is not on the list of available plans.
+  tags:
+  - Batch Jobs
+  - Secondary Services
+  - Data Processing
+- status: 400
+  code: BillingPlanMissing
+  title: A billing plan must be specified.
+  description: No billing plan has been specified by the user and the billing plan can't be determined unambiguously.
+  tags:
+  - Batch Jobs
+  - Secondary Services
+  - Data Processing
+- status: 401
+  code: AuthenticationRequired
+  title: Unauthorized.
+  description: The client did not provide any authentication details for a resource requiring authentication or
+    the provided authentication details are not correct.
+  tags:
+  - Account Management
+- status: 403
+  code: AuthenticationSchemeInvalid
+  title: Authentication method not supported.
+  description: Invalid authentication scheme (e.g. Bearer).
+  tags:
+  - Account Management
+- status: 403
+  code: TokenInvalid
+  title: Authorization token has expired or is invalid. Please authenticate again.
+  description: null
+  tags:
+  - Account Management
+- status: 403
+  code: CredentialsInvalid
+  title: Credentials are not correct.
+  description: null
+  tags:
+  - Account Management
+- status: 403
+  code: PermissionsInsufficient
+  title: Forbidden. The permissions of the authenticated account do not allow to request the requested resource.
+  description: Forbidden. The client did provided correct authentication details, but the privileges/permissions
+    of the provided credentials do not allow to request the resource.
+  tags:
+  - Account Management
+- status: 404
+  code: ServiceNotFound
+  title: Service '{identifier}' does not exist.
+  description: The requested secondary service does not exist.
+  tags:
+  - Secondary Services
+- status: 400
+  code: ServiceUnsupported
+  title: Service type '{type}' is not supported.
+  description: null
+  tags:
+  - Secondary Services
+- status: 400
+  code: ServiceConfigUnsupported
+  title: Service parameter '{parameter}' is not supported.
+  description: Refers to the secondary service `configuration` object.
+  tags:
+  - Secondary Services
+- status: 400
+  code: ServiceConfigInvalid
+  title: 'The value passed for the service parameter ''{parameter}'' is invalid: {reason}'
+  description: Refers to the secondary service `configuration` object.
+  tags:
+  - Secondary Services
+- status: 400
+  code: ServiceConfigRequired
+  title: Service parameter '{parameter}' is required.
+  description: Refers to the secondary service `configuration` object.
+  tags:
+  - Secondary Services

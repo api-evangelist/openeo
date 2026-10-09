@@ -1,0 +1,101 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/api-evangelist/openeo/main/json-schema/openeo-workspace-schema.json",
+  "title": "Workspace",
+  "x-generated": "2026-10-09",
+  "x-method": "derived",
+  "x-generator": "derive-json-schema.py",
+  "x-source": "openapi/openeo-workspaces-openapi.yml#/components/schemas/workspace",
+  "required": [
+    "id",
+    "status",
+    "type"
+  ],
+  "type": "object",
+  "properties": {
+    "id": {
+      "$ref": "#/$defs/workspace_id"
+    },
+    "title": {
+      "$ref": "#/$defs/workspace_title"
+    },
+    "description": {
+      "$ref": "#/$defs/workspace_description"
+    },
+    "type": {
+      "type": "string",
+      "description": "The workspace provider name as defined in `GET /workspace_providers`."
+    },
+    "status": {
+      "type": "string",
+      "description": "The status of the workspace."
+    },
+    "details": {
+      "type": "string",
+      "description": "A status message (e.g. error message) or any other free-text information about the workspace."
+    },
+    "quota": {
+      "$ref": "../../openapi.yaml#/components/schemas/max_storage_quota"
+    }
+  },
+  "oneOf": [
+    {
+      "title": "Unavailable",
+      "description": "The workspace is not available, e.g. because it's still provisioning it or the back-end can't connect to it / lost the connection / has been deleted externally, ...",
+      "properties": {
+        "status": {
+          "enum": [
+            "provisioning",
+            "unavailable"
+          ]
+        }
+      }
+    },
+    {
+      "title": "Ready",
+      "properties": {
+        "status": {
+          "enum": [
+            "ready"
+          ]
+        },
+        "url": {
+          "$ref": "#/$defs/workspace_url"
+        },
+        "properties": {
+          "$ref": "#/$defs/workspace_properties"
+        },
+        "free": {
+          "$ref": "../../openapi.yaml#/components/schemas/storage_quota_free"
+        }
+      }
+    }
+  ],
+  "$defs": {
+    "workspace_description": {
+      "type": "string",
+      "format": "commonmark",
+      "description": "A description that describes the workspace.\n\n[CommonMark 0.29](http://commonmark.org/) syntax MAY be used for rich\ntext representation."
+    },
+    "workspace_id": {
+      "type": "string",
+      "pattern": "^[\\w\\-\\.~]+$"
+    },
+    "workspace_properties": {
+      "type": "object",
+      "description": "Any additional metadata of the workspace provided by the workspace provider. The structure is not specified by the API.",
+      "additionalProperties": {
+        "description": "Any type"
+      }
+    },
+    "workspace_title": {
+      "type": "string",
+      "description": "A short title for the workspace."
+    },
+    "workspace_url": {
+      "type": "string",
+      "format": "uri",
+      "description": "The URL of the actual workspace, e.g. a bucket URL."
+    }
+  }
+}

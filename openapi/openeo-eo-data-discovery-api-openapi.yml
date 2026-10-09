@@ -1,0 +1,1446 @@
+openapi: 3.2.0
+info:
+  title: Openeo EO Data Discovery API
+  version: 1.3.0
+  contact:
+    name: openEO Project Steering Committee
+    url: https://openeo.org
+    email: openeo.psc@uni-muenster.de
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  description: 'Operations tagged EO Data Discovery across 2 of this provider''s published API definitions: openeo-api-openapi.yaml, openeo-openapi.yml. Each path carries the servers of the definition it was published in.'
+servers:
+- url: https://openeo.example/api/{version}
+  description: The URL of the API MAY freely be chosen by the back-end providers. The path, including API versioning, is a *recommendation* only. Nevertheless, all servers MUST support HTTPS as the authentication methods are not secure with HTTP only!
+  variables:
+    version:
+      default: v1
+      description: 'API versioning is RECOMMENDED. As the openEO API is following
+
+        [SemVer](https://semver.org/) only the **major** part of the version
+
+        numbers SHOULD be used for API versioning in the URL. To make clear
+
+        that it is a version number, it is RECOMMENDED to add the prefix `v`.
+
+
+        Example: API version `1.2.3` is recommended to use `v1`.
+
+
+        The reason to only consider the major part is that backward-incompatible
+
+        changes are introduced by major changes only. All changes from minor
+
+        and patch releases can usually be integrated without breakages and thus
+
+        a change in the URL is not really needed.
+
+
+        The version number in the URL MUST not be used by the clients to detect
+
+        the version number of the API. Use the version number returned in the
+
+        property `api_version` from `GET /` instead.'
+tags:
+- name: EO Data Discovery
+  description: These endpoints allow to list the collections that are available at the back-end and can be used as data cubes for data processing.
+paths:
+  /collections:
+    get:
+      summary: Basic metadata for all datasets
+      operationId: list-collections
+      description: 'Lists available collections with at least the required information.
+
+
+        It is **strongly RECOMMENDED** to keep the response size small by
+
+        omitting larger optional values from the objects in `collections` (e.g. the
+
+        `summaries` and `cube:dimensions` properties).
+
+        To get the full metadata for a collection clients MUST
+
+        request `GET /collections/{collection_id}`.
+
+
+        This endpoint is compatible with STAC API 1.0.0 and later and
+
+        OGC API - Features 1.0.
+
+        STAC API extensions and
+
+        STAC extensions
+
+        can be implemented in addition to what is documented here.
+
+
+        Note: Although it is possible to request public collections without
+
+        authorization, it is RECOMMENDED that clients (re-)request the collections
+
+        with the Bearer token once available to also retrieve any private collections.'
+      tags:
+      - EO Data Discovery
+      security:
+      - {}
+      - Bearer: []
+      parameters:
+      - $ref: '#/components/parameters/pagination_limit'
+      responses:
+        '200':
+          description: Lists of collections and related links.
+          content:
+            application/json:
+              schema:
+                title: Collections
+                type: object
+                required:
+                - collections
+                - links
+                properties:
+                  collections:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/collection'
+                  links:
+                    $ref: '#/components/schemas/links_pagination'
+              example:
+                collections:
+                - stac_version: 1.0.0
+                  type: Collection
+                  id: Sentinel-2A
+                  title: Sentinel-2A MSI L1C
+                  description: Sentinel-2A is a wide-swath, high-resolution, multi-spectral imaging mission supporting Copernicus Land Monitoring studies, including the monitoring of vegetation, soil and water cover, as well as observation of inland waterways and coastal areas.
+                  license: proprietary
+                  extent:
+                    spatial:
+                      bbox:
+                      - - -180
+                        - -56
+                        - 180
+                        - 83
+                    temporal:
+                      interval:
+                      - - '2015-06-23T00:00:00Z'
+                        - '2019-01-01T00:00:00Z'
+                  keywords:
+                  - copernicus
+                  - esa
+                  - msi
+                  - sentinel
+                  providers:
+                  - name: European Space Agency (ESA)
+                    roles:
+                    - producer
+                    - licensor
+                    url: https://sentinel.esa.int/web/sentinel/user-guides/sentinel-2-msi
+                  - name: openEO
+                    roles:
+                    - host
+                    url: https://developers.google.com/earth-engine/datasets/catalog/COPERNICUS_S2
+                  links:
+                  - rel: license
+                    href: https://scihub.copernicus.eu/twiki/pub/SciHubWebPortal/TermsConditions/Sentinel_Data_Terms_and_Conditions.pdf
+                - stac_version: 1.0.0
+                  type: Collection
+                  id: MOD09Q1
+                  title: MODIS/Terra Surface Reflectance 8-Day L3 Global 250m SIN Grid V006
+                  description: The MOD09Q1 Version 6 product provides an estimate of the surface spectral reflectance of Terra MODIS Bands 1-2 corrected for atmospheric conditions such as gasses, aerosols, and Rayleigh scattering. Provided along with the two 250 m MODIS bands is one additional layer, the Surface Reflectance QC 250 m band. For each pixel, a value is selected from all the acquisitions within the 8-day composite period. The criteria for the pixel choice include cloud and solar zenith. When several acquisitions meet the criteria the pixel with the minimum channel 3 (blue) value is used. Validation at stage 3 has been achieved for all MODIS Surface Reflectance products.
+                  license: proprietary
+                  extent:
+                    spatial:
+                      bbox:
+                      - - -180
+                        - -90
+                        - 180
+                        - 90
+                    temporal:
+                      interval:
+                      - - '2000-02-01T00:00:00Z'
+                        - null
+                  links:
+                  - rel: license
+                    href: https://openeo.example/api/v1/collections/MOD09Q1/license
+                links:
+                - rel: alternate
+                  href: https://openeo.example/csw
+                  title: openEO catalog (OGC Catalogue Services 3.0)
+        4XX:
+          $ref: '#/components/responses/client_error_auth'
+        5XX:
+          $ref: '#/components/responses/server_error'
+    servers:
+    - url: https://openeo.example/api/{version}
+      description: The URL of the API MAY freely be chosen by the back-end providers. The path, including API versioning, is a *recommendation* only. Nevertheless, all servers MUST support HTTPS as the authentication methods are not secure with HTTP only!
+      variables:
+        version:
+          default: v1
+          description: 'API versioning is RECOMMENDED. As the openEO API is following
+
+            [SemVer](https://semver.org/) only the **major** part of the version
+
+            numbers SHOULD be used for API versioning in the URL. To make clear
+
+            that it is a version number, it is RECOMMENDED to add the prefix `v`.
+
+
+            Example: API version `1.2.3` is recommended to use `v1`.
+
+
+            The reason to only consider the major part is that backward-incompatible
+
+            changes are introduced by major changes only. All changes from minor
+
+            and patch releases can usually be integrated without breakages and thus
+
+            a change in the URL is not really needed.
+
+
+            The version number in the URL MUST not be used by the clients to detect
+
+            the version number of the API. Use the version number returned in the
+
+            property `api_version` from `GET /` instead.'
+  /collections/{collection_id}:
+    get:
+      summary: Full metadata for a specific dataset
+      operationId: describe-collection
+      description: 'Lists **all** information about a specific collection specified by the
+
+        identifier `collection_id`.
+
+
+        This endpoint is compatible with STAC API 1.0.0 and later and
+
+        OGC API - Features 1.0.
+
+        STAC API extensions and
+
+        STAC extensions
+
+        can be implemented in addition to what is documented here.
+
+
+        Note: Providing the Bearer token is REQUIRED for private collections.'
+      tags:
+      - EO Data Discovery
+      security:
+      - {}
+      - Bearer: []
+      parameters:
+      - $ref: '#/components/parameters/collection_id'
+      responses:
+        '200':
+          description: JSON object with the full collection metadata.
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - cube:dimensions
+                - summaries
+                allOf:
+                - $ref: '#/components/schemas/collection'
+              example:
+                stac_version: 1.0.0
+                stac_extensions:
+                - https://stac-extensions.github.io/datacube/v2.2.0/schema.json
+                type: Collection
+                id: Sentinel-2
+                title: Sentinel-2 MSI L2A
+                description: Sentinel-2A is a wide-swath, high-resolution, multi-spectral imaging mission supporting Copernicus Land Monitoring studies.
+                license: proprietary
+                keywords:
+                - copernicus
+                - esa
+                - msi
+                - sentinel
+                providers:
+                - name: European Space Agency (ESA)
+                  roles:
+                  - producer
+                  - licensor
+                  url: https://sentinel.esa.int/web/sentinel/user-guides/sentinel-2-msi
+                - name: Google
+                  roles:
+                  - host
+                  url: https://developers.google.com/earth-engine/datasets/catalog/COPERNICUS_S2
+                extent:
+                  spatial:
+                    bbox:
+                    - - -180
+                      - -56
+                      - 180
+                      - 83
+                  temporal:
+                    interval:
+                    - - '2015-06-23T00:00:00Z'
+                      - null
+                links:
+                - rel: license
+                  href: https://scihub.copernicus.eu/twiki/pub/SciHubWebPortal/TermsConditions/Sentinel_Data_Terms_and_Conditions.pdf
+                  type: application/pdf
+                - rel: http://www.opengis.net/def/rel/ogc/1.0/queryables
+                  href: https://openeo.example/api/v1/collections/Sentinel-2A/queryables
+                  type: application/schema+json
+                - rel: about
+                  href: https://earth.esa.int/web/sentinel/user-guides/sentinel-2-msi/product-types/level-1c
+                  type: text/html
+                  title: ESA Sentinel-2 MSI Level-1C User Guide
+                - rel: example
+                  href: https://openeo.example/api/v1/collections/Sentinel-2/examples/true-color.json
+                  type: application/json
+                  title: Example Process for True-Color Visualization
+                - rel: example
+                  href: https://openeo.example/api/v1/collections/Sentinel-2/examples/ndvi.json
+                  type: application/json
+                  title: Example Process for NDVI Calculation and Visualization
+                cube:dimensions:
+                  x:
+                    type: spatial
+                    axis: x
+                    extent:
+                    - -180
+                    - 180
+                    reference_system: 4326
+                  y:
+                    type: spatial
+                    axis: y
+                    extent:
+                    - -56
+                    - 83
+                    reference_system: 4326
+                  t:
+                    type: temporal
+                    extent:
+                    - '2015-06-23T00:00:00Z'
+                    - null
+                    step: null
+                  bands:
+                    type: bands
+                    values:
+                    - B1
+                    - B2
+                    - B3
+                    - B4
+                    - B5
+                    - B6
+                    - B7
+                    - B8
+                    - B8A
+                    - B9
+                    - B10
+                    - B11
+                    - B12
+                summaries:
+                  constellation:
+                  - Sentinel-2
+                  platform:
+                  - Sentinel-2A
+                  - Sentinel-2B
+                  instruments:
+                  - MSI
+                  eo:cloud_cover:
+                    minimum: 0
+                    maximum: 75
+                  sat:orbit_state:
+                  - ascending
+                  - descending
+                  gsd:
+                  - 10
+                  - 20
+                  - 60
+                  eo:bands:
+                  - name: B1
+                    common_name: coastal
+                    center_wavelength: 0.4439
+                    gsd: 60
+                  - name: B2
+                    common_name: blue
+                    center_wavelength: 0.4966
+                    gsd: 10
+                  - name: B3
+                    common_name: green
+                    center_wavelength: 0.56
+                    gsd: 10
+                  - name: B4
+                    common_name: red
+                    center_wavelength: 0.6645
+                    gsd: 10
+                  - name: B5
+                    center_wavelength: 0.7039
+                    gsd: 20
+                  - name: B6
+                    center_wavelength: 0.7402
+                    gsd: 20
+                  - name: B7
+                    center_wavelength: 0.7825
+                    gsd: 20
+                  - name: B8
+                    common_name: nir
+                    center_wavelength: 0.8351
+                    gsd: 10
+                  - name: B8A
+                    common_name: nir08
+                    center_wavelength: 0.8648
+                    gsd: 20
+                  - name: B9
+                    common_name: nir09
+                    center_wavelength: 0.945
+                    gsd: 60
+                  - name: B10
+                    common_name: cirrus
+                    center_wavelength: 1.3735
+                    gsd: 60
+                  - name: B11
+                    common_name: swir16
+                    center_wavelength: 1.6137
+                    gsd: 20
+                  - name: B12
+                    common_name: swir22
+                    center_wavelength: 2.2024
+                    gsd: 20
+                  proj:epsg:
+                    minimum: 32601
+                    maximum: 32660
+                assets:
+                  thumbnail:
+                    href: https://openeo.example/api/v1/collections/Sentinel-2/thumbnail.png
+                    type: image/png
+                    title: Preview
+                    roles:
+                    - thumbnail
+                  inspire:
+                    href: https://openeo.example/api/v1/collections/Sentinel-2/inspire.xml
+                    type: application/xml
+                    title: INSPIRE metadata
+                    description: INSPIRE compliant XML metadata
+                    roles:
+                    - metadata
+        4XX:
+          $ref: '#/components/responses/client_error_auth'
+        5XX:
+          $ref: '#/components/responses/server_error'
+    servers:
+    - url: https://openeo.example/api/{version}
+      description: The URL of the API MAY freely be chosen by the back-end providers. The path, including API versioning, is a *recommendation* only. Nevertheless, all servers MUST support HTTPS as the authentication methods are not secure with HTTP only!
+      variables:
+        version:
+          default: v1
+          description: 'API versioning is RECOMMENDED. As the openEO API is following
+
+            [SemVer](https://semver.org/) only the **major** part of the version
+
+            numbers SHOULD be used for API versioning in the URL. To make clear
+
+            that it is a version number, it is RECOMMENDED to add the prefix `v`.
+
+
+            Example: API version `1.2.3` is recommended to use `v1`.
+
+
+            The reason to only consider the major part is that backward-incompatible
+
+            changes are introduced by major changes only. All changes from minor
+
+            and patch releases can usually be integrated without breakages and thus
+
+            a change in the URL is not really needed.
+
+
+            The version number in the URL MUST not be used by the clients to detect
+
+            the version number of the API. Use the version number returned in the
+
+            property `api_version` from `GET /` instead.'
+  /collections/{collection_id}/queryables:
+    get:
+      summary: Metadata filters for a specific dataset
+      operationId: list-collection-queryables
+      description: 'Lists **all** supported metadata filters (also called "queryables") for
+
+        a specific collection.
+
+
+        This endpoint is compatible with the endpoint defined in the STAC API extension
+
+        `filter` and
+
+        OGC API - Features - Part 3: Filtering.
+
+        For a precise definition please follow those specifications.
+
+
+        This endpoints provides a JSON Schema for each queryable that openEO
+
+        users can use in multiple scenarios:
+
+        1. For loading data from the collection, e.g. in the process `load_collection`.
+
+        2. For filtering items using CQL2 on the `/collections/{collection_id}/items` endpoint
+
+        (if STAC API - Features is implemented in addition to the openEO API).
+
+
+        Note: Providing the Bearer token is REQUIRED for private collections.'
+      tags:
+      - EO Data Discovery
+      security:
+      - {}
+      - Bearer: []
+      parameters:
+      - $ref: '#/components/parameters/collection_id'
+      responses:
+        '200':
+          description: 'A JSON Schema defining the queryables.
+
+
+            It is RECOMMENDED to dereference all "$refs".'
+          content:
+            application/schema+json:
+              schema:
+                $ref: '#/components/schemas/json_schema'
+              example:
+                $schema: https://json-schema.org/draft/2019-09/schema
+                $id: https://openeo.example/api/v1/collections/Sentinel-2A/queryables
+                type: object
+                title: Sentinel-2A
+                properties:
+                  eo:cloud_cover:
+                    title: Cloud Cover
+                    type: number
+                    minimum: 0
+                    maximum: 100
+                  platform:
+                    title: Platform
+                    description: The satellite platform.
+                    type: string
+                    enum:
+                    - sentinel-2a
+                    - sentinel-2b
+                additionalProperties: false
+        4XX:
+          $ref: '#/components/responses/client_error_auth'
+        5XX:
+          $ref: '#/components/responses/server_error'
+    servers:
+    - url: https://openeo.example/api/{version}
+      description: The URL of the API MAY freely be chosen by the back-end providers. The path, including API versioning, is a *recommendation* only. Nevertheless, all servers MUST support HTTPS as the authentication methods are not secure with HTTP only!
+      variables:
+        version:
+          default: v1
+          description: 'API versioning is RECOMMENDED. As the openEO API is following
+
+            [SemVer](https://semver.org/) only the **major** part of the version
+
+            numbers SHOULD be used for API versioning in the URL. To make clear
+
+            that it is a version number, it is RECOMMENDED to add the prefix `v`.
+
+
+            Example: API version `1.2.3` is recommended to use `v1`.
+
+
+            The reason to only consider the major part is that backward-incompatible
+
+            changes are introduced by major changes only. All changes from minor
+
+            and patch releases can usually be integrated without breakages and thus
+
+            a change in the URL is not really needed.
+
+
+            The version number in the URL MUST not be used by the clients to detect
+
+            the version number of the API. Use the version number returned in the
+
+            property `api_version` from `GET /` instead.'
+components:
+  schemas:
+    stac_version:
+      type: string
+      description: 'The [version of the STAC specification](https://github.com/radiantearth/stac-spec/releases), which MAY not be equal to the [STAC API version](#tag/EO-Data-Discovery/STAC).
+
+        The openEO API allows for the STAC versions 1.x.x (RECOMMENDED) and 0.9.x (DEPRECATED).'
+      pattern: ^(0\.9.\d+|1\.\d+.\d+)
+      example: 1.1.0
+    asset:
+      title: STAC Asset
+      type: object
+      required:
+      - href
+      properties:
+        href:
+          title: Asset location
+          description: 'URL to the downloadable asset.
+
+            The URLs SHOULD be available without authentication so that external clients can download them easily. If the data is confidential, signed URLs SHOULD be used to protect against unauthorized access from third parties.'
+          type: string
+        title:
+          description: The displayed title for clients and users.
+          type: string
+        description:
+          type: string
+          format: commonmark
+          description: 'Multi-line description to explain the asset.
+
+
+            [CommonMark 0.29](http://commonmark.org/) syntax MAY be used for rich
+
+            text representation.'
+        type:
+          title: Media Type
+          description: Media type of the asset.
+          type: string
+          example: image/tiff; application=geotiff
+        roles:
+          type: array
+          items:
+            type: string
+          description: 'Purposes of the asset. Can be any value, but commonly used values are:
+
+
+            * `thumbnail`: A visualization of the data, usually a lower-resolution true color image in JPEG or PNG format.
+
+            * `reproducibility`: Information how the data was produced and/or can be reproduced, e.g. the process graph used to compute the data in JSON format.
+
+            * `data`: The computed data in the format specified by the user in the process graph (applicable in `GET /jobs/{job_id}/results` only).
+
+            * `metadata`: Additional metadata available for the computed data.'
+          example:
+          - data
+    stac_extensions:
+      type: array
+      description: A list of implemented STAC extensions. The list contains URLs to the JSON Schema files it can be validated against.
+      uniqueItems: true
+      items:
+        anyOf:
+        - title: Reference to a JSON Schema
+          type: string
+          format: uri
+          example: https://openeo.example/stac/custom-extemsion/v1.0.0/schema.json
+        - title: Reference to a core extension (STAC < 1.0.0-rc.1 only, DEPRECATED)
+          type: string
+          example: datacube
+    log_code:
+      type: string
+      description: The code is either one of the standardized error codes or a custom code, for example specified by a user in the `inspect` process.
+      example: SampleError
+    dimension:
+      title: Dimension
+      description: A dimension, each object represents a distinct dimension with the key being the dimension name.
+      type: object
+      required:
+      - type
+      properties:
+        type:
+          description: Type of the dimension.
+          type: string
+          enum:
+          - spatial
+          - temporal
+          - bands
+          - geometry
+          - other
+        description:
+          $ref: '#/components/schemas/description'
+      discriminator:
+        propertyName: type
+        mapping:
+          spatial: '#/components/schemas/dimension_spatial'
+          temporal: '#/components/schemas/dimension_temporal'
+          bands: '#/components/schemas/dimension_bands'
+          geometry: '#/components/schemas/dimension_geometry'
+          other: '#/components/schemas/dimension_other'
+    stac_providers:
+      type: array
+      description: A list of providers, which MAY include all organizations capturing or processing the data or the hosting provider. Providers SHOULD be listed in chronological order with the most recent provider being the last element of the list.
+      items:
+        type: object
+        title: Provider
+        required:
+        - name
+        properties:
+          name:
+            description: The name of the organization or the individual.
+            type: string
+            example: Example Cloud Corp.
+          description:
+            description: 'Multi-line description to add further provider information such as processing details for processors and producers, hosting details for hosts or basic contact information.
+
+
+              CommonMark 0.29 syntax MAY be used for rich text representation.'
+            type: string
+            example: No further processing applied.
+          roles:
+            description: 'Roles of the provider.
+
+
+              The provider''s role(s) can be one or more of the following
+
+              elements:
+
+              * `licensor`: The organization that is licensing the dataset under
+
+              the license specified in the collection''s license field.
+
+              * `producer`: The producer of the data is the provider that
+
+              initially captured and processed the source data, e.g. ESA for
+
+              Sentinel-2 data.
+
+              * `processor`: A processor is any provider who processed data to a
+
+              derived product.
+
+              * `host`: The host is the actual provider offering the data on their
+
+              storage. There SHOULD be no more than one host, specified as last
+
+              element of the list.'
+            type: array
+            items:
+              type: string
+              enum:
+              - producer
+              - licensor
+              - processor
+              - host
+            example:
+            - producer
+            - licensor
+            - host
+          url:
+            description: Homepage on which the provider describes the dataset and publishes contact information.
+            type: string
+            format: uri
+            example: https://cloud.example
+    description:
+      type: string
+      format: commonmark
+      description: 'Detailed description to explain the entity.
+
+
+        [CommonMark 0.29](http://commonmark.org/) syntax MAY be used for rich text representation.'
+    collection:
+      title: Collection
+      type: object
+      required:
+      - stac_version
+      - id
+      - description
+      - license
+      - extent
+      - links
+      properties:
+        stac_version:
+          $ref: '#/components/schemas/stac_version'
+        stac_extensions:
+          $ref: '#/components/schemas/stac_extensions'
+        type:
+          type: string
+          enum:
+          - Collection
+          description: For STAC versions >= 1.0.0-rc.1 this field is required.
+        id:
+          $ref: '#/components/schemas/collection_id'
+        title:
+          type: string
+          description: A short descriptive one-line title for the collection.
+        description:
+          type: string
+          format: commonmark
+          description: 'Detailed multi-line description to explain the collection.
+
+
+            [CommonMark 0.29](http://commonmark.org/) syntax MAY be used for rich text representation.'
+        keywords:
+          type: array
+          description: List of keywords describing the collection.
+          items:
+            type: string
+        version:
+          type: string
+          description: 'Version of the collection.
+
+
+            This property REQUIRES to add `version` (STAC < 1.0.0-rc.1) or
+
+            `https://stac-extensions.github.io/version/v1.2.0/schema.json` (STAC >= 1.0.0-rc.1)
+
+            to the list of `stac_extensions`.'
+        deprecated:
+          type: boolean
+          default: false
+          description: 'Specifies that the collection is deprecated with the potential to
+
+            be removed. It should be transitioned out of usage as soon as
+
+            possible and users should refrain from using it in new projects.
+
+
+            A link with relation type `latest-version` SHOULD be added to the
+
+            links and MUST refer to the collection that can be used instead.
+
+
+            This property REQUIRES to add `version` (STAC < 1.0.0-rc.1) or
+
+            `https://stac-extensions.github.io/version/v1.2.0/schema.json` (STAC >= 1.0.0-rc.1)
+
+            to the list of `stac_extensions`.'
+        license:
+          $ref: '#/components/schemas/stac_license'
+        providers:
+          $ref: '#/components/schemas/stac_providers'
+        extent:
+          type: object
+          title: Collection Extent
+          description: 'The extent of the data in the collection. Additional members MAY
+
+            be added to represent other extents, for example, thermal or
+
+            pressure ranges.
+
+
+            The first item in the array always describes the overall extent of
+
+            the data. All subsequent items describe more preciseextents,
+
+            e.g. to identify clusters of data.
+
+            Clients only interested in the overall extent will only need to
+
+            access the first item in each array.'
+          required:
+          - spatial
+          - temporal
+          properties:
+            spatial:
+              title: Collection Spatial Extent
+              description: The *potential* spatial extents of the features in the collection.
+              type: object
+              properties:
+                bbox:
+                  description: 'One or more bounding boxes that describe the spatial extent
+
+                    of the dataset.
+
+
+                    The first bounding box describes the overall spatial extent
+
+                    of the data. All subsequent bounding boxes describe more
+
+                    precise bounding boxes, e.g. to identify clusters of data.
+
+                    Clients only interested in the overall spatial extent will
+
+                    only need to access the first item in each array.'
+                  type: array
+                  minItems: 1
+                  items:
+                    $ref: '#/components/schemas/bbox'
+            temporal:
+              title: Collection Temporal Extent
+              description: The *potential* temporal extents of the features in the collection.
+              type: object
+              properties:
+                interval:
+                  description: 'One or more time intervals that describe the temporal extent
+
+                    of the dataset.
+
+
+                    The first time interval describes the overall temporal extent
+
+                    of the data. All subsequent time intervals describe more
+
+                    precise time intervals, e.g. to identify clusters of data.
+
+                    Clients only interested in the overall extent will only need
+
+                    to access the first item in each array.'
+                  type: array
+                  minItems: 1
+                  items:
+                    description: 'Begin and end times of the time interval. The coordinate
+
+                      reference system is the Gregorian calendar.
+
+
+                      The value `null` is supported and indicates an open time
+
+                      interval.'
+                    type: array
+                    minItems: 2
+                    maxItems: 2
+                    items:
+                      type:
+                      - string
+                      - 'null'
+                      format: date-time
+                    example:
+                    - '2011-11-11T12:22:11Z'
+                    - null
+        links:
+          description: 'Links related to this collection.
+
+            Could reference to licensing information, other meta data formats with
+
+            additional information or a preview image.
+
+
+            Providing links with the following `rel` (relation) types is RECOMMENDED:
+
+
+            1. `root` and `parent`: URL to the data discovery endpoint at `/collections`.
+
+
+            2. `license`: A link to the license(s) SHOULD be specified if the `license`
+
+            field is set to `proprietary` or `various`.
+
+
+            3. `example`: Links to examples of processes that use this collection.
+
+
+            4. `latest-version`: If a collection has been marked as deprecated, a link SHOULD
+
+            point to the latest version of the collection. The relation types `predecessor-version`
+
+            (link to older version) and `successor-version` (link to newer version) can also be used
+
+            to show the relation between versions.
+
+
+            5. `alternate`: An alternative representation of the collection.
+
+            For example, this could be the collection available through another
+
+            catalog service such as OGC CSW, a human-readable HTML version or a
+
+            metadata document following another standard such as ISO 19115 or DCAT.
+
+
+            6. `http://www.opengis.net/def/rel/ogc/1.0/queryables`: URL to the
+
+            queryables endpoint at `/collections/{collection_id}/queryables`.
+
+            For JSON Schema documents, the `type` field must be set to `application/schema+json`.
+
+
+            For additional relation types see also the lists of
+
+            [common relation types in openEO](#section/API-Principles/Web-Linking)
+
+            and the STAC specification for Collections.'
+          type: array
+          items:
+            $ref: '#/components/schemas/link'
+        cube:dimensions:
+          title: STAC Collection Cube Dimensions
+          description: 'The named default dimensions of the data cube.
+
+            Names must be unique per collection.
+
+
+            The keys of the object are the dimension names. For
+
+            interoperability, it is RECOMMENDED to use the
+
+            following dimension names if there is only a single
+
+            dimension with the specified criteria:
+
+
+            * `x` for the dimension of type `spatial` with the axis set to `x`
+
+            * `y` for the dimension of type `spatial` with the axis set to `y`
+
+            * `z` for the dimension of type `spatial` with the axis set to `z`
+
+            * `t` for the dimension of type `temporal`
+
+            * `bands` for dimensions of type `bands`
+
+            * `geometry` for dimensions of type `geometry`
+
+
+            This property REQUIRES to add a version of the data cube extension to the list
+
+            of `stac_extensions`, e.g. `https://stac-extensions.github.io/datacube/v2.2.0/schema.json`.'
+          type: object
+          additionalProperties:
+            x-additionalPropertiesName: Dimension Name
+            allOf:
+            - $ref: '#/components/schemas/dimension'
+        summaries:
+          title: STAC Summaries (Collection Properties)
+          description: "Collection properties from STAC extensions (e.g. EO,\nSAR, Satellite or Scientific) or even custom extensions.\n\nSummaries are either a unique set of all available\nvalues, statistics *or* a JSON Schema. Statistics only\nspecify the range (minimum and maximum values) by default,\nbut can optionally be accompanied by additional\nstatistical values. The range can specify the\npotential range of values, but it is recommended to be\nas precise as possible. The set of values MUST contain\nat least one element and it is strongly RECOMMENDED to\nlist all values. It is recommended to list as many\nproperties as reasonable so that consumers get a full\noverview of the Collection. Properties that are\ncovered by the Collection specification (e.g.\n`providers` and `license`) SHOULD NOT be repeated in the\nsummaries.\n\nPotential fields for the summaries can be found here:\n\n* **[STAC Common Metadata](https://github.com/radiantearth/stac-spec/blob/v1.1.0/commons/common-metadata.md)**:\n  A list of commonly used fields throughout all domains\n* **[Content Extensions](https://stac-extensions.github.io)**:\n  Domain-specific fields for domains such as EO, SAR and point clouds.\n* **Custom Properties**:\n  It is generally allowed to add custom fields."
+          type: object
+          additionalProperties:
+            oneOf:
+            - type: array
+              title: Set of values
+              items:
+                description: A value of any type.
+            - $ref: '#/components/schemas/collection_summary_stats'
+            - $ref: '#/components/schemas/json_schema'
+        assets:
+          description: 'Dictionary of asset objects for data that can be downloaded,
+
+            each with a unique key.
+
+            The keys MAY be used by clients as file names.'
+          allOf:
+          - $ref: '#/components/schemas/stac_assets'
+    json_schema_type:
+      type: string
+      enum:
+      - array
+      - boolean
+      - integer
+      - 'null'
+      - number
+      - object
+      - string
+    collection_summary_stats:
+      type: object
+      title: Statistics / Range
+      description: 'By default, only ranges with a minimum and a maximum value can be specified. Ranges can be specified for ordinal values only, which means they need to have a rank order. Therefore, ranges can only be specified for numbers and some special types of strings. Examples: grades (A to F), dates or times. Implementors are free to add other derived statistical values to the object, for example `mean` or `stddev`.'
+      required:
+      - minimum
+      - maximum
+      properties:
+        minimum:
+          description: The minimum value (inclusive).
+          anyOf:
+          - type: string
+          - type: number
+        maximum:
+          description: The maximum value (inclusive).
+          anyOf:
+          - type: string
+          - type: number
+    log_links:
+      description: 'Links related to this log entry / error, e.g. to a resource that
+
+        provides further explanations.
+
+
+        For relation types see the lists of
+
+        [common relation types in openEO](#section/API-Principles/Web-Linking).'
+      type: array
+      items:
+        $ref: '#/components/schemas/link'
+      example:
+      - href: https://openeo.example/docs/errors/SampleError
+        rel: about
+    link:
+      title: Link
+      description: A link to another resource on the web. Bases on [RFC 5899](https://www.rfc-editor.org/rfc/rfc5988.html).
+      type: object
+      required:
+      - href
+      - rel
+      properties:
+        rel:
+          type: string
+          description: Relationship between the current document and the linked document. SHOULD be a [registered link relation type](https://www.iana.org/assignments/link-relations/link-relations.xml) whenever feasible.
+          example: related
+        href:
+          type: string
+          description: The value MUST be a valid URL.
+          format: uri
+          example: https://openeo.example
+        type:
+          type: string
+          description: The value MUST be a string that hints at the format used to represent data at the provided URI, preferably a media (MIME) type.
+          example: text/html
+        title:
+          type: string
+          description: Used as a human-readable label for a link.
+          example: openEO
+    stac_assets:
+      type: object
+      title: Assets
+      description: 'Dictionary of asset objects for data that can be downloaded, each with a
+
+        unique key. The keys MAY be used by clients as file names.'
+      additionalProperties:
+        $ref: '#/components/schemas/asset'
+      example:
+        preview.png:
+          href: https://openeo.example/api/v1/download/583fba8b2ce583fba8b2ce/preview.png
+          type: image/png
+          title: Thumbnail
+          roles:
+          - thumbnail
+        process.json:
+          href: https://openeo.example/api/v1/download/583fba8b2ce583fba8b2ce/process.json
+          type: application/json
+          title: Original Process
+          roles:
+          - process
+          - reproduction
+        1.tif:
+          href: https://openeo.example/api/v1/download/583fba8b2ce583fba8b2ce/1.tif
+          type: image/tiff; application=geotiff
+          title: Band 1
+          roles:
+          - data
+        2.tif:
+          href: https://openeo.example/api/v1/download/583fba8b2ce583fba8b2ce/2.tif
+          type: image/tiff; application=geotiff
+          title: Band 2
+          roles:
+          - data
+        inspire.xml:
+          href: https://openeo.example/api/v1/download/583fba8b2ce583fba8b2ce/inspire.xml
+          type: application/xml
+          title: INSPIRE metadata
+          description: INSPIRE compliant XML metadata
+          roles:
+          - metadata
+    error:
+      title: General Error
+      description: 'An error object declares additional information about a client-side or server-side error.
+
+        See also: * [Error Handling](#section/API-Principles/Error-Handling) in the API in general. * [Common Error Codes](errors.json)'
+      type: object
+      required:
+      - code
+      - message
+      properties:
+        id:
+          type: string
+          description: A back-end MAY add a unique identifier to the error response to be able to log and track errors with further non-disclosable details. A client could communicate this id to a back-end provider to get further information.
+          example: 550e8400-e29b-11d4-a716-446655440000
+        code:
+          $ref: '#/components/schemas/log_code'
+        message:
+          type: string
+          description: A message explaining what the client may need to change or what difficulties the server is facing.
+          example: Parameter 'sample' is missing.
+        links:
+          $ref: '#/components/schemas/log_links'
+    json_schema:
+      type: object
+      title: JSON Schema
+      description: 'A JSON Schema compliant to [JSON Schema draft-07](https://json-schema.org/draft-07/json-schema-validation.html) or later.
+
+
+        JSON Schemas SHOULD always be dereferenced (i.e. all `$refs` should be resolved).
+
+        This allows clients to consume the schemas much better.
+
+        Clients are not expected to support dereferencing `$refs`.
+
+
+        Note: The specified schema in the OpenAPI document is only a common subset of JSON Schema.
+
+        Additional keywords from the JSON Schema specification MAY be used.'
+      properties:
+        $schema:
+          description: 'The JSON Schema version. If not given in the context of openEO,
+
+            defaults to JSON Schema draft-07: `http://json-schema.org/draft-07/schema#`
+
+
+            The default value for `$schema` property may have to be added to the JSON Schema
+
+            object before passing it to a JSON Schema validator.'
+          type: string
+          format: uri
+          default: http://json-schema.org/draft-07/schema#
+        $id:
+          description: ID of your JSON Schema.
+          type: string
+          format: uri
+        type:
+          description: 'The allowed data type(s) for a value.
+
+
+            If this property is not present, all data types are allowed.'
+          oneOf:
+          - $ref: '#/components/schemas/json_schema_type'
+          - type: array
+            minItems: 1
+            uniqueItems: true
+            items:
+              $ref: '#/components/schemas/json_schema_type'
+        pattern:
+          type: string
+          format: regex
+          description: The regular expression a string value must match against.
+        enum:
+          type: array
+          items: {}
+          description: An exclusive list of allowed values.
+        minimum:
+          type: number
+          description: The minimum value (inclusive) allowed for a numerical value.
+        maximum:
+          type: number
+          description: The maximum value (inclusive) allowed for a numerical value.
+        minItems:
+          type: number
+          minimum: 0
+          default: 0
+          description: The minimum number of items required in an array.
+        maxItems:
+          type: number
+          minimum: 0
+          description: The maximum number of items required in an array.
+        items:
+          description: Specifies schemas for the items in an array.
+          anyOf:
+          - type: array
+            minItems: 1
+            items:
+              $ref: '#/components/schemas/json_schema'
+          - $ref: '#/components/schemas/json_schema'
+      additionalProperties:
+        description: Any other property supported by the JSON Schema version that is given through the property `$schema` are allowed. Defaults to JSON Schema [draft-07](https://json-schema.org/draft-07/json-schema-validation.html), but can also be any later version of JSON Schema.
+      example:
+        type: string
+        enum:
+        - a
+        - b
+    links_pagination:
+      description: 'Links related to this list of resources, for example links for pagination
+
+        or alternative formats such as a human-readable HTML version.
+
+        The links array MUST NOT be paginated.
+
+
+        If pagination is implemented, the following `rel` (relation) types apply:
+
+
+        1. `next` (REQUIRED): A link to the next page, except on the last page.
+
+
+        2. `prev` (OPTIONAL): A link to the previous page, except on the first page.
+
+
+        3. `first` (OPTIONAL): A link to the first page, except on the first page.
+
+
+        4. `last` (OPTIONAL): A link to the last page, except on the last page.
+
+
+        For additional relation types see also the lists of
+
+        [common relation types in openEO](#section/API-Principles/Web-Linking).'
+      type: array
+      items:
+        $ref: '#/components/schemas/link'
+    collection_id:
+      type: string
+      description: A unique identifier for the collection, which MUST match the specified pattern.
+      pattern: ^[\w\-\.~\/]+$
+      example: Sentinel-2A
+    bbox:
+      description: 'Each bounding box is provided as four or six numbers,
+
+        depending on whether the coordinate reference system
+
+        includes a vertical axis (height or depth):
+
+
+        * West (lower left corner, coordinate axis 1)
+
+        * South (lower left corner, coordinate axis 2)
+
+        * Base (optional, minimum value, coordinate axis 3)
+
+        * East (upper right corner, coordinate axis 1)
+
+        * North (upper right corner, coordinate axis 2)
+
+        * Height (optional, maximum value, coordinate axis 3)
+
+
+        The coordinate reference system of the values is WGS 84
+
+        longitude/latitude (http://www.opengis.net/def/crs/OGC/1.3/CRS84).
+
+
+        For WGS 84 longitude/latitude the values are in most cases
+
+        the sequence of minimum longitude, minimum latitude, maximum
+
+        longitude and maximum latitude.
+
+
+        However, in cases where the box spans the antimeridian the
+
+        first value (west-most box edge) is larger than the third value
+
+        (east-most box edge).
+
+
+        If the vertical axis is included, the third and the sixth
+
+        number are the bottom and the top of the 3-dimensional bounding box.'
+      type: array
+      oneOf:
+      - title: 4 elements
+        minItems: 4
+        maxItems: 4
+      - title: 6 elements
+        minItems: 6
+        maxItems: 6
+      items:
+        type: number
+      example:
+      - -180
+      - -90
+      - 180
+      - 90
+    stac_license:
+      type: string
+      description: 'License(s) of the data as a SPDX [License identifier](https://spdx.org/licenses/).
+
+        Alternatively, use `proprietary` if the license is not on the SPDX
+
+        license list or `various` if multiple licenses apply. In these two cases
+
+        links to the license texts SHOULD be added, see the `license` link
+
+        relation type.
+
+
+        Non-SPDX licenses SHOULD add a link to the license text with the
+
+        `license` relation in the links section. The license text MUST NOT be
+
+        provided as a value of this field. If there is no public license URL
+
+        available, it is RECOMMENDED to host the license text and link to it.'
+      example: Apache-2.0
+  parameters:
+    pagination_limit:
+      name: limit
+      description: 'This parameter enables pagination for the endpoint and specifies the maximum number of
+
+        elements that arrays in the top-level object (e.g. collections, processes, batch jobs,
+
+        secondary services, log entries, etc.) are allowed to contain.
+
+        The `links` array MUST NOT be paginated like the resources,
+
+        but instead contain links related to the paginated resources
+
+        or the pagination itself (e.g. a link to the next page).
+
+        If the parameter is not provided or empty, all elements are returned.
+
+
+        Pagination is OPTIONAL: back-ends or clients may not support it.
+
+        Therefore, it MUST be implemented in a way that clients not supporting
+
+        pagination get all resources regardless. Back-ends not supporting
+
+        pagination MUST return all resources.
+
+
+        If the response is paginated, the `links` array MUST be used to communicate the
+
+        links for browsing the pagination with predefined `rel` types. See the `links` array schema
+
+        for supported `rel` types.
+
+        Back-end implementations can, unless specified otherwise, use any kind of pagination technique,
+
+        depending on what is supported best by their infrastructure: page-based, offset-based, token-based
+
+        or something else. The clients SHOULD use whatever is specified
+
+        in the links with the corresponding `rel` types.'
+      in: query
+      allowEmptyValue: true
+      example: 10
+      schema:
+        type: integer
+        minimum: 1
+    collection_id:
+      name: collection_id
+      in: path
+      description: Collection identifier
+      required: true
+      schema:
+        $ref: '#/components/schemas/collection_id'
+  responses:
+    server_error:
+      description: 'The request can not be fulfilled due to an error at the back-end. The
+
+        error is never the client’s fault and therefore it is reasonable for the
+
+        client to retry the exact same request that triggered this response.
+
+
+        The response body SHOULD contain a JSON error object. MUST be any HTTP
+
+        status code specified in [RFC 7231](https://www.rfc-editor.org/rfc/rfc7231.html#section-6.6).
+
+
+        See also:
+
+        * [Error Handling](#section/API-Principles/Error-Handling) in the API in general.
+
+        * [Common Error Codes](errors.json)'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/error'
+    client_error_auth:
+      description: 'The request can not be fulfilled due to an error on client-side, i.e. the
+
+        request is invalid. The client SHOULD NOT repeat the request without
+
+        modifications.
+
+
+        The response body SHOULD contain a JSON error object.
+
+        MUST be any HTTP status code specified in [RFC 7231](https://www.rfc-editor.org/rfc/rfc7231.html#section-6.6).
+
+        This request MUST respond with HTTP status codes 401 if authorization is required or
+
+        403 if the authorization failed or access is forbidden in general to the
+
+        authenticated user. HTTP status code 404 SHOULD be used if the value of
+
+        a path parameter is invalid.
+
+
+        See also:
+
+        * [Error Handling](#section/API-Principles/Error-Handling) in the API in general.
+
+        * [Common Error Codes](errors.json)'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/error'
+  securitySchemes:
+    Bearer:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT or openEO
+      description: "A Bearer token can be provided in two different formats:\n1. **JSON Web Token (JWT) - RECOMMENDED**\n\n   - Conformance class: `https://api.openeo.org/1.3.0/authentication/jwt`\n   \n   The Bearer token is an access token in [JWT](https://datatracker.ietf.org/doc/html/rfc7519) format\n   as defined in RFC 7519. For openEO, it MUST include the issuer in the\n   `iss` claim although being optional in RFC 7519.\n   If the concept of an issuer does not exist in an authentication method (e.g. in HTTP Basic),\n   implementations could use the endpoint for Basic Authentication as the issuer, for example.\n\n   openEO backend implementations MUST signal their support for JWT by listing the given\n   conformance class. Likewise, openEO clients SHOULD only use JWT when the openEO backend\n   lists the conformance class.\n\n2. **openEO Tokens - DEPRECATED**\n\n   - Conformance class: *None*\n\n   The Bearer Token is constructed from the authentication method, a\n   provider ID (if available) and the access token. All separated by a\n   forward slash `/`.\n\n   Examples (replace `TOKEN` with the actual access token):\n\n   - Basic authentication (no provider ID available): `basic//TOKEN`\n   - OpenID Connect (provider ID is `ms`): `oidc/ms/TOKEN`.\n     For OpenID Connect, the provider ID corresponds to the value\n     specified for `id` for each provider in `GET /credentials/oidc`.\n\n   All openEO backends MUST accept this method for backward compatibility\n   until version 2.0 of the specification.\n\n   The access tokens provided by the identity provider do not include\n   the prefix that includes the authentication method and provider ID.\n   The Bearer Token sent to the openEO backend MUST have the prefix, e.g. `basic//` for Basic authentication.\n   This means that the clients have to prepend the prefix.\n\nJWT and openEO tokens can be distinguished by the presence of a slash `/` in the token, which JWT can never contain due to the Base64 encoding."
+    Basic:
+      type: http
+      scheme: basic
+externalDocs:
+  description: openEO Documentation
+  url: https://openeo.org/documentation/1.0/
+x-refined-from:
+- openeo-api-openapi.yaml
+- openeo-openapi.yml

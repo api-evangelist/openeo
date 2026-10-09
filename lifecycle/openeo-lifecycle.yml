@@ -1,0 +1,18 @@
+generated: '2026-10-09'
+method: searched
+source: openapi/openeo-openapi.yml (servers[].variables.version); https://github.com/Open-EO/openeo-api/blob/master/CHANGELOG.md
+versioning:
+  scheme: semver
+  in_url: major only, prefixed v (e.g. /api/v1) - RECOMMENDED, not required
+  discovery: clients MUST read `api_version` from GET / rather than the URL
+  current: 1.3.0
+deprecation:
+  policy: 'Deprecations are announced in the changelog and flagged with `deprecated: true` in process/collection
+    metadata; no Sunset/Deprecation headers (RFC 8594) are specified.'
+  recent:
+  - openEO-specific Bearer token format (deprecated in 1.3.0)
+  - STAC 0.9.x (deprecated in 1.3.0)
+status_page: null
+sla: null
+note: openEO is a specification implemented by independent back-ends; uptime/status/SLA are back-end matters and
+  none is published for the specification.

@@ -1,0 +1,11 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/api-evangelist/openeo/main/json-schema/openeo-workspace-id-schema.json",
+  "title": "workspace_id",
+  "x-generated": "2026-10-09",
+  "x-method": "derived",
+  "x-generator": "derive-json-schema.py",
+  "x-source": "openapi/openeo-workspaces-openapi.yml#/components/schemas/workspace_id",
+  "type": "string",
+  "pattern": "^[\\w\\-\\.~]+$"
+}

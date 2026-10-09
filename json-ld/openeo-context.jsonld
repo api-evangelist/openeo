@@ -1,0 +1,351 @@
+{
+  "@context": {
+    "@vocab": "https://openeo.org/schema#",
+    "schema": "https://schema.org/",
+    "xsd": "http://www.w3.org/2001/XMLSchema#",
+    "dcterms": "http://purl.org/dc/terms/",
+    "openeo": "https://openeo.org/schema#",
+    "order": "openeo:order",
+    "id": {
+      "@id": "openeo:id",
+      "@type": "@id"
+    },
+    "source_collection_id": {
+      "@id": "openeo:source_collection_id",
+      "@type": "xsd:string"
+    },
+    "target_collection_id": {
+      "@id": "openeo:target_collection_id",
+      "@type": "xsd:string"
+    },
+    "costs": {
+      "@id": "openeo:costs",
+      "@type": "@id"
+    },
+    "parameters": {
+      "@id": "openeo:parameters",
+      "@type": "@id"
+    },
+    "items": {
+      "@id": "openeo:items",
+      "@container": "@list"
+    },
+    "links": {
+      "@id": "openeo:links",
+      "@container": "@list"
+    },
+    "udf_runtime": "openeo:udf_runtime",
+    "title": {
+      "@id": "openeo:title",
+      "@type": "@id"
+    },
+    "description": {
+      "@id": "openeo:description",
+      "@type": "@id"
+    },
+    "type": {
+      "@id": "openeo:type",
+      "@type": "xsd:string"
+    },
+    "default": {
+      "@id": "openeo:default",
+      "@type": "xsd:string"
+    },
+    "deprecated": {
+      "@id": "openeo:deprecated",
+      "@type": "@id"
+    },
+    "experimental": {
+      "@id": "openeo:experimental",
+      "@type": "@id"
+    },
+    "result_status": "openeo:result_status",
+    "batch_job_result": "openeo:batch_job_result",
+    "stac_version": {
+      "@id": "openeo:stac_version",
+      "@type": "@id"
+    },
+    "stac_extensions": {
+      "@id": "openeo:stac_extensions",
+      "@type": "@id"
+    },
+    "bbox": {
+      "@id": "openeo:bbox",
+      "@type": "@id"
+    },
+    "geometry": {
+      "@id": "openeo:geometry"
+    },
+    "properties": {
+      "@id": "openeo:properties"
+    },
+    "assets": {
+      "@id": "openeo:assets",
+      "@type": "@id"
+    },
+    "file_format": "openeo:file_format",
+    "gis_data_types": {
+      "@id": "openeo:gis_data_types",
+      "@container": "@list"
+    },
+    "link": "openeo:link",
+    "rel": {
+      "@id": "openeo:rel",
+      "@type": "xsd:string"
+    },
+    "href": {
+      "@id": "openeo:href",
+      "@type": "@id"
+    },
+    "asset": "openeo:asset",
+    "roles": {
+      "@id": "openeo:roles",
+      "@container": "@list"
+    },
+    "collection": "openeo:collection",
+    "keywords": {
+      "@id": "openeo:keywords",
+      "@container": "@list"
+    },
+    "version": {
+      "@id": "openeo:version",
+      "@type": "xsd:string"
+    },
+    "license": {
+      "@id": "openeo:license",
+      "@type": "@id"
+    },
+    "providers": {
+      "@id": "openeo:providers",
+      "@type": "@id"
+    },
+    "extent": {
+      "@id": "openeo:extent"
+    },
+    "summaries": {
+      "@id": "openeo:summaries"
+    },
+    "collection_summary_stats": "openeo:collection_summary_stats",
+    "minimum": {
+      "@id": "openeo:minimum"
+    },
+    "maximum": {
+      "@id": "openeo:maximum"
+    },
+    "dimension": "openeo:dimension",
+    "dimension_axis_xyz": "openeo:dimension_axis_xyz",
+    "process": "openeo:process",
+    "summary": {
+      "@id": "openeo:summary",
+      "@type": "@id"
+    },
+    "categories": {
+      "@id": "openeo:categories",
+      "@type": "@id"
+    },
+    "returns": {
+      "@id": "openeo:returns",
+      "@type": "@id"
+    },
+    "exceptions": {
+      "@id": "openeo:exceptions",
+      "@type": "@id"
+    },
+    "examples": {
+      "@id": "openeo:examples",
+      "@container": "@list"
+    },
+    "process_graph": {
+      "@id": "openeo:process_graph",
+      "@type": "@id"
+    },
+    "user_defined_process_meta": "openeo:user_defined_process_meta",
+    "process_graph_with_metadata": "openeo:process_graph_with_metadata",
+    "process_return_value": "openeo:process_return_value",
+    "base_parameter": "openeo:base_parameter",
+    "name": {
+      "@id": "openeo:name",
+      "@type": "xsd:string"
+    },
+    "optional": {
+      "@id": "openeo:optional",
+      "@type": "xsd:boolean"
+    },
+    "parameter": "openeo:parameter",
+    "process_parameter": "openeo:process_parameter",
+    "batch_job": "openeo:batch_job",
+    "status": {
+      "@id": "openeo:status",
+      "@type": "xsd:string"
+    },
+    "progress": {
+      "@id": "openeo:progress",
+      "@type": "xsd:decimal"
+    },
+    "created": {
+      "@id": "openeo:created",
+      "@type": "@id"
+    },
+    "updated": {
+      "@id": "openeo:updated",
+      "@type": "@id"
+    },
+    "queued": {
+      "@id": "openeo:queued",
+      "@type": "@id"
+    },
+    "started": {
+      "@id": "openeo:started",
+      "@type": "@id"
+    },
+    "unpublished": {
+      "@id": "openeo:unpublished",
+      "@type": "@id"
+    },
+    "plan": {
+      "@id": "openeo:plan",
+      "@type": "@id"
+    },
+    "budget": {
+      "@id": "openeo:budget",
+      "@type": "@id"
+    },
+    "usage": {
+      "@id": "openeo:usage"
+    },
+    "log_level": {
+      "@id": "openeo:log_level",
+      "@type": "@id"
+    },
+    "service": "openeo:service",
+    "url": {
+      "@id": "openeo:url",
+      "@type": "@id"
+    },
+    "enabled": {
+      "@id": "openeo:enabled",
+      "@type": "@id"
+    },
+    "configuration": {
+      "@id": "openeo:configuration",
+      "@type": "@id"
+    },
+    "attributes": {
+      "@id": "openeo:attributes"
+    },
+    "resource_parameter": "openeo:resource_parameter",
+    "required": {
+      "@id": "openeo:required",
+      "@type": "xsd:boolean"
+    },
+    "error": "openeo:error",
+    "code": {
+      "@id": "openeo:code",
+      "@type": "@id"
+    },
+    "message": {
+      "@id": "openeo:message",
+      "@type": "xsd:string"
+    },
+    "min_log_level_default": "openeo:min_log_level_default",
+    "min_log_level_update": "openeo:min_log_level_update",
+    "process_json_schema": "openeo:process_json_schema",
+    "subtype": {
+      "@id": "openeo:subtype",
+      "@type": "xsd:string"
+    },
+    "process_graph_json_schema": "openeo:process_graph_json_schema",
+    "datacube_json_schema": "openeo:datacube_json_schema",
+    "dimensions": {
+      "@id": "openeo:dimensions",
+      "@container": "@list"
+    },
+    "json_schema": "openeo:json_schema",
+    "pattern": {
+      "@id": "openeo:pattern",
+      "@type": "xsd:string"
+    },
+    "enum": {
+      "@id": "openeo:enum",
+      "@container": "@list"
+    },
+    "minItems": {
+      "@id": "openeo:minItems",
+      "@type": "xsd:decimal"
+    },
+    "maxItems": {
+      "@id": "openeo:maxItems",
+      "@type": "xsd:decimal"
+    },
+    "json_schema_type": "openeo:json_schema_type",
+    "file": "openeo:file",
+    "path": {
+      "@id": "openeo:path",
+      "@type": "xsd:string"
+    },
+    "size": {
+      "@id": "openeo:size",
+      "@type": "xsd:integer"
+    },
+    "modified": {
+      "@id": "openeo:modified",
+      "@type": "xsd:dateTime"
+    },
+    "geometry_type": "openeo:geometry_type",
+    "GeoJsonPoint": "openeo:GeoJsonPoint",
+    "coordinates": {
+      "@id": "openeo:coordinates",
+      "@type": "@id"
+    },
+    "GeoJsonGeometry": "openeo:GeoJsonGeometry",
+    "log_entry": "openeo:log_entry",
+    "level": {
+      "@id": "openeo:level",
+      "@type": "@id"
+    },
+    "time": {
+      "@id": "openeo:time",
+      "@type": "xsd:dateTime"
+    },
+    "data": {
+      "@id": "openeo:data"
+    },
+    "stacktrace": {
+      "@id": "openeo:stacktrace",
+      "@type": "xsd:string"
+    },
+    "usage_metric": "openeo:usage_metric",
+    "value": {
+      "@id": "openeo:value",
+      "@type": "xsd:decimal"
+    },
+    "unit": {
+      "@id": "openeo:unit",
+      "@type": "xsd:string"
+    },
+    "workspace": "openeo:workspace",
+    "details": {
+      "@id": "openeo:details",
+      "@type": "xsd:string"
+    },
+    "quota": {
+      "@id": "openeo:quota",
+      "@type": "@id"
+    },
+    "create_workspace": "openeo:create_workspace",
+    "intent": {
+      "@id": "openeo:intent"
+    },
+    "register_workspace": "openeo:register_workspace"
+  },
+  "@type": "schema:Dataset",
+  "schema:name": "openEO API JSON-LD context",
+  "schema:description": "A JSON-LD @context for the objects openEO's own API contract declares: one class per component schema, one property per declared field, typed from the contract. Derived by script (derive-json-ld.py, 2026-10-09) from openapi/openeo-commercial-data-openapi.yml, openapi/openeo-openapi.yml, openapi/openeo-processing-parameters-openapi.yml.",
+  "dcterms:created": "2026-10-09",
+  "dcterms:source": [
+    "openapi/openeo-commercial-data-openapi.yml",
+    "openapi/openeo-openapi.yml",
+    "openapi/openeo-processing-parameters-openapi.yml",
+    "openapi/openeo-workspaces-openapi.yml"
+  ]
+}

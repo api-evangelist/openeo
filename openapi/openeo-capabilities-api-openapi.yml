@@ -1,0 +1,1776 @@
+openapi: 3.2.0
+info:
+  title: Openeo Capabilities API
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  version: '1.0'
+  description: 'Operations tagged Capabilities across 4 of this provider''s published API definitions: openeo-api-openapi.yaml, openeo-processing-parameters-openapi.yaml, openeo-openapi.yml, openeo-processing-parameters-openapi.yml. Each path carries the servers of the definition it was published in.'
+servers:
+- url: https://openeo.example/api/{version}
+  description: The URL of the API MAY freely be chosen by the back-end providers. The path, including API versioning, is a *recommendation* only. Nevertheless, all servers MUST support HTTPS as the authentication methods are not secure with HTTP only!
+  variables:
+    version:
+      default: v1
+      description: 'API versioning is RECOMMENDED. As the openEO API is following
+
+        [SemVer](https://semver.org/) only the **major** part of the version
+
+        numbers SHOULD be used for API versioning in the URL. To make clear
+
+        that it is a version number, it is RECOMMENDED to add the prefix `v`.
+
+
+        Example: API version `1.2.3` is recommended to use `v1`.
+
+
+        The reason to only consider the major part is that backward-incompatible
+
+        changes are introduced by major changes only. All changes from minor
+
+        and patch releases can usually be integrated without breakages and thus
+
+        a change in the URL is not really needed.
+
+
+        The version number in the URL MUST not be used by the clients to detect
+
+        the version number of the API. Use the version number returned in the
+
+        property `api_version` from `GET /` instead.'
+tags:
+- name: Capabilities
+  description: General information about the API implementation and other supported capabilities provided by the back-end.
+paths:
+  /:
+    get:
+      summary: Information about the back-end
+      operationId: capabilities
+      description: Lists general information about the back-end, including which version and endpoints of the openEO API are supported. May also include billing information.
+      tags:
+      - Capabilities
+      security:
+      - {}
+      responses:
+        '200':
+          description: 'Information about the API version and supported endpoints /
+
+            features.
+
+
+            This endpoint MUST always be available for the API to be valid.'
+          content:
+            application/json:
+              schema:
+                title: Capabilities
+                type: object
+                required:
+                - id
+                - title
+                - description
+                - api_version
+                - backend_version
+                - stac_version
+                - conformsTo
+                - type
+                - endpoints
+                - links
+                properties:
+                  api_version:
+                    type: string
+                    description: Version number of the openEO API specification the back-end implements.
+                    enum:
+                    - 1.3.0
+                  backend_version:
+                    type: string
+                    description: 'Version number of the back-end implementation.
+
+                      Every change on back-end side MUST cause a change of the version number.'
+                    example: 1.1.2
+                  stac_version:
+                    $ref: '#/components/schemas/stac_version'
+                  type:
+                    type: string
+                    enum:
+                    - Catalog
+                    example: Catalog
+                  id:
+                    type: string
+                    description: 'Identifier for the service.
+
+                      This field originates from STAC and is used as unique identifier for the STAC catalog available at `/collections`.'
+                    example: cool-eo-cloud
+                  title:
+                    type: string
+                    description: The name of the service.
+                    example: Example Cloud Corp.
+                  description:
+                    type: string
+                    format: commonmark
+                    description: 'A description of the service, which allows the service provider to introduce the user to its service.
+
+                      [CommonMark 0.29](http://commonmark.org/) syntax MAY be used for rich text representation.'
+                    example: "This service is provided to you by [Example Cloud Corp.](https://cloud.example). It implements the full openEO API and allows to process a range of 999 EO data sets, including \n\n* Sentinel 1/2/3 and 5\n* Landsat 7/8\n\nA free plan is available to test the service. For further information please contact our customer service at [support@cloud.example](mailto:support@cloud.example)."
+                  conformsTo:
+                    $ref: '#/components/schemas/conformsTo'
+                  production:
+                    $ref: '#/components/schemas/production'
+                  endpoints:
+                    type: array
+                    description: Lists all supported endpoints. Supported are all endpoints, which are implemented, return usually a 2XX or 3XX HTTP status code and are fully compatible to the API specification. An entry for this endpoint (path `/` with method `GET`) SHOULD NOT be listed. Each path MUST only be listed once in the array.
+                    items:
+                      title: Endpoint
+                      type: object
+                      required:
+                      - path
+                      - methods
+                      properties:
+                        path:
+                          description: Path to the endpoint, relative to the URL of this endpoint. In general the paths MUST follow the paths specified in the openAPI specification as closely as possible. Therefore, paths MUST be prepended with a leading slash, but MUST NOT contain a trailing slash. Variables in the paths MUST be placed in curly braces and follow the parameter names in the openAPI specification, e.g. `{job_id}`.
+                          type: string
+                        methods:
+                          description: Supported HTTP verbs in uppercase. It is OPTIONAL to list `OPTIONS` as method (see the [CORS section](#section/Cross-Origin-Resource-Sharing-(CORS))).
+                          type: array
+                          items:
+                            type: string
+                            enum:
+                            - GET
+                            - POST
+                            - PATCH
+                            - PUT
+                            - DELETE
+                            - OPTIONS
+                    example:
+                    - path: /collections
+                      methods:
+                      - GET
+                    - path: /collections/{collection_id}
+                      methods:
+                      - GET
+                    - path: /processes
+                      methods:
+                      - GET
+                    - path: /jobs
+                      methods:
+                      - GET
+                      - POST
+                    - path: /jobs/{job_id}
+                      methods:
+                      - GET
+                      - DELETE
+                      - PATCH
+                  billing:
+                    title: Billing
+                    description: 'Billing related data, e.g. the currency used or available plans to process jobs.
+
+                      This property MUST be specified if the back-end uses any billing related API functionalities, e.g. budgeting or estimates.
+
+                      The absence of this property does not mean the back-end is necessarily free to use for all. Providers may choose to bill users outside of the API, e.g. with a monthly fee that is not depending on individual API interactions.'
+                    type: object
+                    required:
+                    - currency
+                    properties:
+                      currency:
+                        description: The currency the back-end is billing in. The currency MUST be either a valid currency code as defined in ISO-4217 or a back-end specific unit that is used for billing such as credits, tiles or CPU hours. If set to `null`, budget and costs are not supported by the back-end and users can not be charged.
+                        type:
+                        - string
+                        - 'null'
+                        example: USD
+                      default_plan:
+                        type: string
+                        description: "Name of the plan the back-end uses for billing in case \n1. the user has not subscribed to a specific plan\n   (see `default_plan` in `GET /me`) and\n2. also did not provide a specific plan with the\n   processing request.\n\nIf a free plan is available at the back-end, it is \nprobably most useful to provide this as the back-end\nwide default plan and override it with paid plans through\nthe user-specific default plan in `GET /me`.\nOtherwise, users that have not set up payment yet MAY\nreceive an error for each processing requests where\nthey did not provide a free plan specifically."
+                        example: free
+                      plans:
+                        description: Array of plans
+                        type: array
+                        items:
+                          title: Billing Plan
+                          type: object
+                          required:
+                          - name
+                          - description
+                          - paid
+                          properties:
+                            name:
+                              type: string
+                              description: Name of the plan. It MUST be accepted in a *case insensitive* manner throughout the API.
+                              example: free
+                            description:
+                              type: string
+                              format: commonmark
+                              description: 'A description that gives a rough overview over the plan.
+
+
+                                [CommonMark 0.29](http://commonmark.org/) syntax MAY be used for rich text representation.'
+                              example: Free plan for testing.
+                            paid:
+                              type: boolean
+                              description: Indicates whether the plan is a paid plan (`true`) or a free plan (`false`).
+                            url:
+                              type: string
+                              description: URL to a web page with more details about the plan.
+                              format: uri
+                              example: https://cloud.example/plans/free-plan
+                        example:
+                        - name: free
+                          description: Free plan. Calculates one tile per second and a maximum amount of 100 tiles per hour.
+                          url: https://cloud.example/plans/free-plan
+                          paid: false
+                        - name: premium
+                          description: Premium plan. Calculates unlimited tiles and each calculated tile costs 0.003 USD.
+                          url: https://cloud.example/plans/premium-plan
+                          paid: true
+                  links:
+                    description: "Links related to this service, e.g. the homepage of\nthe service provider or the terms of service.\n\nIt is highly RECOMMENDED to provide links with the\nfollowing `rel` (relation) types:\n\n1. `version-history`: A link back to the Well-Known URL\n(including `/.well-known/openeo`, see the corresponding endpoint for details)\nto allow clients to work on the most recent version.\n\n2. `terms-of-service`: A link to the terms of service. If\na back-end provides a link to the terms of service, the\nclients MUST provide a way to read the terms of service\nand only connect to the back-end after the user agreed to\nthem. The user interface MUST be designed in a way that\nthe terms of service are not agreed to by default, i.e.\nthe user MUST explicitly agree to them.\n\n3. `privacy-policy`: A link to the privacy policy (GDPR).\nIf a back-end provides a link to a privacy policy, the\nclients MUST provide a way to read the privacy policy and\nonly connect to the back-end after the user agreed to\nthem. The user interface MUST be designed in a way that\nthe privacy policy is not agreed to by default, i.e. the\nuser MUST explicitly agree to them.\n\n4. `service-desc` or `service-doc`: A link to the API definition.\nUse `service-desc` for machine-readable API definition and \n`service-doc` for human-readable API definition.\nRequired if full OGC API compatibility is desired.\n\n5. `conformance`: A link to the Conformance declaration\n(see `/conformance`). \nRequired if full OGC API compatibility is desired.\n\n6. `data`: A link to the collections (see `/collections`).\nRequired if full OGC API compatibility is desired.\n\n7. `create-form`: A link to a user registration page.\n\n8. `recovery-form`: A link to a page where a user can\nrecover a user account (e.g. to reset the password or send\na reminder about the username to the user's email account).\n\n9. `web-editor`: A link to an openEO Web Editor instance.\nThis allows clients to open a Web Editor for other tasks.\nIt may be accompanied with a `version` flag in the link\nto allow feature-detection for certain Web Editor functionalities.\n\nFor additional relation types see also the lists of\n[common relation types in openEO](#section/API-Principles/Web-Linking)."
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/link'
+                    example:
+                    - href: https://cloud.example
+                      rel: about
+                      type: text/html
+                      title: Homepage of the service provider
+                    - href: https://cloud.example/tos
+                      rel: terms-of-service
+                      type: text/html
+                      title: Terms of Service
+                    - href: https://cloud.example/privacy
+                      rel: privacy-policy
+                      type: text/html
+                      title: Privacy Policy
+                    - href: https://cloud.example/register
+                      rel: create-form
+                      type: text/html
+                      title: User Registration
+                    - href: https://cloud.example/lost-password
+                      rel: recovery-form
+                      type: text/html
+                      title: Reset Password
+                    - href: https://cloud.example/.well-known/openeo
+                      rel: version-history
+                      type: application/json
+                      title: List of supported openEO versions
+                    - href: https://cloud.example/api/v1/conformance
+                      rel: conformance
+                      type: application/json
+                      title: OGC Conformance Classes
+                    - href: https://cloud.example/api/v1/collections
+                      rel: data
+                      type: application/json
+                      title: List of Datasets
+                    - href: https://editor.openeo.org
+                      rel: web-editor
+                      type: text/html
+                      title: openEO Web Editor
+                      version: 0.14.0
+        4XX:
+          $ref: '#/components/responses/client_error'
+        5XX:
+          $ref: '#/components/responses/server_error'
+    servers:
+    - url: https://openeo.example/api/{version}
+      description: The URL of the API MAY freely be chosen by the back-end providers. The path, including API versioning, is a *recommendation* only. Nevertheless, all servers MUST support HTTPS as the authentication methods are not secure with HTTP only!
+      variables:
+        version:
+          default: v1
+          description: 'API versioning is RECOMMENDED. As the openEO API is following
+
+            [SemVer](https://semver.org/) only the **major** part of the version
+
+            numbers SHOULD be used for API versioning in the URL. To make clear
+
+            that it is a version number, it is RECOMMENDED to add the prefix `v`.
+
+
+            Example: API version `1.2.3` is recommended to use `v1`.
+
+
+            The reason to only consider the major part is that backward-incompatible
+
+            changes are introduced by major changes only. All changes from minor
+
+            and patch releases can usually be integrated without breakages and thus
+
+            a change in the URL is not really needed.
+
+
+            The version number in the URL MUST not be used by the clients to detect
+
+            the version number of the API. Use the version number returned in the
+
+            property `api_version` from `GET /` instead.'
+  /.well-known/openeo:
+    get:
+      summary: Supported openEO versions
+      operationId: connect
+      description: 'Lists all implemented openEO versions supported by the
+
+        service provider. This endpoint is the Well-Known URI
+
+        (see RFC 5785) for openEO.
+
+
+        This allows a client to easily identify the most recent openEO
+
+        implementation it supports. By default, a client SHOULD connect to the
+
+        most recent production-ready version it supports. If not available, the
+
+        most recent supported version of *all* versions SHOULD be connected to.
+
+        Clients MAY let users choose to connect to versions that are not
+
+        production-ready or outdated.
+
+        The most recent version is determined by comparing the version numbers
+
+        according to rules from Semantic Versioning,
+
+        especially §11. Any pair of API
+
+        versions in this list MUST NOT be equal according to Semantic Versioning.
+
+
+        The Well-Known URI is the entry point for clients and users, so make
+
+        sure it is permanent and easy to use and remember. Clients MUST NOT
+
+        require the well-known path (`/.well-known/openeo`) in the URL that is
+
+        specified by a user to connect to the back-end.
+
+
+        For clients, the usual behavior SHOULD follow these steps:
+
+        1. The user provides a URI, which may consist of a scheme (protocol),
+
+        an authority (host, port) and a path.
+
+        2. The client parses the URI and appends `/.well-knwon/openeo` to the
+
+        path. Make sure to correctly handle leading/trailing slashes.
+
+        3. Send a request to the new URI.
+
+        A. On success: Detect the most suitable API instance/version (see above)
+
+        and read the capabilities
+
+        from there.
+
+        B. On failure: Directly try to read the capabilities from the original URI
+
+        given by the user.
+
+
+        **This URI MUST NOT be versioned as the other endpoints.**
+
+        If your API is available at `https://openeo.example/api/v1`, and
+
+        you instruct your API users to use `https://openeo.example` as connection URI,
+
+        the Well-Known URI SHOULD be located at `https://openeo.example/.well-known/openeo`.
+
+        The Well-Known URI is usually directly located at the top-level, but it is not a
+
+        requirement. For example, `https://openeo.example/eo/.well-known/openeo` is also allowed.
+
+
+        Clients MAY get additional information (e.g. title or description) about
+
+        a back-end from the most recent version that has the `production` flag
+
+        set to `true`.'
+      tags:
+      - Capabilities
+      security:
+      - {}
+      servers:
+      - url: https://openeo.example
+        description: The Well-Known URI SHOULD be available directly at `https://{{domain}}/.well-known/openeo` in contrast to the other endpoints, which may be versioned and can run on other hosts, ports, ... etc.
+      responses:
+        '200':
+          description: List of all available API instances, each with URL and the implemented openEO API version.
+          content:
+            application/json:
+              schema:
+                title: Well Known Discovery
+                type: object
+                required:
+                - versions
+                properties:
+                  versions:
+                    type: array
+                    items:
+                      title: API Instance
+                      type: object
+                      required:
+                      - url
+                      - api_version
+                      properties:
+                        url:
+                          type: string
+                          format: uri
+                          description: '*Absolute* URLs to the service.'
+                          example: https://openeo.example/api/v1
+                        production:
+                          $ref: '#/components/schemas/production'
+                        api_version:
+                          type: string
+                          description: Version number of the openEO specification this back-end implements.
+              example:
+                versions:
+                - url: https://openeo.example/api/v0
+                  api_version: 0.4.2
+                - url: https://openeo.example/api/v1
+                  api_version: 1.3.0
+                - url: https://dev.openeo.example/api/v2
+                  production: false
+                  api_version: 2.0.0-beta
+        4XX:
+          $ref: '#/components/responses/client_error'
+        5XX:
+          $ref: '#/components/responses/server_error'
+    servers:
+    - url: https://openeo.example/api/{version}
+      description: The URL of the API MAY freely be chosen by the back-end providers. The path, including API versioning, is a *recommendation* only. Nevertheless, all servers MUST support HTTPS as the authentication methods are not secure with HTTP only!
+      variables:
+        version:
+          default: v1
+          description: 'API versioning is RECOMMENDED. As the openEO API is following
+
+            [SemVer](https://semver.org/) only the **major** part of the version
+
+            numbers SHOULD be used for API versioning in the URL. To make clear
+
+            that it is a version number, it is RECOMMENDED to add the prefix `v`.
+
+
+            Example: API version `1.2.3` is recommended to use `v1`.
+
+
+            The reason to only consider the major part is that backward-incompatible
+
+            changes are introduced by major changes only. All changes from minor
+
+            and patch releases can usually be integrated without breakages and thus
+
+            a change in the URL is not really needed.
+
+
+            The version number in the URL MUST not be used by the clients to detect
+
+            the version number of the API. Use the version number returned in the
+
+            property `api_version` from `GET /` instead.'
+  /file_formats:
+    get:
+      summary: Supported file formats
+      operationId: list-file-types
+      description: 'Lists supported input and output file formats.
+
+        *Input* file formats specify which file a back-end can *read* from.
+
+        *Output* file formats specify which file a back-end can *write* to.
+
+
+        The response to this request is an object listing all available input
+
+        and output file formats separately with their parameters and additional
+
+        data. This endpoint does not include the supported secondary web
+
+        services.
+
+
+        **Note**: Format names and parameters MUST be fully aligned with the
+
+        GDAL codes if available, see GDAL Raster
+
+        Formats and OGR Vector
+
+        Formats. It is OPTIONAL to
+
+        support all output format parameters supported by GDAL. Some file
+
+        formats not available through GDAL may be defined centrally for openEO.
+
+        Custom file formats or parameters MAY be defined.
+
+
+        The format descriptions MUST describe how the file formats relate to
+
+        data cubes. Input file formats MUST describe how the files have to be
+
+        structured to be transformed into data cubes. Output file formats MUST
+
+        describe how the data cubes are stored at the back-end and how the
+
+        resulting file structure looks like.
+
+
+        Back-ends MUST NOT support aliases, for example it is not allowed to
+
+        support `geotiff` instead of `gtiff`. Nevertheless, openEO Clients MAY
+
+        translate user input for convenience (e.g. translate `geotiff` to
+
+        `gtiff`). Also, for a better user experience the back-end can specify a
+
+        `title`.
+
+
+        Format names MUST be accepted in a *case insensitive* manner throughout the API.'
+      tags:
+      - Capabilities
+      security:
+      - {}
+      - Bearer: []
+      responses:
+        '200':
+          description: An object with containing all input and output format separately.  For each property `input` and `output` an object is defined where the  file format names are the property keys and the property values are objects that define a title, supported parameters and related links.
+          content:
+            application/json:
+              schema:
+                title: File Formats
+                type: object
+                required:
+                - input
+                - output
+                properties:
+                  input:
+                    title: Input File Formats
+                    type: object
+                    description: Map of supported input file formats, i.e. file formats a back-end can **read** from. The property keys are the file format names that are used by clients and users, for example in process graphs.
+                    additionalProperties:
+                      $ref: '#/components/schemas/file_format'
+                  output:
+                    title: Output File Formats
+                    type: object
+                    description: Map of supported output file formats, i.e. file formats a back-end can **write** to. The property keys are the file format names that are used by clients and users, for example in process graphs.
+                    additionalProperties:
+                      $ref: '#/components/schemas/file_format'
+              example:
+                output:
+                  GTiff:
+                    title: GeoTiff
+                    description: Export to GeoTiff. Does not support cloud-optimized GeoTiffs (COGs) yet.
+                    gis_data_types:
+                    - raster
+                    parameters:
+                      tiled:
+                        type: boolean
+                        description: This option can be used to force creation of tiled TIFF files [true]. By default [false] stripped TIFF files are created.
+                        default: false
+                      compress:
+                        type: string
+                        description: Set the compression to use.
+                        default: NONE
+                        enum:
+                        - JPEG
+                        - LZW
+                        - DEFLATE
+                        - NONE
+                      jpeg_quality:
+                        type: integer
+                        description: Set the JPEG quality when using JPEG.
+                        minimum: 1
+                        maximum: 100
+                        default: 75
+                    links:
+                    - href: https://gdal.org/drivers/raster/gtiff.html
+                      rel: about
+                      title: GDAL on the GeoTiff file format and storage options
+                  GPKG:
+                    title: OGC GeoPackage
+                    gis_data_types:
+                    - raster
+                    - vector
+                    parameters:
+                      version:
+                        type: string
+                        description: Set GeoPackage version. In AUTO mode, this will be equivalent to 1.2 starting with GDAL 2.3.
+                        enum:
+                        - auto
+                        - '1'
+                        - '1.1'
+                        - '1.2'
+                        default: auto
+                    links:
+                    - href: https://gdal.org/drivers/raster/gpkg.html
+                      rel: about
+                      title: GDAL on GeoPackage for raster data
+                    - href: https://gdal.org/drivers/vector/gpkg.html
+                      rel: about
+                      title: GDAL on GeoPackage for vector data
+                input:
+                  GPKG:
+                    title: OGC GeoPackage
+                    gis_data_types:
+                    - raster
+                    - vector
+                    parameters:
+                      table:
+                        type: string
+                        description: '**RASTER ONLY.** Name of the table containing the tiles. If the GeoPackage dataset only contains one table, this option is not necessary. Otherwise, it is required.'
+                    links:
+                    - href: https://gdal.org/drivers/raster/gpkg.html
+                      rel: about
+                      title: GDAL on GeoPackage for raster data
+                    - href: https://gdal.org/drivers/vector/gpkg.html
+                      rel: about
+                      title: GDAL on GeoPackage for vector data
+        4XX:
+          $ref: '#/components/responses/client_error'
+        5XX:
+          $ref: '#/components/responses/server_error'
+    servers:
+    - url: https://openeo.example/api/{version}
+      description: The URL of the API MAY freely be chosen by the back-end providers. The path, including API versioning, is a *recommendation* only. Nevertheless, all servers MUST support HTTPS as the authentication methods are not secure with HTTP only!
+      variables:
+        version:
+          default: v1
+          description: 'API versioning is RECOMMENDED. As the openEO API is following
+
+            [SemVer](https://semver.org/) only the **major** part of the version
+
+            numbers SHOULD be used for API versioning in the URL. To make clear
+
+            that it is a version number, it is RECOMMENDED to add the prefix `v`.
+
+
+            Example: API version `1.2.3` is recommended to use `v1`.
+
+
+            The reason to only consider the major part is that backward-incompatible
+
+            changes are introduced by major changes only. All changes from minor
+
+            and patch releases can usually be integrated without breakages and thus
+
+            a change in the URL is not really needed.
+
+
+            The version number in the URL MUST not be used by the clients to detect
+
+            the version number of the API. Use the version number returned in the
+
+            property `api_version` from `GET /` instead.'
+  /conformance:
+    get:
+      summary: Conformance classes this API implements
+      operationId: conformance
+      description: 'Lists all conformance classes specified in various standards that the
+
+        implementation conforms to. Conformance classes are commonly used in
+
+        all OGC API standards and the STAC API specification. openEO adds relatively
+
+        broadly defined conformance classes, especially for the extensions.
+
+        Otherwise, the implemented functionality can usually be retrieved from
+
+        the capabilities in openEO.
+
+
+        The general openEO conformance class is `https://api.openeo.org/1.3.0`.
+
+        See the individual openEO API extensions for their conformance classes.
+
+
+        The conformance classes listed at this endpoint and listed in the
+
+        corresponding `conformsTo` property in `GET /` MUST be equal.
+
+
+        More details:
+
+        - STAC API, especially the conformance class "STAC API - Collections"
+
+        - OGC API standards'
+      tags:
+      - Capabilities
+      security:
+      - {}
+      - Bearer: []
+      responses:
+        '200':
+          description: The URIs of all conformance classes supported by the server.
+          content:
+            application/json:
+              schema:
+                title: OGC Conformance Classes
+                type: object
+                required:
+                - conformsTo
+                properties:
+                  conformsTo:
+                    $ref: '#/components/schemas/conformsTo'
+        4XX:
+          $ref: '#/components/responses/client_error'
+        5XX:
+          $ref: '#/components/responses/server_error'
+    servers:
+    - url: https://openeo.example/api/{version}
+      description: The URL of the API MAY freely be chosen by the back-end providers. The path, including API versioning, is a *recommendation* only. Nevertheless, all servers MUST support HTTPS as the authentication methods are not secure with HTTP only!
+      variables:
+        version:
+          default: v1
+          description: 'API versioning is RECOMMENDED. As the openEO API is following
+
+            [SemVer](https://semver.org/) only the **major** part of the version
+
+            numbers SHOULD be used for API versioning in the URL. To make clear
+
+            that it is a version number, it is RECOMMENDED to add the prefix `v`.
+
+
+            Example: API version `1.2.3` is recommended to use `v1`.
+
+
+            The reason to only consider the major part is that backward-incompatible
+
+            changes are introduced by major changes only. All changes from minor
+
+            and patch releases can usually be integrated without breakages and thus
+
+            a change in the URL is not really needed.
+
+
+            The version number in the URL MUST not be used by the clients to detect
+
+            the version number of the API. Use the version number returned in the
+
+            property `api_version` from `GET /` instead.'
+  /udf_runtimes:
+    get:
+      summary: Supported UDF runtimes
+      operationId: list-udf-runtimes
+      description: Lists the supported runtimes for user-defined functions (UDFs), which includes either the programming languages including version numbers and available libraries including version numbers or docker containers.
+      tags:
+      - Capabilities
+      security:
+      - {}
+      - Bearer: []
+      responses:
+        '200':
+          description: Description of UDF runtime support
+          content:
+            application/json:
+              schema:
+                title: UDF Runtimes
+                type: object
+                description: "Map of available runtime environments. Runtime environments\ncan be either a programming language environment or Docker-based.\n\nEach runtime environment has a unique name, which is used as\nthe property key. The name is used in processes to select the\nruntime environment for UDFs, so the names should be stable and\nmeaningful.\nIt is RECOMMENDED to use the following naming and casing:\n* For programming langauge environments use the names as provided\n  in in the [Scriptol List of Programming Languages](https://www.scriptol.com/programming/list-programming-languages.php).\n* For docker images use the docker image identifier excluding the registry path."
+                minProperties: 1
+                additionalProperties:
+                  x-additionalPropertiesName: UDF Runtime name
+                  allOf:
+                  - $ref: '#/components/schemas/udf_runtime'
+              example:
+                PHP:
+                  title: PHP v7.x
+                  description: Just an example how to reference a docker image.
+                  experimental: true
+                  type: docker
+                  docker: openeo/udf-php7
+                  default: latest
+                  tags:
+                  - latest
+                  - 7.3.1
+                  - '7.3'
+                  - '7.2'
+                  links:
+                  - href: https://hub.docker.com/openeo/udf-php7/
+                    rel: about
+                R:
+                  title: R v3.x for Statistical Computing
+                  description: R programming language with `Rcpp` and `rmarkdown` extensions installed.
+                  type: language
+                  default: 3.5.2
+                  versions:
+                    3.1.0:
+                      deprecated: true
+                      libraries:
+                        Rcpp:
+                          version: 1.0.10
+                          links:
+                          - href: https://cran.r-project.org/web/packages/Rcpp/index.html
+                            rel: about
+                        rmarkdown:
+                          version: 1.7.0
+                          links:
+                          - href: https://cran.r-project.org/web/packages/rmarkdown/index.html
+                            rel: about
+                    3.5.2:
+                      libraries:
+                        Rcpp:
+                          version: 1.2.0
+                          links:
+                          - href: https://cran.r-project.org/web/packages/Rcpp/index.html
+                            rel: about
+                        rmarkdown:
+                          version: 1.7.0
+                          links:
+                          - href: https://cran.r-project.org/web/packages/rmarkdown/index.html
+                            rel: about
+        4XX:
+          $ref: '#/components/responses/client_error_auth'
+        5XX:
+          $ref: '#/components/responses/server_error'
+    servers:
+    - url: https://openeo.example/api/{version}
+      description: The URL of the API MAY freely be chosen by the back-end providers. The path, including API versioning, is a *recommendation* only. Nevertheless, all servers MUST support HTTPS as the authentication methods are not secure with HTTP only!
+      variables:
+        version:
+          default: v1
+          description: 'API versioning is RECOMMENDED. As the openEO API is following
+
+            [SemVer](https://semver.org/) only the **major** part of the version
+
+            numbers SHOULD be used for API versioning in the URL. To make clear
+
+            that it is a version number, it is RECOMMENDED to add the prefix `v`.
+
+
+            Example: API version `1.2.3` is recommended to use `v1`.
+
+
+            The reason to only consider the major part is that backward-incompatible
+
+            changes are introduced by major changes only. All changes from minor
+
+            and patch releases can usually be integrated without breakages and thus
+
+            a change in the URL is not really needed.
+
+
+            The version number in the URL MUST not be used by the clients to detect
+
+            the version number of the API. Use the version number returned in the
+
+            property `api_version` from `GET /` instead.'
+  /service_types:
+    get:
+      summary: Supported secondary web service protocols
+      operationId: list-service-types
+      description: 'Lists supported secondary web service protocols such as
+
+        OGC WMS,
+
+        OGC WCS,
+
+        OGC API - Features
+
+        or XYZ tiles.
+
+        The response is an object of all available secondary web service protocols
+
+        with their supported configuration settings and expected process parameters.
+
+
+        * The configuration settings for the service SHOULD be defined upon
+
+        creation of a service and the service will be set up accordingly.
+
+        * The process parameters SHOULD be referenced (with a `from_parameter`
+
+        reference) in the user-defined process that is used to compute web service
+
+        results.
+
+        The appropriate arguments MUST be provided to the user-defined process,
+
+        usually at runtime from the context of the web service.
+
+        For example, a map service such as a WMS would
+
+        need to inject the spatial extent into the user-defined process so that the
+
+        back-end can compute the corresponding tile correctly.
+
+
+        To improve interoperability between back-ends common names for the
+
+        services SHOULD be used, e.g. the abbreviations used in the official
+
+        OGC Schema Repository for the respective
+
+        services.
+
+
+        Service names MUST be accepted in a *case insensitive* manner throughout the API.'
+      tags:
+      - Capabilities
+      security:
+      - {}
+      - Bearer: []
+      responses:
+        '200':
+          description: An object with a map containing all service names as keys and an object that defines supported configuration settings and process parameters.
+          content:
+            application/json:
+              schema:
+                title: Service Types
+                type: object
+                description: Map of supported secondary web services.
+                additionalProperties:
+                  x-additionalPropertiesName: Service Name
+                  title: Service Type
+                  type: object
+                  required:
+                  - configuration
+                  - process_parameters
+                  properties:
+                    title:
+                      $ref: '#/components/schemas/object_title'
+                    description:
+                      $ref: '#/components/schemas/description'
+                    deprecated:
+                      $ref: '#/components/schemas/deprecated'
+                    experimental:
+                      $ref: '#/components/schemas/experimental'
+                    configuration:
+                      title: Service Configuration
+                      description: Map of supported configuration settings made available to the creator of the service.
+                      type: object
+                      additionalProperties:
+                        $ref: '#/components/schemas/resource_parameter'
+                    process_parameters:
+                      title: Process Parameters
+                      description: List of parameters made available to user-defined processes.
+                      type: array
+                      items:
+                        $ref: '#/components/schemas/process_parameter'
+                    links:
+                      description: 'Links related to this service type, e.g. more
+
+                        information about the configuration settings and process parameters.
+
+
+                        For relation types see the lists of
+
+                        [common relation types in openEO](#section/API-Principles/Web-Linking).'
+                      type: array
+                      items:
+                        $ref: '#/components/schemas/link'
+              example:
+                WMS:
+                  title: OGC Web Map Service
+                  configuration:
+                    version:
+                      type: string
+                      description: The WMS version offered to consumers of the service.
+                      default: 1.3.0
+                      enum:
+                      - 1.1.1
+                      - 1.3.0
+                  process_parameters:
+                  - name: layer
+                    description: The layer name.
+                    schema:
+                      type: string
+                    default: roads
+                  - name: spatial_extent
+                    description: A bounding box in WGS84.
+                    schema:
+                      type: object
+                      required:
+                      - west
+                      - south
+                      - east
+                      - north
+                      properties:
+                        west:
+                          description: West (lower left corner, coordinate axis 1).
+                          type: number
+                        south:
+                          description: South (lower left corner, coordinate axis 2).
+                          type: number
+                        east:
+                          description: East (upper right corner, coordinate axis 1).
+                          type: number
+                        north:
+                          description: North (upper right corner, coordinate axis 2).
+                          type: number
+                  links:
+                  - href: https://www.opengeospatial.org/standards/wms
+                    rel: about
+                    title: OGC Web Map Service Standard
+                OGCAPI-FEATURES:
+                  title: OGC API - Features
+                  description: Exposes a OGC API - Features in version 1.0 of the specification (successor of OGC WFS 3.0).
+                  configuration:
+                    title:
+                      type: string
+                      description: The title for the OGC API - Features landing page
+                    description:
+                      type: string
+                      description: The description for the OGC API - Features landing page
+                    conformsTo:
+                      type: array
+                      description: 'The OGC API - Features conformance classes to enable for this service.
+
+
+                        `http://www.opengis.net/spec/ogcapi-features-1/1.0/conf/core` is always enabled.'
+                      items:
+                        type: string
+                        enum:
+                        - http://www.opengis.net/spec/ogcapi-features-1/1.0/conf/oas30
+                        - http://www.opengis.net/spec/ogcapi-features-1/1.0/conf/html
+                        - http://www.opengis.net/spec/ogcapi-features-1/1.0/conf/geojson
+                        - http://www.opengis.net/spec/ogcapi-features-2/1.0/conf/crs
+                  process_parameters: []
+                  links:
+                  - href: https://www.opengeospatial.org/standards/wfs
+                    rel: about
+                    title: OGC Web Feature Service Standard
+        4XX:
+          $ref: '#/components/responses/client_error'
+        5XX:
+          $ref: '#/components/responses/server_error'
+    servers:
+    - url: https://openeo.example/api/{version}
+      description: The URL of the API MAY freely be chosen by the back-end providers. The path, including API versioning, is a *recommendation* only. Nevertheless, all servers MUST support HTTPS as the authentication methods are not secure with HTTP only!
+      variables:
+        version:
+          default: v1
+          description: 'API versioning is RECOMMENDED. As the openEO API is following
+
+            [SemVer](https://semver.org/) only the **major** part of the version
+
+            numbers SHOULD be used for API versioning in the URL. To make clear
+
+            that it is a version number, it is RECOMMENDED to add the prefix `v`.
+
+
+            Example: API version `1.2.3` is recommended to use `v1`.
+
+
+            The reason to only consider the major part is that backward-incompatible
+
+            changes are introduced by major changes only. All changes from minor
+
+            and patch releases can usually be integrated without breakages and thus
+
+            a change in the URL is not really needed.
+
+
+            The version number in the URL MUST not be used by the clients to detect
+
+            the version number of the API. Use the version number returned in the
+
+            property `api_version` from `GET /` instead.'
+  /processing_parameters:
+    get:
+      summary: Additional processing parameters
+      operationId: list-processing-parameters
+      description: 'Lists additional custom processing parameters
+
+        that a back-end offers for the different processing modes (synchronous processing, batch jobs, secondary web services).
+
+        The parameters specified here can be added to the corresponding `POST` requests at the top-level of the object that is sent as the payload.
+
+        All parameters SHOULD explicitly be made optional with reasonable defaults as otherwise the interoperability between the implementations decreases.'
+      tags:
+      - Capabilities
+      security:
+      - {}
+      - Bearer: []
+      responses:
+        '200':
+          description: An object with a list of parameters per processing mode.
+          content:
+            application/json:
+              schema:
+                description: Processing parameters per processing mode.
+                type: object
+                properties:
+                  create_job_parameters:
+                    $ref: '#/components/schemas/processing_create_parameters'
+                  create_service_parameters:
+                    $ref: '#/components/schemas/processing_create_parameters'
+                  create_synchronous_parameters:
+                    $ref: '#/components/schemas/processing_create_parameters'
+        4XX:
+          $ref: ../../openapi.yaml#/components/responses/client_error
+        5XX:
+          $ref: ../../openapi.yaml#/components/responses/server_error
+    servers:
+    - url: https://openeo.example/api/{version}
+      description: The URL of the API MAY freely be chosen by the back-end providers. The path, including API versioning, is a *recommendation* only. Nevertheless, all servers MUST support HTTPS as the authentication methods are not secure with HTTP only!
+      variables:
+        version:
+          default: v1
+          description: API versioning is RECOMMENDED. As the openEO API is following [SemVer](https://semver.org/) only the MAJOR part of the stable version numbers (i.e. versions >= 1.0.0) SHOULD be used for API versioning in the URL. The reason is that backward-incompatible changes are usually introduced by major changes. Therefore, the version number in the URL MUST not be used by the clients to detect the version number of the API. Use the version number returned from `GET /` instead.
+components:
+  schemas:
+    process_graph_json_schema:
+      title: Process Graph
+      type: object
+      properties:
+        subtype:
+          type: string
+          enum:
+          - process-graph
+        parameters:
+          type: array
+          title: Process Graph Parameters
+          description: 'A list of parameters passed to the child process graph.
+
+
+            The order in the array corresponds to the parameter order to
+
+            be used in clients that do not support named parameters.'
+          items:
+            $ref: '#/components/schemas/parameter'
+        returns:
+          type: object
+          title: Process Graph Return Value
+          description: Description of the data that is returned by the child process graph.
+          required:
+          - schema
+          properties:
+            description:
+              $ref: '#/components/schemas/process_description'
+            schema:
+              $ref: '#/components/schemas/data_type_schema'
+          allOf:
+          - $ref: '#/components/schemas/process_json_schema'
+    stac_version:
+      type: string
+      description: 'The [version of the STAC specification](https://github.com/radiantearth/stac-spec/releases), which MAY not be equal to the [STAC API version](#tag/EO-Data-Discovery/STAC).
+
+        The openEO API allows for the STAC versions 1.x.x (RECOMMENDED) and 0.9.x (DEPRECATED).'
+      pattern: ^(0\.9.\d+|1\.\d+.\d+)
+      example: 1.1.0
+    process_description:
+      type: string
+      format: commonmark
+      description: 'Detailed description to explain the entity.
+
+
+        [CommonMark 0.29](http://commonmark.org/) syntax MAY be used for rich text representation. In addition to the CommonMark syntax, clients can convert process IDs that are formatted as in the following example into links instead of code blocks: ``` ``process_id()`` ```'
+    parameter:
+      title: Parameter
+      type: object
+      required:
+      - schema
+      properties:
+        schema:
+          $ref: '#/components/schemas/data_type_schema'
+      allOf:
+      - $ref: '#/components/schemas/base_parameter'
+    process_json_schema:
+      type: object
+      title: Single Data Type
+      description: 'Specifies a data type supported by a parameter or return value.
+
+
+        The data types are specified according to the [JSON Schema draft-07](http://json-schema.org/) specification.
+
+        See the chapter [''Schemas'' in ''Defining Processes''](#section/Processes/Defining-Processes) for more information.
+
+
+        JSON Schemas SHOULD NOT contain `default`, `anyOf`, `oneOf`, `allOf` or `not` at the top-level of the schema.
+
+        Instead specify each data type in a separate array element.
+
+
+        The following more complex JSON Schema keywords SHOULD NOT be used:
+
+        `if`, `then`, `else`, `readOnly`, `writeOnly`, `dependencies`, `minProperties`, `maxProperties`, `patternProperties`.
+
+
+        JSON Schemas SHOULD always be dereferenced (i.e. all `$refs` should be resolved). This allows clients to consume the schemas much better.
+
+        Clients are not expected to support dereferencing `$refs`.
+
+
+        Note: The specified schema is only a common subset of JSON Schema. Additional keywords MAY be used.'
+      properties:
+        subtype:
+          type: string
+          description: The allowed sub data type for a value. See the chapter on [subtypes](#section/Processes/Defining-Processes) for more information.
+        deprecated:
+          $ref: '#/components/schemas/deprecated'
+      allOf:
+      - $ref: '#/components/schemas/json_schema'
+      oneOf:
+      - title: Generic
+      - $ref: '#/components/schemas/process_graph_json_schema'
+      - $ref: '#/components/schemas/datacube_json_schema'
+    resource_parameter:
+      x-additionalPropertiesName: Parameter Name
+      type: object
+      title: Resource Parameter
+      description: 'Describes a parameter for various resources (e.g. file formats, service types).
+
+
+        The parameters are specified according to the [JSON Schema draft-07](http://json-schema.org/) specification.
+
+        See the chapter [''Schemas'' in ''Defining Processes''](#section/Processes/Defining-Processes) for more information.
+
+
+        The following more complex JSON Schema keywords SHOULD NOT be used:
+
+        `if`, `then`, `else`, `readOnly`, `writeOnly`, `dependencies`, `minProperties`, `maxProperties`, `patternProperties`.
+
+
+        JSON Schemas SHOULD always be dereferenced (i.e. all `$refs` should be resolved). This allows clients to consume the schemas much better.
+
+        Clients are not expected to support dereferencing `$refs`.
+
+
+        Note: The specified schema is only a common subset of JSON Schema. Additional keywords MAY be used.'
+      required:
+      - description
+      properties:
+        description:
+          type: string
+          description: A brief description of the parameter according to [JSON Schema draft-07](https://json-schema.org/draft-07/json-schema-validation.html#rfc.section.10.1).
+        required:
+          type: boolean
+          description: Determines whether this parameter is mandatory.
+          default: false
+        experimental:
+          $ref: '#/components/schemas/experimental'
+        default:
+          description: The default value represents what would be assumed by the consumer of the input as the value of the parameter if none is provided. The value MUST conform to the defined type for the parameter defined at the same level. For example, if type is string, then default can be "foo" but cannot be 1. See [JSON Schema draft-07](https://json-schema.org/draft-07/json-schema-validation.html#rfc.section.10.2).
+      allOf:
+      - $ref: '#/components/schemas/json_schema'
+    experimental:
+      type: boolean
+      description: Declares that the specified entity is experimental, which means that it is likely to change or may produce unpredictable behavior. Users should refrain from using it in production, but still feel encouraged to try it out and give feedback.
+      default: false
+    process_schema:
+      title: Process Data types
+      description: Either a single data type or a list of data types for process parameter or process return values.
+      oneOf:
+      - $ref: '#/components/schemas/process_json_schema'
+      - title: Multiple data types
+        description: A list of data types supported, specified as JSON Schemas.
+        type: array
+        minItems: 1
+        uniqueItems: true
+        items:
+          $ref: '#/components/schemas/process_json_schema'
+    object_title:
+      type: string
+      description: A human-readable short title to be displayed to users **in addition** to the names specified in the keys. This property is only for better user experience so that users can understand the names better. Example titles could be `GeoTiff` for the key `GTiff` (for file formats) or `OGC Web Map Service` for the key `WMS` (for service types). The title MUST NOT be used in communication (e.g. in process graphs), although clients MAY translate the titles into the corresponding names.
+    log_code:
+      type: string
+      description: The code is either one of the standardized error codes or a custom code, for example specified by a user in the `inspect` process.
+      example: SampleError
+    geometry_type:
+      title: Geometry type
+      type: string
+      enum:
+      - Point
+      - MultiPoint
+      - LineString
+      - MultiLineString
+      - Polygon
+      - MultiPolygon
+      - GeometryCollection
+    udf_runtime:
+      type: object
+      required:
+      - type
+      - default
+      properties:
+        title:
+          $ref: '#/components/schemas/object_title'
+        description:
+          $ref: '#/components/schemas/description'
+        type:
+          type: string
+          description: 'The type of the UDF runtime.
+
+
+            Predefined types are:
+
+            * `language` for Programming Languages and
+
+            * `docker` for Docker Containers.
+
+
+            The types can potentially be extended by back-ends.'
+        default:
+          type: string
+        deprecated:
+          $ref: '#/components/schemas/deprecated'
+        experimental:
+          $ref: '#/components/schemas/experimental'
+        links:
+          type: array
+          description: "Links related to this runtime, e.g. external documentation.\n\nIt is highly RECOMMENDED to provide at least links with\nthe following `rel` (relation) types:\n\n1. `about`: A resource that further explains the runtime,\ne.g. a user guide or the documentation. It is RECOMMENDED to \nadd descriptive titles for a better user experience.\n\nFor additional relation types see also the lists of\n[common relation types in openEO](#section/API-Principles/Web-Linking)."
+          items:
+            $ref: '#/components/schemas/link'
+      discriminator:
+        propertyName: type
+        mapping:
+          language: '#/components/schemas/udf_programming_language'
+          docker: '#/components/schemas/udf_docker'
+    base_parameter:
+      type: object
+      required:
+      - name
+      - description
+      properties:
+        name:
+          type: string
+          description: "A unique name for the parameter. \n\nUsing [snake case](https://en.wikipedia.org/wiki/Snake_case) (e.g. `window_size` or `scale_factor`) is RECOMMENDED."
+          pattern: ^\w+$
+        description:
+          $ref: '#/components/schemas/process_description'
+        optional:
+          type: boolean
+          description: 'Determines whether this parameter is optional to be specified even when no default is specified.
+
+            Clients SHOULD automatically set this parameter to `true`, if a default value is specified. Back-ends SHOULD NOT fail, if a default value is specified and this flag is missing.'
+          default: false
+        deprecated:
+          $ref: '#/components/schemas/deprecated'
+        experimental:
+          $ref: '#/components/schemas/experimental'
+        default:
+          description: The default value for this parameter. Required parameters SHOULD NOT specify a default value. Optional parameters SHOULD always specify a default value.
+    process_parameter:
+      title: Process Parameter
+      type: object
+      required:
+      - schema
+      properties:
+        schema:
+          $ref: '#/components/schemas/process_schema'
+      allOf:
+      - $ref: '#/components/schemas/base_parameter'
+    production:
+      type: boolean
+      description: 'Specifies whether the implementation is ready to be used in production use (`true`) or not (`false`).
+
+        Clients SHOULD only connect to non-production implementations if the user explicitly confirmed to use a non-production implementation.
+
+        This flag is part of `GET /.well-known/openeo` and `GET /`. It MUST be used consistently in both endpoints.'
+      default: false
+    file_format:
+      x-additionalPropertiesName: File Format Name
+      title: File Format
+      type: object
+      description: Describes a specific file format.
+      required:
+      - gis_data_types
+      - parameters
+      properties:
+        title:
+          $ref: '#/components/schemas/object_title'
+        description:
+          $ref: '#/components/schemas/description'
+        gis_data_types:
+          type: array
+          description: 'Specifies the supported GIS spatial data types for this format.
+
+            It is RECOMMENDED to specify at least one of the data types, which will likely become a requirement in a future API version.'
+          items:
+            type: string
+            enum:
+            - raster
+            - vector
+            - table
+            - pointcloud
+            - other
+        deprecated:
+          $ref: '#/components/schemas/deprecated'
+        experimental:
+          $ref: '#/components/schemas/experimental'
+        parameters:
+          title: File Format Parameters
+          description: Specifies the supported parameters for this file format.
+          type: object
+          additionalProperties:
+            $ref: '#/components/schemas/resource_parameter'
+        links:
+          type: array
+          description: 'Links related to this file format, e.g. external documentation.
+
+
+            For relation types see the lists of
+
+            [common relation types in openEO](#section/API-Principles/Web-Linking).'
+          items:
+            $ref: '#/components/schemas/link'
+    description:
+      type: string
+      format: commonmark
+      description: 'Detailed description to explain the entity.
+
+
+        [CommonMark 0.29](http://commonmark.org/) syntax MAY be used for rich text representation.'
+    json_schema_type:
+      type: string
+      enum:
+      - array
+      - boolean
+      - integer
+      - 'null'
+      - number
+      - object
+      - string
+    dimension_axis_xyz:
+      title: Axis
+      description: Axis of a geometry or dimension (`x`, `y` or `z`)
+      type: string
+      enum:
+      - x
+      - y
+      - z
+    conformsTo:
+      description: 'Lists all conformance classes specified in various standards that the
+
+        implementation conforms to. Conformance classes are commonly used in
+
+        all OGC API standards and the STAC API specification.
+
+
+        The general openEO conformance class is `https://api.openeo.org/1.3.0`.
+
+        See the individual openEO API extensions for their conformance classes.'
+      type: array
+      items:
+        type: string
+        format: uri
+      example:
+      - https://api.openeo.org/1.3.0
+      - https://api.openeo.org/extensions/commercial-data/0.1.0
+      - https://api.openeo.org/extensions/federation/0.2.0
+      - https://api.stacspec.org/v1.0.0/core
+      - https://api.stacspec.org/v1.0.0/collections
+    deprecated:
+      type: boolean
+      description: 'Declares that the specified entity is deprecated with the potential
+
+        to be removed in any of the next versions. It should be transitioned out
+
+        of usage as soon as possible and users should refrain from using it in
+
+        new implementations.'
+      default: false
+    log_links:
+      description: 'Links related to this log entry / error, e.g. to a resource that
+
+        provides further explanations.
+
+
+        For relation types see the lists of
+
+        [common relation types in openEO](#section/API-Principles/Web-Linking).'
+      type: array
+      items:
+        $ref: '#/components/schemas/link'
+      example:
+      - href: https://openeo.example/docs/errors/SampleError
+        rel: about
+    link:
+      title: Link
+      description: A link to another resource on the web. Bases on [RFC 5899](https://www.rfc-editor.org/rfc/rfc5988.html).
+      type: object
+      required:
+      - href
+      - rel
+      properties:
+        rel:
+          type: string
+          description: Relationship between the current document and the linked document. SHOULD be a [registered link relation type](https://www.iana.org/assignments/link-relations/link-relations.xml) whenever feasible.
+          example: related
+        href:
+          type: string
+          description: The value MUST be a valid URL.
+          format: uri
+          example: https://openeo.example
+        type:
+          type: string
+          description: The value MUST be a string that hints at the format used to represent data at the provided URI, preferably a media (MIME) type.
+          example: text/html
+        title:
+          type: string
+          description: Used as a human-readable label for a link.
+          example: openEO
+    datacube_json_schema:
+      title: Datacube
+      properties:
+        subtype:
+          type: string
+          enum:
+          - datacube
+        dimensions:
+          title: Datacube constraints
+          description: "Allows to specify requirements the data cube has to fulfill.\nRight now, it only allows to specify the dimension types and \nadds for specific dimension types:\n* axes for `spatial` dimensions in raster datacubes\n* geometry types for `geometry` dimensions in vector datacubes"
+          type: array
+          items:
+            type: object
+            required:
+            - type
+            properties:
+              type:
+                type: string
+            oneOf:
+            - title: Spatial (raster)
+              properties:
+                type:
+                  type: string
+                  enum:
+                  - spatial
+                axis:
+                  type: array
+                  minItems: 1
+                  items:
+                    $ref: '#/components/schemas/dimension_axis_xyz'
+            - title: Spatial (vector)
+              properties:
+                type:
+                  type: string
+                  enum:
+                  - geometry
+                geometry_type:
+                  type: array
+                  minItems: 1
+                  items:
+                    $ref: '#/components/schemas/geometry_type'
+            - title: Other
+              properties:
+                type:
+                  type: string
+                  enum:
+                  - bands
+                  - temporal
+                  - other
+    data_type_schema:
+      title: Data Types
+      description: Either a single data type or a list of data types.
+      oneOf:
+      - $ref: '#/components/schemas/process_json_schema'
+      - title: Multiple data types
+        description: A list of data types this parameter supports, specified as JSON Schemas.
+        type: array
+        minItems: 1
+        uniqueItems: true
+        items:
+          $ref: '#/components/schemas/process_json_schema'
+    error:
+      title: General Error
+      description: 'An error object declares additional information about a client-side or server-side error.
+
+        See also: * [Error Handling](#section/API-Principles/Error-Handling) in the API in general. * [Common Error Codes](errors.json)'
+      type: object
+      required:
+      - code
+      - message
+      properties:
+        id:
+          type: string
+          description: A back-end MAY add a unique identifier to the error response to be able to log and track errors with further non-disclosable details. A client could communicate this id to a back-end provider to get further information.
+          example: 550e8400-e29b-11d4-a716-446655440000
+        code:
+          $ref: '#/components/schemas/log_code'
+        message:
+          type: string
+          description: A message explaining what the client may need to change or what difficulties the server is facing.
+          example: Parameter 'sample' is missing.
+        links:
+          $ref: '#/components/schemas/log_links'
+    json_schema:
+      type: object
+      title: JSON Schema
+      description: 'A JSON Schema compliant to [JSON Schema draft-07](https://json-schema.org/draft-07/json-schema-validation.html) or later.
+
+
+        JSON Schemas SHOULD always be dereferenced (i.e. all `$refs` should be resolved).
+
+        This allows clients to consume the schemas much better.
+
+        Clients are not expected to support dereferencing `$refs`.
+
+
+        Note: The specified schema in the OpenAPI document is only a common subset of JSON Schema.
+
+        Additional keywords from the JSON Schema specification MAY be used.'
+      properties:
+        $schema:
+          description: 'The JSON Schema version. If not given in the context of openEO,
+
+            defaults to JSON Schema draft-07: `http://json-schema.org/draft-07/schema#`
+
+
+            The default value for `$schema` property may have to be added to the JSON Schema
+
+            object before passing it to a JSON Schema validator.'
+          type: string
+          format: uri
+          default: http://json-schema.org/draft-07/schema#
+        $id:
+          description: ID of your JSON Schema.
+          type: string
+          format: uri
+        type:
+          description: 'The allowed data type(s) for a value.
+
+
+            If this property is not present, all data types are allowed.'
+          oneOf:
+          - $ref: '#/components/schemas/json_schema_type'
+          - type: array
+            minItems: 1
+            uniqueItems: true
+            items:
+              $ref: '#/components/schemas/json_schema_type'
+        pattern:
+          type: string
+          format: regex
+          description: The regular expression a string value must match against.
+        enum:
+          type: array
+          items: {}
+          description: An exclusive list of allowed values.
+        minimum:
+          type: number
+          description: The minimum value (inclusive) allowed for a numerical value.
+        maximum:
+          type: number
+          description: The maximum value (inclusive) allowed for a numerical value.
+        minItems:
+          type: number
+          minimum: 0
+          default: 0
+          description: The minimum number of items required in an array.
+        maxItems:
+          type: number
+          minimum: 0
+          description: The maximum number of items required in an array.
+        items:
+          description: Specifies schemas for the items in an array.
+          anyOf:
+          - type: array
+            minItems: 1
+            items:
+              $ref: '#/components/schemas/json_schema'
+          - $ref: '#/components/schemas/json_schema'
+      additionalProperties:
+        description: Any other property supported by the JSON Schema version that is given through the property `$schema` are allowed. Defaults to JSON Schema [draft-07](https://json-schema.org/draft-07/json-schema-validation.html), but can also be any later version of JSON Schema.
+      example:
+        type: string
+        enum:
+        - a
+        - b
+    processing_create_parameters:
+      title: Creation Parameters
+      description: 'List of additional custom parameters that a back-end offers during the creation
+
+        of batch jobs (`POST /jobs`) and secondary web services (`POST /services`) respectively.'
+      type: array
+      items:
+        $ref: ../../openapi.yaml#/components/schemas/parameter
+      example:
+      - name: memory
+        description: Maximum amount of memory that will be allocated for processing, in gigabytes.
+        optional: true
+        default: 32
+        schema:
+          type: integer
+          minimum: 1
+  responses:
+    client_error_auth:
+      description: 'The request can not be fulfilled due to an error on client-side, i.e. the
+
+        request is invalid. The client SHOULD NOT repeat the request without
+
+        modifications.
+
+
+        The response body SHOULD contain a JSON error object.
+
+        MUST be any HTTP status code specified in [RFC 7231](https://www.rfc-editor.org/rfc/rfc7231.html#section-6.6).
+
+        This request MUST respond with HTTP status codes 401 if authorization is required or
+
+        403 if the authorization failed or access is forbidden in general to the
+
+        authenticated user. HTTP status code 404 SHOULD be used if the value of
+
+        a path parameter is invalid.
+
+
+        See also:
+
+        * [Error Handling](#section/API-Principles/Error-Handling) in the API in general.
+
+        * [Common Error Codes](errors.json)'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/error'
+    client_error:
+      description: 'The request can not be fulfilled due to an error on client-side, i.e. the
+
+        request is invalid. The client SHOULD NOT repeat the request without
+
+        modifications.
+
+
+        The response body SHOULD contain a JSON error object.
+
+        MUST be any HTTP status code specified in [RFC
+
+        7231](https://www.rfc-editor.org/rfc/rfc7231.html#section-6.6). This request
+
+        usually does not respond with HTTP status codes 401 and 403 due to
+
+        missing authorization. HTTP status code 404 SHOULD be used if the value
+
+        of a path parameter is invalid.
+
+
+        See also:
+
+        * [Error Handling](#section/API-Principles/Error-Handling) in the API in general.
+
+        * [Common Error Codes](errors.json)'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/error'
+    server_error:
+      description: 'The request can not be fulfilled due to an error at the back-end. The
+
+        error is never the client’s fault and therefore it is reasonable for the
+
+        client to retry the exact same request that triggered this response.
+
+
+        The response body SHOULD contain a JSON error object. MUST be any HTTP
+
+        status code specified in [RFC 7231](https://www.rfc-editor.org/rfc/rfc7231.html#section-6.6).
+
+
+        See also:
+
+        * [Error Handling](#section/API-Principles/Error-Handling) in the API in general.
+
+        * [Common Error Codes](errors.json)'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/error'
+  securitySchemes:
+    Bearer:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT or openEO
+      description: "A Bearer token can be provided in two different formats:\n1. **JSON Web Token (JWT) - RECOMMENDED**\n\n   - Conformance class: `https://api.openeo.org/1.3.0/authentication/jwt`\n   \n   The Bearer token is an access token in [JWT](https://datatracker.ietf.org/doc/html/rfc7519) format\n   as defined in RFC 7519. For openEO, it MUST include the issuer in the\n   `iss` claim although being optional in RFC 7519.\n   If the concept of an issuer does not exist in an authentication method (e.g. in HTTP Basic),\n   implementations could use the endpoint for Basic Authentication as the issuer, for example.\n\n   openEO backend implementations MUST signal their support for JWT by listing the given\n   conformance class. Likewise, openEO clients SHOULD only use JWT when the openEO backend\n   lists the conformance class.\n\n2. **openEO Tokens - DEPRECATED**\n\n   - Conformance class: *None*\n\n   The Bearer Token is constructed from the authentication method, a\n   provider ID (if available) and the access token. All separated by a\n   forward slash `/`.\n\n   Examples (replace `TOKEN` with the actual access token):\n\n   - Basic authentication (no provider ID available): `basic//TOKEN`\n   - OpenID Connect (provider ID is `ms`): `oidc/ms/TOKEN`.\n     For OpenID Connect, the provider ID corresponds to the value\n     specified for `id` for each provider in `GET /credentials/oidc`.\n\n   All openEO backends MUST accept this method for backward compatibility\n   until version 2.0 of the specification.\n\n   The access tokens provided by the identity provider do not include\n   the prefix that includes the authentication method and provider ID.\n   The Bearer Token sent to the openEO backend MUST have the prefix, e.g. `basic//` for Basic authentication.\n   This means that the clients have to prepend the prefix.\n\nJWT and openEO tokens can be distinguished by the presence of a slash `/` in the token, which JWT can never contain due to the Base64 encoding."
+    Basic:
+      type: http
+      scheme: basic
+x-refined-from:
+- openeo-api-openapi.yaml
+- openeo-processing-parameters-openapi.yaml
+- openeo-openapi.yml
+- openeo-processing-parameters-openapi.yml

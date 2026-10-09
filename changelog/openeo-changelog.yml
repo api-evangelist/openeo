@@ -1,0 +1,40 @@
+generated: '2026-10-09'
+method: searched
+source: https://github.com/Open-EO/openeo-api/blob/master/CHANGELOG.md
+scheme: semver
+current_version: 1.3.0
+entries:
+- version: 1.3.0
+  date: '2026-02-02'
+  breaking: false
+  highlights:
+  - 'New extensions: Remote Process Definition, Processing Parameters, Workspaces'
+  - 'GET /: new relation type web-editor'
+  - 'GET /credentials/oidc: added authorization_parameters'
+  - 'POST /result: added response header OpenEO-Identifier'
+  - Support for standard JSON Web Tokens (JWT) being used as Bearer tokens
+  - Deprecated the openEO-specific Bearer token format (authentication mechanism/provider id/access token)
+  - Deprecated STAC 0.9.x
+- version: 1.2.0
+  date: '2021-05-25'
+  breaking: false
+  highlights:
+  - 'New extensions: Commercial Data, Federation'
+  - 'GET /: new relation types create-form and recovery-form'
+  - 'GET /file_formats: add pointcloud to gis_data_types'
+- version: 1.1.0
+  date: '2021-05-17'
+  breaking: false
+  highlights:
+  - See changelog
+- version: 1.0.1
+  date: '2020-12-07'
+  breaking: false
+  highlights:
+  - See changelog
+- version: 1.0.0
+  date: '2020-07-17'
+  breaking: true
+  highlights:
+  - First stable 1.0 release of the openEO API
+note: Changelog of the openEO API specification itself; each back-end implementing it releases independently.
