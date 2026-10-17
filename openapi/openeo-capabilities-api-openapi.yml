@@ -5,7 +5,7 @@ info:
     name: Apache 2.0
     url: http://www.apache.org/licenses/LICENSE-2.0.html
   version: '1.0'
-  description: 'Operations tagged Capabilities across 4 of this provider''s published API definitions: openeo-api-openapi.yaml, openeo-processing-parameters-openapi.yaml, openeo-openapi.yml, openeo-processing-parameters-openapi.yml. Each path carries the servers of the definition it was published in.'
+  description: 'Operations tagged Capabilities across 2 of this provider''s published API definitions: openeo-api-openapi.yaml, openeo-processing-parameters-openapi.yaml. Each path carries the servers of the definition it was published in.'
 servers:
 - url: https://openeo.example/api/{version}
   description: The URL of the API MAY freely be chosen by the back-end providers. The path, including API versioning, is a *recommendation* only. Nevertheless, all servers MUST support HTTPS as the authentication methods are not secure with HTTP only!
@@ -1136,20 +1136,6 @@ components:
               $ref: '#/components/schemas/data_type_schema'
           allOf:
           - $ref: '#/components/schemas/process_json_schema'
-    stac_version:
-      type: string
-      description: 'The [version of the STAC specification](https://github.com/radiantearth/stac-spec/releases), which MAY not be equal to the [STAC API version](#tag/EO-Data-Discovery/STAC).
-
-        The openEO API allows for the STAC versions 1.x.x (RECOMMENDED) and 0.9.x (DEPRECATED).'
-      pattern: ^(0\.9.\d+|1\.\d+.\d+)
-      example: 1.1.0
-    process_description:
-      type: string
-      format: commonmark
-      description: 'Detailed description to explain the entity.
-
-
-        [CommonMark 0.29](http://commonmark.org/) syntax MAY be used for rich text representation. In addition to the CommonMark syntax, clients can convert process IDs that are formatted as in the following example into links instead of code blocks: ``` ``process_id()`` ```'
     parameter:
       title: Parameter
       type: object
@@ -1160,118 +1146,18 @@ components:
           $ref: '#/components/schemas/data_type_schema'
       allOf:
       - $ref: '#/components/schemas/base_parameter'
-    process_json_schema:
-      type: object
-      title: Single Data Type
-      description: 'Specifies a data type supported by a parameter or return value.
-
-
-        The data types are specified according to the [JSON Schema draft-07](http://json-schema.org/) specification.
-
-        See the chapter [''Schemas'' in ''Defining Processes''](#section/Processes/Defining-Processes) for more information.
-
-
-        JSON Schemas SHOULD NOT contain `default`, `anyOf`, `oneOf`, `allOf` or `not` at the top-level of the schema.
-
-        Instead specify each data type in a separate array element.
-
-
-        The following more complex JSON Schema keywords SHOULD NOT be used:
-
-        `if`, `then`, `else`, `readOnly`, `writeOnly`, `dependencies`, `minProperties`, `maxProperties`, `patternProperties`.
-
-
-        JSON Schemas SHOULD always be dereferenced (i.e. all `$refs` should be resolved). This allows clients to consume the schemas much better.
-
-        Clients are not expected to support dereferencing `$refs`.
-
-
-        Note: The specified schema is only a common subset of JSON Schema. Additional keywords MAY be used.'
-      properties:
-        subtype:
-          type: string
-          description: The allowed sub data type for a value. See the chapter on [subtypes](#section/Processes/Defining-Processes) for more information.
-        deprecated:
-          $ref: '#/components/schemas/deprecated'
-      allOf:
-      - $ref: '#/components/schemas/json_schema'
-      oneOf:
-      - title: Generic
-      - $ref: '#/components/schemas/process_graph_json_schema'
-      - $ref: '#/components/schemas/datacube_json_schema'
-    resource_parameter:
-      x-additionalPropertiesName: Parameter Name
-      type: object
-      title: Resource Parameter
-      description: 'Describes a parameter for various resources (e.g. file formats, service types).
-
-
-        The parameters are specified according to the [JSON Schema draft-07](http://json-schema.org/) specification.
-
-        See the chapter [''Schemas'' in ''Defining Processes''](#section/Processes/Defining-Processes) for more information.
-
-
-        The following more complex JSON Schema keywords SHOULD NOT be used:
-
-        `if`, `then`, `else`, `readOnly`, `writeOnly`, `dependencies`, `minProperties`, `maxProperties`, `patternProperties`.
-
-
-        JSON Schemas SHOULD always be dereferenced (i.e. all `$refs` should be resolved). This allows clients to consume the schemas much better.
-
-        Clients are not expected to support dereferencing `$refs`.
-
-
-        Note: The specified schema is only a common subset of JSON Schema. Additional keywords MAY be used.'
-      required:
-      - description
-      properties:
-        description:
-          type: string
-          description: A brief description of the parameter according to [JSON Schema draft-07](https://json-schema.org/draft-07/json-schema-validation.html#rfc.section.10.1).
-        required:
-          type: boolean
-          description: Determines whether this parameter is mandatory.
-          default: false
-        experimental:
-          $ref: '#/components/schemas/experimental'
-        default:
-          description: The default value represents what would be assumed by the consumer of the input as the value of the parameter if none is provided. The value MUST conform to the defined type for the parameter defined at the same level. For example, if type is string, then default can be "foo" but cannot be 1. See [JSON Schema draft-07](https://json-schema.org/draft-07/json-schema-validation.html#rfc.section.10.2).
-      allOf:
-      - $ref: '#/components/schemas/json_schema'
-    experimental:
-      type: boolean
-      description: Declares that the specified entity is experimental, which means that it is likely to change or may produce unpredictable behavior. Users should refrain from using it in production, but still feel encouraged to try it out and give feedback.
-      default: false
-    process_schema:
-      title: Process Data types
-      description: Either a single data type or a list of data types for process parameter or process return values.
+    data_type_schema:
+      title: Data Types
+      description: Either a single data type or a list of data types.
       oneOf:
       - $ref: '#/components/schemas/process_json_schema'
       - title: Multiple data types
-        description: A list of data types supported, specified as JSON Schemas.
+        description: A list of data types this parameter supports, specified as JSON Schemas.
         type: array
         minItems: 1
         uniqueItems: true
         items:
           $ref: '#/components/schemas/process_json_schema'
-    object_title:
-      type: string
-      description: A human-readable short title to be displayed to users **in addition** to the names specified in the keys. This property is only for better user experience so that users can understand the names better. Example titles could be `GeoTiff` for the key `GTiff` (for file formats) or `OGC Web Map Service` for the key `WMS` (for service types). The title MUST NOT be used in communication (e.g. in process graphs), although clients MAY translate the titles into the corresponding names.
-    log_code:
-      type: string
-      description: The code is either one of the standardized error codes or a custom code, for example specified by a user in the `inspect` process.
-      example: SampleError
-    geometry_type:
-      title: Geometry type
-      type: string
-      enum:
-      - Point
-      - MultiPoint
-      - LineString
-      - MultiLineString
-      - Polygon
-      - MultiPolygon
-      - GeometryCollection
     udf_runtime:
       type: object
       required:
@@ -1311,48 +1197,6 @@ components:
         mapping:
           language: '#/components/schemas/udf_programming_language'
           docker: '#/components/schemas/udf_docker'
-    base_parameter:
-      type: object
-      required:
-      - name
-      - description
-      properties:
-        name:
-          type: string
-          description: "A unique name for the parameter. \n\nUsing [snake case](https://en.wikipedia.org/wiki/Snake_case) (e.g. `window_size` or `scale_factor`) is RECOMMENDED."
-          pattern: ^\w+$
-        description:
-          $ref: '#/components/schemas/process_description'
-        optional:
-          type: boolean
-          description: 'Determines whether this parameter is optional to be specified even when no default is specified.
-
-            Clients SHOULD automatically set this parameter to `true`, if a default value is specified. Back-ends SHOULD NOT fail, if a default value is specified and this flag is missing.'
-          default: false
-        deprecated:
-          $ref: '#/components/schemas/deprecated'
-        experimental:
-          $ref: '#/components/schemas/experimental'
-        default:
-          description: The default value for this parameter. Required parameters SHOULD NOT specify a default value. Optional parameters SHOULD always specify a default value.
-    process_parameter:
-      title: Process Parameter
-      type: object
-      required:
-      - schema
-      properties:
-        schema:
-          $ref: '#/components/schemas/process_schema'
-      allOf:
-      - $ref: '#/components/schemas/base_parameter'
-    production:
-      type: boolean
-      description: 'Specifies whether the implementation is ready to be used in production use (`true`) or not (`false`).
-
-        Clients SHOULD only connect to non-production implementations if the user explicitly confirmed to use a non-production implementation.
-
-        This flag is part of `GET /.well-known/openeo` and `GET /`. It MUST be used consistently in both endpoints.'
-      default: false
     file_format:
       x-additionalPropertiesName: File Format Name
       title: File Format
@@ -1399,6 +1243,28 @@ components:
             [common relation types in openEO](#section/API-Principles/Web-Linking).'
           items:
             $ref: '#/components/schemas/link'
+    error:
+      title: General Error
+      description: 'An error object declares additional information about a client-side or server-side error.
+
+        See also: * [Error Handling](#section/API-Principles/Error-Handling) in the API in general. * [Common Error Codes](errors.json)'
+      type: object
+      required:
+      - code
+      - message
+      properties:
+        id:
+          type: string
+          description: A back-end MAY add a unique identifier to the error response to be able to log and track errors with further non-disclosable details. A client could communicate this id to a back-end provider to get further information.
+          example: 550e8400-e29b-11d4-a716-446655440000
+        code:
+          $ref: '#/components/schemas/log_code'
+        message:
+          type: string
+          description: A message explaining what the client may need to change or what difficulties the server is facing.
+          example: Parameter 'sample' is missing.
+        links:
+          $ref: '#/components/schemas/log_links'
     description:
       type: string
       format: commonmark
@@ -1406,70 +1272,13 @@ components:
 
 
         [CommonMark 0.29](http://commonmark.org/) syntax MAY be used for rich text representation.'
-    json_schema_type:
-      type: string
-      enum:
-      - array
-      - boolean
-      - integer
-      - 'null'
-      - number
-      - object
-      - string
-    dimension_axis_xyz:
-      title: Axis
-      description: Axis of a geometry or dimension (`x`, `y` or `z`)
-      type: string
-      enum:
-      - x
-      - y
-      - z
-    conformsTo:
-      description: 'Lists all conformance classes specified in various standards that the
-
-        implementation conforms to. Conformance classes are commonly used in
-
-        all OGC API standards and the STAC API specification.
-
-
-        The general openEO conformance class is `https://api.openeo.org/1.3.0`.
-
-        See the individual openEO API extensions for their conformance classes.'
-      type: array
-      items:
-        type: string
-        format: uri
-      example:
-      - https://api.openeo.org/1.3.0
-      - https://api.openeo.org/extensions/commercial-data/0.1.0
-      - https://api.openeo.org/extensions/federation/0.2.0
-      - https://api.stacspec.org/v1.0.0/core
-      - https://api.stacspec.org/v1.0.0/collections
-    deprecated:
+    experimental:
       type: boolean
-      description: 'Declares that the specified entity is deprecated with the potential
-
-        to be removed in any of the next versions. It should be transitioned out
-
-        of usage as soon as possible and users should refrain from using it in
-
-        new implementations.'
+      description: Declares that the specified entity is experimental, which means that it is likely to change or may produce unpredictable behavior. Users should refrain from using it in production, but still feel encouraged to try it out and give feedback.
       default: false
-    log_links:
-      description: 'Links related to this log entry / error, e.g. to a resource that
-
-        provides further explanations.
-
-
-        For relation types see the lists of
-
-        [common relation types in openEO](#section/API-Principles/Web-Linking).'
-      type: array
-      items:
-        $ref: '#/components/schemas/link'
-      example:
-      - href: https://openeo.example/docs/errors/SampleError
-        rel: about
+    object_title:
+      type: string
+      description: A human-readable short title to be displayed to users **in addition** to the names specified in the keys. This property is only for better user experience so that users can understand the names better. Example titles could be `GeoTiff` for the key `GTiff` (for file formats) or `OGC Web Map Service` for the key `WMS` (for service types). The title MUST NOT be used in communication (e.g. in process graphs), although clients MAY translate the titles into the corresponding names.
     link:
       title: Link
       description: A link to another resource on the web. Bases on [RFC 5899](https://www.rfc-editor.org/rfc/rfc5988.html).
@@ -1495,89 +1304,103 @@ components:
           type: string
           description: Used as a human-readable label for a link.
           example: openEO
-    datacube_json_schema:
-      title: Datacube
-      properties:
-        subtype:
-          type: string
-          enum:
-          - datacube
-        dimensions:
-          title: Datacube constraints
-          description: "Allows to specify requirements the data cube has to fulfill.\nRight now, it only allows to specify the dimension types and \nadds for specific dimension types:\n* axes for `spatial` dimensions in raster datacubes\n* geometry types for `geometry` dimensions in vector datacubes"
-          type: array
-          items:
-            type: object
-            required:
-            - type
-            properties:
-              type:
-                type: string
-            oneOf:
-            - title: Spatial (raster)
-              properties:
-                type:
-                  type: string
-                  enum:
-                  - spatial
-                axis:
-                  type: array
-                  minItems: 1
-                  items:
-                    $ref: '#/components/schemas/dimension_axis_xyz'
-            - title: Spatial (vector)
-              properties:
-                type:
-                  type: string
-                  enum:
-                  - geometry
-                geometry_type:
-                  type: array
-                  minItems: 1
-                  items:
-                    $ref: '#/components/schemas/geometry_type'
-            - title: Other
-              properties:
-                type:
-                  type: string
-                  enum:
-                  - bands
-                  - temporal
-                  - other
-    data_type_schema:
-      title: Data Types
-      description: Either a single data type or a list of data types.
+    geometry_type:
+      title: Geometry type
+      type: string
+      enum:
+      - Point
+      - MultiPoint
+      - LineString
+      - MultiLineString
+      - Polygon
+      - MultiPolygon
+      - GeometryCollection
+    dimension_axis_xyz:
+      title: Axis
+      description: Axis of a geometry or dimension (`x`, `y` or `z`)
+      type: string
+      enum:
+      - x
+      - y
+      - z
+    log_links:
+      description: 'Links related to this log entry / error, e.g. to a resource that
+
+        provides further explanations.
+
+
+        For relation types see the lists of
+
+        [common relation types in openEO](#section/API-Principles/Web-Linking).'
+      type: array
+      items:
+        $ref: '#/components/schemas/link'
+      example:
+      - href: https://openeo.example/docs/errors/SampleError
+        rel: about
+    process_schema:
+      title: Process Data types
+      description: Either a single data type or a list of data types for process parameter or process return values.
       oneOf:
       - $ref: '#/components/schemas/process_json_schema'
       - title: Multiple data types
-        description: A list of data types this parameter supports, specified as JSON Schemas.
+        description: A list of data types supported, specified as JSON Schemas.
         type: array
         minItems: 1
         uniqueItems: true
         items:
           $ref: '#/components/schemas/process_json_schema'
-    error:
-      title: General Error
-      description: 'An error object declares additional information about a client-side or server-side error.
-
-        See also: * [Error Handling](#section/API-Principles/Error-Handling) in the API in general. * [Common Error Codes](errors.json)'
+    resource_parameter:
+      x-additionalPropertiesName: Parameter Name
       type: object
+      title: Resource Parameter
+      description: 'Describes a parameter for various resources (e.g. file formats, service types).
+
+
+        The parameters are specified according to the [JSON Schema draft-07](http://json-schema.org/) specification.
+
+        See the chapter [''Schemas'' in ''Defining Processes''](#section/Processes/Defining-Processes) for more information.
+
+
+        The following more complex JSON Schema keywords SHOULD NOT be used:
+
+        `if`, `then`, `else`, `readOnly`, `writeOnly`, `dependencies`, `minProperties`, `maxProperties`, `patternProperties`.
+
+
+        JSON Schemas SHOULD always be dereferenced (i.e. all `$refs` should be resolved). This allows clients to consume the schemas much better.
+
+        Clients are not expected to support dereferencing `$refs`.
+
+
+        Note: The specified schema is only a common subset of JSON Schema. Additional keywords MAY be used.'
       required:
-      - code
-      - message
+      - description
       properties:
-        id:
+        description:
           type: string
-          description: A back-end MAY add a unique identifier to the error response to be able to log and track errors with further non-disclosable details. A client could communicate this id to a back-end provider to get further information.
-          example: 550e8400-e29b-11d4-a716-446655440000
-        code:
-          $ref: '#/components/schemas/log_code'
-        message:
-          type: string
-          description: A message explaining what the client may need to change or what difficulties the server is facing.
-          example: Parameter 'sample' is missing.
-        links:
-          $ref: '#/components/schemas/log_links'
+          description: A brief description of the parameter according to [JSON Schema draft-07](https://json-schema.org/draft-07/json-schema-validation.html#rfc.section.10.1).
+        required:
+          type: boolean
+          description: Determines whether this parameter is mandatory.
+          default: false
+        experimental:
+          $ref: '#/components/schemas/experimental'
+        default:
+          description: The default value represents what would be assumed by the consumer of the input as the value of the parameter if none is provided. The value MUST conform to the defined type for the parameter defined at the same level. For example, if type is string, then default can be "foo" but cannot be 1. See [JSON Schema draft-07](https://json-schema.org/draft-07/json-schema-validation.html#rfc.section.10.2).
+      allOf:
+      - $ref: '#/components/schemas/json_schema'
+    production:
+      type: boolean
+      description: 'Specifies whether the implementation is ready to be used in production use (`true`) or not (`false`).
+
+        Clients SHOULD only connect to non-production implementations if the user explicitly confirmed to use a non-production implementation.
+
+        This flag is part of `GET /.well-known/openeo` and `GET /`. It MUST be used consistently in both endpoints.'
+      default: false
+    log_code:
+      type: string
+      description: The code is either one of the standardized error codes or a custom code, for example specified by a user in the `inspect` process.
+      example: SampleError
     json_schema:
       type: object
       title: JSON Schema
@@ -1661,6 +1484,183 @@ components:
         enum:
         - a
         - b
+    json_schema_type:
+      type: string
+      enum:
+      - array
+      - boolean
+      - integer
+      - 'null'
+      - number
+      - object
+      - string
+    process_json_schema:
+      type: object
+      title: Single Data Type
+      description: 'Specifies a data type supported by a parameter or return value.
+
+
+        The data types are specified according to the [JSON Schema draft-07](http://json-schema.org/) specification.
+
+        See the chapter [''Schemas'' in ''Defining Processes''](#section/Processes/Defining-Processes) for more information.
+
+
+        JSON Schemas SHOULD NOT contain `default`, `anyOf`, `oneOf`, `allOf` or `not` at the top-level of the schema.
+
+        Instead specify each data type in a separate array element.
+
+
+        The following more complex JSON Schema keywords SHOULD NOT be used:
+
+        `if`, `then`, `else`, `readOnly`, `writeOnly`, `dependencies`, `minProperties`, `maxProperties`, `patternProperties`.
+
+
+        JSON Schemas SHOULD always be dereferenced (i.e. all `$refs` should be resolved). This allows clients to consume the schemas much better.
+
+        Clients are not expected to support dereferencing `$refs`.
+
+
+        Note: The specified schema is only a common subset of JSON Schema. Additional keywords MAY be used.'
+      properties:
+        subtype:
+          type: string
+          description: The allowed sub data type for a value. See the chapter on [subtypes](#section/Processes/Defining-Processes) for more information.
+        deprecated:
+          $ref: '#/components/schemas/deprecated'
+      allOf:
+      - $ref: '#/components/schemas/json_schema'
+      oneOf:
+      - title: Generic
+      - $ref: '#/components/schemas/process_graph_json_schema'
+      - $ref: '#/components/schemas/datacube_json_schema'
+    datacube_json_schema:
+      title: Datacube
+      properties:
+        subtype:
+          type: string
+          enum:
+          - datacube
+        dimensions:
+          title: Datacube constraints
+          description: "Allows to specify requirements the data cube has to fulfill.\nRight now, it only allows to specify the dimension types and \nadds for specific dimension types:\n* axes for `spatial` dimensions in raster datacubes\n* geometry types for `geometry` dimensions in vector datacubes"
+          type: array
+          items:
+            type: object
+            required:
+            - type
+            properties:
+              type:
+                type: string
+            oneOf:
+            - title: Spatial (raster)
+              properties:
+                type:
+                  type: string
+                  enum:
+                  - spatial
+                axis:
+                  type: array
+                  minItems: 1
+                  items:
+                    $ref: '#/components/schemas/dimension_axis_xyz'
+            - title: Spatial (vector)
+              properties:
+                type:
+                  type: string
+                  enum:
+                  - geometry
+                geometry_type:
+                  type: array
+                  minItems: 1
+                  items:
+                    $ref: '#/components/schemas/geometry_type'
+            - title: Other
+              properties:
+                type:
+                  type: string
+                  enum:
+                  - bands
+                  - temporal
+                  - other
+    deprecated:
+      type: boolean
+      description: 'Declares that the specified entity is deprecated with the potential
+
+        to be removed in any of the next versions. It should be transitioned out
+
+        of usage as soon as possible and users should refrain from using it in
+
+        new implementations.'
+      default: false
+    conformsTo:
+      description: 'Lists all conformance classes specified in various standards that the
+
+        implementation conforms to. Conformance classes are commonly used in
+
+        all OGC API standards and the STAC API specification.
+
+
+        The general openEO conformance class is `https://api.openeo.org/1.3.0`.
+
+        See the individual openEO API extensions for their conformance classes.'
+      type: array
+      items:
+        type: string
+        format: uri
+      example:
+      - https://api.openeo.org/1.3.0
+      - https://api.openeo.org/extensions/commercial-data/0.1.0
+      - https://api.openeo.org/extensions/federation/0.2.0
+      - https://api.stacspec.org/v1.0.0/core
+      - https://api.stacspec.org/v1.0.0/collections
+    base_parameter:
+      type: object
+      required:
+      - name
+      - description
+      properties:
+        name:
+          type: string
+          description: "A unique name for the parameter. \n\nUsing [snake case](https://en.wikipedia.org/wiki/Snake_case) (e.g. `window_size` or `scale_factor`) is RECOMMENDED."
+          pattern: ^\w+$
+        description:
+          $ref: '#/components/schemas/process_description'
+        optional:
+          type: boolean
+          description: 'Determines whether this parameter is optional to be specified even when no default is specified.
+
+            Clients SHOULD automatically set this parameter to `true`, if a default value is specified. Back-ends SHOULD NOT fail, if a default value is specified and this flag is missing.'
+          default: false
+        deprecated:
+          $ref: '#/components/schemas/deprecated'
+        experimental:
+          $ref: '#/components/schemas/experimental'
+        default:
+          description: The default value for this parameter. Required parameters SHOULD NOT specify a default value. Optional parameters SHOULD always specify a default value.
+    process_description:
+      type: string
+      format: commonmark
+      description: 'Detailed description to explain the entity.
+
+
+        [CommonMark 0.29](http://commonmark.org/) syntax MAY be used for rich text representation. In addition to the CommonMark syntax, clients can convert process IDs that are formatted as in the following example into links instead of code blocks: ``` ``process_id()`` ```'
+    stac_version:
+      type: string
+      description: 'The [version of the STAC specification](https://github.com/radiantearth/stac-spec/releases), which MAY not be equal to the [STAC API version](#tag/EO-Data-Discovery/STAC).
+
+        The openEO API allows for the STAC versions 1.x.x (RECOMMENDED) and 0.9.x (DEPRECATED).'
+      pattern: ^(0\.9.\d+|1\.\d+.\d+)
+      example: 1.1.0
+    process_parameter:
+      title: Process Parameter
+      type: object
+      required:
+      - schema
+      properties:
+        schema:
+          $ref: '#/components/schemas/process_schema'
+      allOf:
+      - $ref: '#/components/schemas/base_parameter'
     processing_create_parameters:
       title: Creation Parameters
       description: 'List of additional custom parameters that a back-end offers during the creation
@@ -1678,25 +1678,17 @@ components:
           type: integer
           minimum: 1
   responses:
-    client_error_auth:
-      description: 'The request can not be fulfilled due to an error on client-side, i.e. the
+    server_error:
+      description: 'The request can not be fulfilled due to an error at the back-end. The
 
-        request is invalid. The client SHOULD NOT repeat the request without
+        error is never the client’s fault and therefore it is reasonable for the
 
-        modifications.
+        client to retry the exact same request that triggered this response.
 
 
-        The response body SHOULD contain a JSON error object.
+        The response body SHOULD contain a JSON error object. MUST be any HTTP
 
-        MUST be any HTTP status code specified in [RFC 7231](https://www.rfc-editor.org/rfc/rfc7231.html#section-6.6).
-
-        This request MUST respond with HTTP status codes 401 if authorization is required or
-
-        403 if the authorization failed or access is forbidden in general to the
-
-        authenticated user. HTTP status code 404 SHOULD be used if the value of
-
-        a path parameter is invalid.
+        status code specified in [RFC 7231](https://www.rfc-editor.org/rfc/rfc7231.html#section-6.6).
 
 
         See also:
@@ -1738,17 +1730,25 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/error'
-    server_error:
-      description: 'The request can not be fulfilled due to an error at the back-end. The
+    client_error_auth:
+      description: 'The request can not be fulfilled due to an error on client-side, i.e. the
 
-        error is never the client’s fault and therefore it is reasonable for the
+        request is invalid. The client SHOULD NOT repeat the request without
 
-        client to retry the exact same request that triggered this response.
+        modifications.
 
 
-        The response body SHOULD contain a JSON error object. MUST be any HTTP
+        The response body SHOULD contain a JSON error object.
 
-        status code specified in [RFC 7231](https://www.rfc-editor.org/rfc/rfc7231.html#section-6.6).
+        MUST be any HTTP status code specified in [RFC 7231](https://www.rfc-editor.org/rfc/rfc7231.html#section-6.6).
+
+        This request MUST respond with HTTP status codes 401 if authorization is required or
+
+        403 if the authorization failed or access is forbidden in general to the
+
+        authenticated user. HTTP status code 404 SHOULD be used if the value of
+
+        a path parameter is invalid.
 
 
         See also:
@@ -1772,5 +1772,3 @@ components:
 x-refined-from:
 - openeo-api-openapi.yaml
 - openeo-processing-parameters-openapi.yaml
-- openeo-openapi.yml
-- openeo-processing-parameters-openapi.yml

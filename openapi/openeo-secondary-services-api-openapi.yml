@@ -1,7 +1,8 @@
 openapi: 3.2.0
 info:
-  title: Openeo Secondary Services API
+  title: openEO Secondary Services API
   version: 1.3.0
+  description: The openEO API specification for interoperable cloud-based processing of large Earth observation datasets.
   contact:
     name: openEO Project Steering Committee
     url: https://openeo.org
@@ -9,7 +10,6 @@ info:
   license:
     name: Apache 2.0
     url: http://www.apache.org/licenses/LICENSE-2.0.html
-  description: 'Operations tagged Secondary Services across 2 of this provider''s published API definitions: openeo-api-openapi.yaml, openeo-openapi.yml. Each path carries the servers of the definition it was published in.'
 servers:
 - url: https://openeo.example/api/{version}
   description: The URL of the API MAY freely be chosen by the back-end providers. The path, including API versioning, is a *recommendation* only. Nevertheless, all servers MUST support HTTPS as the authentication methods are not secure with HTTP only!
@@ -225,38 +225,6 @@ paths:
           $ref: '#/components/responses/client_error'
         5XX:
           $ref: '#/components/responses/server_error'
-    servers:
-    - url: https://openeo.example/api/{version}
-      description: The URL of the API MAY freely be chosen by the back-end providers. The path, including API versioning, is a *recommendation* only. Nevertheless, all servers MUST support HTTPS as the authentication methods are not secure with HTTP only!
-      variables:
-        version:
-          default: v1
-          description: 'API versioning is RECOMMENDED. As the openEO API is following
-
-            [SemVer](https://semver.org/) only the **major** part of the version
-
-            numbers SHOULD be used for API versioning in the URL. To make clear
-
-            that it is a version number, it is RECOMMENDED to add the prefix `v`.
-
-
-            Example: API version `1.2.3` is recommended to use `v1`.
-
-
-            The reason to only consider the major part is that backward-incompatible
-
-            changes are introduced by major changes only. All changes from minor
-
-            and patch releases can usually be integrated without breakages and thus
-
-            a change in the URL is not really needed.
-
-
-            The version number in the URL MUST not be used by the clients to detect
-
-            the version number of the API. Use the version number returned in the
-
-            property `api_version` from `GET /` instead.'
   /services:
     get:
       summary: List all web services
@@ -403,38 +371,6 @@ paths:
               additionalProperties:
                 description: Additional back-end specific properties are allowed.
         description: The base data required to create the secondary web service.
-    servers:
-    - url: https://openeo.example/api/{version}
-      description: The URL of the API MAY freely be chosen by the back-end providers. The path, including API versioning, is a *recommendation* only. Nevertheless, all servers MUST support HTTPS as the authentication methods are not secure with HTTP only!
-      variables:
-        version:
-          default: v1
-          description: 'API versioning is RECOMMENDED. As the openEO API is following
-
-            [SemVer](https://semver.org/) only the **major** part of the version
-
-            numbers SHOULD be used for API versioning in the URL. To make clear
-
-            that it is a version number, it is RECOMMENDED to add the prefix `v`.
-
-
-            Example: API version `1.2.3` is recommended to use `v1`.
-
-
-            The reason to only consider the major part is that backward-incompatible
-
-            changes are introduced by major changes only. All changes from minor
-
-            and patch releases can usually be integrated without breakages and thus
-
-            a change in the URL is not really needed.
-
-
-            The version number in the URL MUST not be used by the clients to detect
-
-            the version number of the API. Use the version number returned in the
-
-            property `api_version` from `GET /` instead.'
   /services/{service_id}:
     parameters:
     - $ref: '#/components/parameters/service_id'
@@ -527,38 +463,6 @@ paths:
           $ref: '#/components/responses/client_error_auth'
         5XX:
           $ref: '#/components/responses/server_error'
-    servers:
-    - url: https://openeo.example/api/{version}
-      description: The URL of the API MAY freely be chosen by the back-end providers. The path, including API versioning, is a *recommendation* only. Nevertheless, all servers MUST support HTTPS as the authentication methods are not secure with HTTP only!
-      variables:
-        version:
-          default: v1
-          description: 'API versioning is RECOMMENDED. As the openEO API is following
-
-            [SemVer](https://semver.org/) only the **major** part of the version
-
-            numbers SHOULD be used for API versioning in the URL. To make clear
-
-            that it is a version number, it is RECOMMENDED to add the prefix `v`.
-
-
-            Example: API version `1.2.3` is recommended to use `v1`.
-
-
-            The reason to only consider the major part is that backward-incompatible
-
-            changes are introduced by major changes only. All changes from minor
-
-            and patch releases can usually be integrated without breakages and thus
-
-            a change in the URL is not really needed.
-
-
-            The version number in the URL MUST not be used by the clients to detect
-
-            the version number of the API. Use the version number returned in the
-
-            property `api_version` from `GET /` instead.'
   /services/{service_id}/logs:
     get:
       summary: Logs for a secondary service
@@ -586,38 +490,6 @@ paths:
           $ref: '#/components/responses/client_error_auth'
         5XX:
           $ref: '#/components/responses/server_error'
-    servers:
-    - url: https://openeo.example/api/{version}
-      description: The URL of the API MAY freely be chosen by the back-end providers. The path, including API versioning, is a *recommendation* only. Nevertheless, all servers MUST support HTTPS as the authentication methods are not secure with HTTP only!
-      variables:
-        version:
-          default: v1
-          description: 'API versioning is RECOMMENDED. As the openEO API is following
-
-            [SemVer](https://semver.org/) only the **major** part of the version
-
-            numbers SHOULD be used for API versioning in the URL. To make clear
-
-            that it is a version number, it is RECOMMENDED to add the prefix `v`.
-
-
-            Example: API version `1.2.3` is recommended to use `v1`.
-
-
-            The reason to only consider the major part is that backward-incompatible
-
-            changes are introduced by major changes only. All changes from minor
-
-            and patch releases can usually be integrated without breakages and thus
-
-            a change in the URL is not really needed.
-
-
-            The version number in the URL MUST not be used by the clients to detect
-
-            the version number of the API. Use the version number returned in the
-
-            property `api_version` from `GET /` instead.'
 components:
   schemas:
     process_graph_json_schema:
@@ -652,16 +524,6 @@ components:
               $ref: '#/components/schemas/data_type_schema'
           allOf:
           - $ref: '#/components/schemas/process_json_schema'
-    service_enabled:
-      type: boolean
-      description: Describes whether a secondary web service is responding to requests (true) or not (false). Disabled services do not produce any costs.
-    process_description:
-      type: string
-      format: commonmark
-      description: 'Detailed description to explain the entity.
-
-
-        [CommonMark 0.29](http://commonmark.org/) syntax MAY be used for rich text representation. In addition to the CommonMark syntax, clients can convert process IDs that are formatted as in the following example into links instead of code blocks: ``` ``process_id()`` ```'
     parameter:
       title: Parameter
       type: object
@@ -672,32 +534,560 @@ components:
           $ref: '#/components/schemas/data_type_schema'
       allOf:
       - $ref: '#/components/schemas/base_parameter'
-    billing_plan:
+    billing_plan_null_default:
+      type:
+      - string
+      - 'null'
+      description: "The billing plan to process and charge the job or service with.\n\nBilling plans MUST be accepted in a *case insensitive* manner.\nBack-ends MUST resolve the billing plan in the following way:\n\n* If a non-`null` value is given: Persist the `plan` that has been provided in the request.\n* Otherwise:\n  1. Persist the `default_plan` exposed through `GET /me`, if available.\n  2. Persist the `default_plan` exposed through `GET /`, if available.\n  3. If a single plan is exposed by the back-end, persist it.\n  4. Otherwise, the back-end MUST throw a `BillingPlanMissing` error.\n\nThe resolved plan MUST be persisted permanently, regardless of any \nchanges to the exposed billing plans in `GET /` in the future.\n\nBilling plans not on the list of available plans MUST be rejected with\nopenEO error `BillingPlanInvalid`."
+      example: free
+      default: null
+    data_type_schema:
+      title: Data Types
+      description: Either a single data type or a list of data types.
+      oneOf:
+      - $ref: '#/components/schemas/process_json_schema'
+      - title: Multiple data types
+        description: A list of data types this parameter supports, specified as JSON Schemas.
+        type: array
+        minItems: 1
+        uniqueItems: true
+        items:
+          $ref: '#/components/schemas/process_json_schema'
+    eo_description:
+      type:
+      - string
+      - 'null'
+      format: commonmark
+      description: 'Detailed multi-line description to explain the entity.
+
+
+        [CommonMark 0.29](http://commonmark.org/) syntax MAY be used for rich text representation.'
+      example: Deriving minimum NDVI measurements over pixel time series of Sentinel-2
+    service:
+      title: Secondary Web Service
+      description: The metadata of a secondary web service that has been submitted by the authenticated user.
+      type: object
+      required:
+      - id
+      - enabled
+      - type
+      - url
+      properties:
+        id:
+          $ref: '#/components/schemas/service_id'
+        title:
+          $ref: '#/components/schemas/eo_title'
+        description:
+          $ref: '#/components/schemas/eo_description'
+        url:
+          type: string
+          format: uri
+          description: URL at which the secondary web service is accessible. Does not necessarily need to be located within the API.
+          example: https://openeo.example/wms/wms-a3cca9
+        type:
+          $ref: '#/components/schemas/service_type'
+        enabled:
+          $ref: '#/components/schemas/service_enabled'
+        process:
+          $ref: '#/components/schemas/process_graph_with_metadata'
+        configuration:
+          $ref: '#/components/schemas/service_configuration'
+        attributes:
+          title: Secondary Web Service Attributes
+          type: object
+          description: Additional attributes of the secondary web service, e.g. available layers for a WMS instance based on the bands in the underlying GeoTiff.
+          example:
+            layers:
+            - ndvi
+            - evi
+        created:
+          $ref: '#/components/schemas/created'
+        plan:
+          $ref: '#/components/schemas/billing_plan'
+        costs:
+          $ref: '#/components/schemas/money'
+        budget:
+          $ref: '#/components/schemas/budget'
+        usage:
+          description: 'Metrics about the resource usage of the secondary web service.
+
+
+            Back-ends are not expected to update the metrics in real-time.
+
+            For detailed usage metrics for individual processing steps, metrics
+
+            can be added to the logs (e.g. `GET /jobs/{job_id}/logs`) with the
+
+            same schema.'
+          allOf:
+          - $ref: '#/components/schemas/usage'
+        log_level:
+          $ref: '#/components/schemas/min_log_level_default'
+    error:
+      title: General Error
+      description: 'An error object declares additional information about a client-side or server-side error.
+
+        See also: * [Error Handling](#section/API-Principles/Error-Handling) in the API in general. * [Common Error Codes](errors.json)'
+      type: object
+      required:
+      - code
+      - message
+      properties:
+        id:
+          type: string
+          description: A back-end MAY add a unique identifier to the error response to be able to log and track errors with further non-disclosable details. A client could communicate this id to a back-end provider to get further information.
+          example: 550e8400-e29b-11d4-a716-446655440000
+        code:
+          $ref: '#/components/schemas/log_code'
+        message:
+          type: string
+          description: A message explaining what the client may need to change or what difficulties the server is facing.
+          example: Parameter 'sample' is missing.
+        links:
+          $ref: '#/components/schemas/log_links'
+    usage_metric:
+      type: object
+      required:
+      - value
+      - unit
+      properties:
+        value:
+          type: number
+          minimum: 0
+        unit:
+          type: string
+    description:
       type: string
+      format: commonmark
+      description: 'Detailed description to explain the entity.
+
+
+        [CommonMark 0.29](http://commonmark.org/) syntax MAY be used for rich text representation.'
+    budget:
+      type:
+      - number
+      - 'null'
+      minimum: 0
+      description: 'Maximum amount of costs the request is allowed to produce.
+
+        The value MUST be specified in the currency of the back-end.
+
+        No limits apply, if the value is `null` or the back-end has no currency
+
+        set in `GET /`.'
+      example: 100
+      default: null
+    log_level:
+      description: 'The severity level of the log entry.
+
+
+        The order of the levels is as follows (from low to high severity): `debug`, `info`, `warning`, `error`.
+
+
+        The level `error` usually corresponds with critical issues that usually terminate the data processing.'
+      type: string
+      enum:
+      - error
+      - warning
+      - info
+      - debug
+      example: error
+    billing_plan_null:
+      type:
+      - string
+      - 'null'
       description: 'The billing plan to process and charge the job or service with.
 
 
-        Billing plans MUST be handled in a *case insensitive* manner.
+        Billing plans MUST be accepted in a *case insensitive* manner.
+
+        Back-ends MUST resolve the billing plan in the following way if billing is supported:
 
 
-        The plans can be retrieved from `GET /`, but the value returned here may
+        * If a value is given and it is not `null`: Persist the `plan` that has been provided in the request.
 
-        not be in the list of plans any longer.'
+        * Otherwise, do not change the billing plan.
+
+
+        Billing plans not on the list of available plans MUST be rejected with
+
+        openEO error `BillingPlanInvalid`.'
       example: free
-    process_json_schema:
+    usage:
+      title: Resource usage metrics
       type: object
-      title: Single Data Type
-      description: 'Specifies a data type supported by a parameter or return value.
+      properties:
+        cpu:
+          description: Specifies the CPU usage, usually in a unit such as `cpu-seconds`.
+          allOf:
+          - $ref: '#/components/schemas/usage_metric'
+        memory:
+          description: Specifies the memory usage, usually in a unit such as `mb-seconds` or `gb-hours`.
+          allOf:
+          - $ref: '#/components/schemas/usage_metric'
+        duration:
+          description: Specifies the wall time, usually in a unit such as `seconds`, `minutes` or `hours`.
+          allOf:
+          - $ref: '#/components/schemas/usage_metric'
+        network:
+          description: Specifies the network transfer usage (incoming and outgoing), usually in a unit such as `b` (bytes), `kb` (kilobytes), `mb` (megabytes) or `gb` (gigabytes).
+          allOf:
+          - $ref: '#/components/schemas/usage_metric'
+        disk:
+          description: Specifies the amount of input (read) and output (write) operations on the storage such as disks, usually in a unit such as `b` (bytes), `kb` (kilobytes), `mb` (megabytes) or `gb` (gigabytes).
+          allOf:
+          - $ref: '#/components/schemas/usage_metric'
+        storage:
+          description: Specifies the usage of storage space, usually in a unit such as `b` (bytes), `kb` (kilobytes), `mb` (megabytes) or `gb` (gigabytes).
+          allOf:
+          - $ref: '#/components/schemas/usage_metric'
+      additionalProperties:
+        description: Additional metrics.
+        allOf:
+        - $ref: '#/components/schemas/usage_metric'
+      example:
+        cpu:
+          value: 40668
+          unit: cpu-seconds
+        duration:
+          value: 2611
+          unit: seconds
+        memory:
+          value: 108138811
+          unit: mb-seconds
+        network:
+          value: 0
+          unit: kb
+        storage:
+          value: 55
+          unit: mb
+    process_id:
+      type: string
+      description: "The identifier for the process. It MUST be unique across its namespace\n(e.g. predefined processes or user-defined processes).\n\nClients SHOULD warn the user if a user-defined process is added with the \nsame identifier as one of the predefined process."
+      pattern: ^\w+$
+      example: ndvi
+    experimental:
+      type: boolean
+      description: Declares that the specified entity is experimental, which means that it is likely to change or may produce unpredictable behavior. Users should refrain from using it in production, but still feel encouraged to try it out and give feedback.
+      default: false
+    service_type:
+      description: Definition of the service type to access result data. All available service types can be retrieved via `GET /service_types`. Service types MUST be accepted in a *case insensitive* manner.
+      type: string
+      example: wms
+    process_exceptions:
+      type: object
+      title: Process Exceptions
+      description: 'Declares exceptions (errors) that might occur during execution
+
+        of this process. This list is just for informative purposes and may be
+
+        incomplete. This list MUST only contain exceptions that stop the
+
+        execution of a process and MUST NOT contain warnings, notices or
+
+        debugging messages. It is meant to primarily contain errors that
+
+        have been caused by the user. It is RECOMMENDED that exceptions
+
+        are referred to and explained in process or parameter descriptions.
 
 
-        The data types are specified according to the [JSON Schema draft-07](http://json-schema.org/) specification.
+        The keys define the error code and MUST match the following pattern:
+
+        `^\w+$`
+
+
+        This schema follows the schema of the general openEO error list (see
+
+        errors.json).'
+      additionalProperties:
+        x-additionalPropertiesName: Error Code
+        title: Process Exception
+        type: object
+        required:
+        - message
+        properties:
+          description:
+            type: string
+            format: commonmark
+            description: 'Detailed description to explain the error to client
+
+              users and back-end developers. This should not be shown in the
+
+              clients directly, but MAY be linked to in the errors `url`
+
+              property.
+
+
+              [CommonMark 0.29](http://commonmark.org/) syntax MAY be used
+
+              for rich text representation.'
+          message:
+            type: string
+            description: 'Explains the reason the server is rejecting the request. This message is intended to be displayed to the client user. For "4xx" error codes the message SHOULD explain shortly how the client needs to modify the request.
+
+
+              The message MAY contain variables, which are enclosed by curly brackets. Example: `{variable_name}`'
+            example: 'The value specified for the process argument ''{argument}'' in process ''{process}'' is invalid: {reason}'
+          http:
+            type: integer
+            description: HTTP Status Code, following the [error handling conventions in openEO](#section/API-Principles/Error-Handling). Defaults to `400`.
+            default: 400
+    process:
+      title: Process
+      type: object
+      properties:
+        id:
+          $ref: '#/components/schemas/process_id'
+        summary:
+          $ref: '#/components/schemas/process_summary'
+        description:
+          $ref: '#/components/schemas/process_description'
+        categories:
+          $ref: '#/components/schemas/process_categories'
+        parameters:
+          $ref: '#/components/schemas/process_parameters'
+        returns:
+          $ref: '#/components/schemas/process_return_value'
+        deprecated:
+          $ref: '#/components/schemas/deprecated'
+        experimental:
+          $ref: '#/components/schemas/experimental'
+        exceptions:
+          $ref: '#/components/schemas/process_exceptions'
+        examples:
+          type: array
+          description: Examples, may be used for unit tests.
+          items:
+            title: Process Example
+            type: object
+            required:
+            - arguments
+            properties:
+              title:
+                type: string
+                description: A title for the example.
+              description:
+                $ref: '#/components/schemas/process_description'
+              arguments:
+                $ref: '#/components/schemas/process_arguments'
+              returns:
+                description: The return value which can by of any data type.
+        links:
+          type: array
+          description: 'Links related to this process, e.g. additional external documentation.
+
+
+            Providing links with the following `rel` (relation) types is RECOMMENDED:
+
+
+            1. `latest-version`: If a process has been marked as deprecated, a link SHOULD
+
+            point to the preferred version of the process. The relation types `predecessor-version`
+
+            (link to older version) and `successor-version` (link to newer version) can also be used
+
+            to show the relation between versions.
+
+
+            2. `version-history`: A link to a changelog and/or a list of versions of the process
+
+            (see also the relation types `latest-version` etc.).
+
+
+            3. `example`: Links to examples of other processes that use this process.
+
+
+            4. `cite-as`: For all DOIs associated with the process, the respective DOI
+
+            links SHOULD be added.
+
+
+            5. `license`: Links to applicable license(s). The link titles should reflect the license names.
+
+
+            6. `author`: Links to authors of the process. The `href` can use the `mailto:` protocol to
+
+            link to an email address. The link titles should reflect the author names and affiliations.
+
+
+            7. `canonical`: Points to a publicly accessible and more long-lived URL.
+
+
+            For additional relation types see also the lists of
+
+            [common relation types in openEO](#section/API-Principles/Web-Linking).'
+          items:
+            $ref: '#/components/schemas/link'
+        process_graph:
+          $ref: '#/components/schemas/process_graph'
+    links_pagination:
+      description: 'Links related to this list of resources, for example links for pagination
+
+        or alternative formats such as a human-readable HTML version.
+
+        The links array MUST NOT be paginated.
+
+
+        If pagination is implemented, the following `rel` (relation) types apply:
+
+
+        1. `next` (REQUIRED): A link to the next page, except on the last page.
+
+
+        2. `prev` (OPTIONAL): A link to the previous page, except on the first page.
+
+
+        3. `first` (OPTIONAL): A link to the first page, except on the first page.
+
+
+        4. `last` (OPTIONAL): A link to the last page, except on the last page.
+
+
+        For additional relation types see also the lists of
+
+        [common relation types in openEO](#section/API-Principles/Web-Linking).'
+      type: array
+      items:
+        $ref: '#/components/schemas/link'
+    budget_update:
+      type:
+      - number
+      - 'null'
+      minimum: 0
+      description: 'Maximum amount of costs the request is allowed to produce.
+
+        The value MUST be specified in the currency of the back-end.
+
+        No limits apply, if the value is `null`.'
+      example: 100
+    service_configuration:
+      type: object
+      title: Service Configuration
+      description: Map of configuration settings, i.e. the setting names supported by the secondary web service combined with actual values. See `GET /service_types` for supported configuration settings. For example, this could specify the required version of the service, visualization details or any other service dependent configuration.
+      example:
+        version: 1.3.0
+    process_graph_with_metadata:
+      title: Process Graph with metadata
+      description: A process graph, optionally enriched with process metadata.
+      type: object
+      required:
+      - process_graph
+      properties:
+        id:
+          type:
+          - string
+          - 'null'
+        summary:
+          type:
+          - string
+          - 'null'
+        description:
+          type:
+          - string
+          - 'null'
+        parameters:
+          type:
+          - array
+          - 'null'
+          items: {}
+        returns:
+          type:
+          - object
+          - 'null'
+      allOf:
+      - $ref: '#/components/schemas/process'
+    object_title:
+      type: string
+      description: A human-readable short title to be displayed to users **in addition** to the names specified in the keys. This property is only for better user experience so that users can understand the names better. Example titles could be `GeoTiff` for the key `GTiff` (for file formats) or `OGC Web Map Service` for the key `WMS` (for service types). The title MUST NOT be used in communication (e.g. in process graphs), although clients MAY translate the titles into the corresponding names.
+    link:
+      title: Link
+      description: A link to another resource on the web. Bases on [RFC 5899](https://www.rfc-editor.org/rfc/rfc5988.html).
+      type: object
+      required:
+      - href
+      - rel
+      properties:
+        rel:
+          type: string
+          description: Relationship between the current document and the linked document. SHOULD be a [registered link relation type](https://www.iana.org/assignments/link-relations/link-relations.xml) whenever feasible.
+          example: related
+        href:
+          type: string
+          description: The value MUST be a valid URL.
+          format: uri
+          example: https://openeo.example
+        type:
+          type: string
+          description: The value MUST be a string that hints at the format used to represent data at the provided URI, preferably a media (MIME) type.
+          example: text/html
+        title:
+          type: string
+          description: Used as a human-readable label for a link.
+          example: openEO
+    geometry_type:
+      title: Geometry type
+      type: string
+      enum:
+      - Point
+      - MultiPoint
+      - LineString
+      - MultiLineString
+      - Polygon
+      - MultiPolygon
+      - GeometryCollection
+    process_namespace:
+      type:
+      - string
+      - 'null'
+      default: null
+      example: null
+      description: "The namespace the `process_id` is valid for.\n\nThe following options are predefined by the openEO API, but additional\nnamespaces may be introduced by back-ends or in a future version of the API.\n\n* `null` (default): Checks both user-defined and predefined processes,\n   but prefers user-defined processes if both are available.\n   This allows users to add missing predefined processes for portability,\n   e.g. common processes from [processes.openeo.org](https://processes.openeo.org)\n   that have a process graph included.\n   Logging the namespace selected by the back-end for debugging purposes is RECOMMENDED.\n* `backend`: Uses exclusively the predefined processes listed at `GET /processes`.\n* `user`: Uses exclusively the user-defined processes listed at `GET /process_graphs`.\n\nIf multiple processes with the same identifier exist, Clients SHOULD\ninform the user that it's recommended to select a namespace."
+    dimension_axis_xyz:
+      title: Axis
+      description: Axis of a geometry or dimension (`x`, `y` or `z`)
+      type: string
+      enum:
+      - x
+      - y
+      - z
+    log_links:
+      description: 'Links related to this log entry / error, e.g. to a resource that
+
+        provides further explanations.
+
+
+        For relation types see the lists of
+
+        [common relation types in openEO](#section/API-Principles/Web-Linking).'
+      type: array
+      items:
+        $ref: '#/components/schemas/link'
+      example:
+      - href: https://openeo.example/docs/errors/SampleError
+        rel: about
+    process_schema:
+      title: Process Data types
+      description: Either a single data type or a list of data types for process parameter or process return values.
+      oneOf:
+      - $ref: '#/components/schemas/process_json_schema'
+      - title: Multiple data types
+        description: A list of data types supported, specified as JSON Schemas.
+        type: array
+        minItems: 1
+        uniqueItems: true
+        items:
+          $ref: '#/components/schemas/process_json_schema'
+    resource_parameter:
+      x-additionalPropertiesName: Parameter Name
+      type: object
+      title: Resource Parameter
+      description: 'Describes a parameter for various resources (e.g. file formats, service types).
+
+
+        The parameters are specified according to the [JSON Schema draft-07](http://json-schema.org/) specification.
 
         See the chapter [''Schemas'' in ''Defining Processes''](#section/Processes/Defining-Processes) for more information.
-
-
-        JSON Schemas SHOULD NOT contain `default`, `anyOf`, `oneOf`, `allOf` or `not` at the top-level of the schema.
-
-        Instead specify each data type in a separate array element.
 
 
         The following more complex JSON Schema keywords SHOULD NOT be used:
@@ -711,18 +1101,59 @@ components:
 
 
         Note: The specified schema is only a common subset of JSON Schema. Additional keywords MAY be used.'
+      required:
+      - description
       properties:
-        subtype:
+        description:
           type: string
-          description: The allowed sub data type for a value. See the chapter on [subtypes](#section/Processes/Defining-Processes) for more information.
-        deprecated:
-          $ref: '#/components/schemas/deprecated'
+          description: A brief description of the parameter according to [JSON Schema draft-07](https://json-schema.org/draft-07/json-schema-validation.html#rfc.section.10.1).
+        required:
+          type: boolean
+          description: Determines whether this parameter is mandatory.
+          default: false
+        experimental:
+          $ref: '#/components/schemas/experimental'
+        default:
+          description: The default value represents what would be assumed by the consumer of the input as the value of the parameter if none is provided. The value MUST conform to the defined type for the parameter defined at the same level. For example, if type is string, then default can be "foo" but cannot be 1. See [JSON Schema draft-07](https://json-schema.org/draft-07/json-schema-validation.html#rfc.section.10.2).
       allOf:
       - $ref: '#/components/schemas/json_schema'
-      oneOf:
-      - title: Generic
-      - $ref: '#/components/schemas/process_graph_json_schema'
-      - $ref: '#/components/schemas/datacube_json_schema'
+    billing_plan:
+      type: string
+      description: 'The billing plan to process and charge the job or service with.
+
+
+        Billing plans MUST be handled in a *case insensitive* manner.
+
+
+        The plans can be retrieved from `GET /`, but the value returned here may
+
+        not be in the list of plans any longer.'
+      example: free
+    money:
+      description: An amount of money or credits. The value MUST be specified in the currency the back-end is working with. The currency can be retrieved by calling `GET /`. If no currency is set, this field MUST be `null`.
+      type:
+      - number
+      - 'null'
+      minimum: 0
+      example: 12.98
+      default: null
+    eo_title:
+      description: A short description to easily distinguish entities.
+      type:
+      - string
+      - 'null'
+      example: NDVI based on Sentinel-2
+    process_return_value:
+      type: object
+      title: Process Return Value
+      description: Description of the data that is returned by this process.
+      required:
+      - schema
+      properties:
+        description:
+          $ref: '#/components/schemas/process_description'
+        schema:
+          $ref: '#/components/schemas/process_schema'
     process_graph:
       title: Process Graph
       description: A process graph defines a graph-like structure as a connected set of executable processes. Each key is a unique identifier (node ID) that is used to refer to the process in the graph.
@@ -861,823 +1292,20 @@ components:
               from_node: mintime
             format: GTiff
           result: true
-    usage:
-      title: Resource usage metrics
-      type: object
-      properties:
-        cpu:
-          description: Specifies the CPU usage, usually in a unit such as `cpu-seconds`.
-          allOf:
-          - $ref: '#/components/schemas/usage_metric'
-        memory:
-          description: Specifies the memory usage, usually in a unit such as `mb-seconds` or `gb-hours`.
-          allOf:
-          - $ref: '#/components/schemas/usage_metric'
-        duration:
-          description: Specifies the wall time, usually in a unit such as `seconds`, `minutes` or `hours`.
-          allOf:
-          - $ref: '#/components/schemas/usage_metric'
-        network:
-          description: Specifies the network transfer usage (incoming and outgoing), usually in a unit such as `b` (bytes), `kb` (kilobytes), `mb` (megabytes) or `gb` (gigabytes).
-          allOf:
-          - $ref: '#/components/schemas/usage_metric'
-        disk:
-          description: Specifies the amount of input (read) and output (write) operations on the storage such as disks, usually in a unit such as `b` (bytes), `kb` (kilobytes), `mb` (megabytes) or `gb` (gigabytes).
-          allOf:
-          - $ref: '#/components/schemas/usage_metric'
-        storage:
-          description: Specifies the usage of storage space, usually in a unit such as `b` (bytes), `kb` (kilobytes), `mb` (megabytes) or `gb` (gigabytes).
-          allOf:
-          - $ref: '#/components/schemas/usage_metric'
-      additionalProperties:
-        description: Additional metrics.
-        allOf:
-        - $ref: '#/components/schemas/usage_metric'
-      example:
-        cpu:
-          value: 40668
-          unit: cpu-seconds
-        duration:
-          value: 2611
-          unit: seconds
-        memory:
-          value: 108138811
-          unit: mb-seconds
-        network:
-          value: 0
-          unit: kb
-        storage:
-          value: 55
-          unit: mb
-    process_parameters:
-      type: array
-      description: 'A list of parameters.
-
-
-        The order in the array corresponds to the parameter order to
-
-        be used in clients that do not support named parameters.
-
-
-        **Note:** Specifying an empty array is different from (if allowed)
-
-        `null` or the property being absent.
-
-        An empty array means the process has no parameters.
-
-        `null` / property absent means that the parameters are unknown as
-
-        the user has not specified them. There could still be parameters in the
-
-        process graph, if one is specified.'
-      items:
-        $ref: '#/components/schemas/process_parameter'
-    service_type:
-      description: Definition of the service type to access result data. All available service types can be retrieved via `GET /service_types`. Service types MUST be accepted in a *case insensitive* manner.
-      type: string
-      example: wms
-    min_log_level_default:
-      description: 'The minimum severity level for log entries that the back-end stores for the processing request.
-
-
-        The order of the levels is as follows (from low to high severity): `debug`, `info`, `warning`, `error`.
-
-        That means if `warning` is set, the back-end will only store log entries with the level `warning` and `error`.
-
-
-        The default minimum log level is `info`.
-
-        Users need to specifically set this property to `debug` to capture *all* log entries.
-
-        It is RECOMMENDED that users set the level at least to "warning" in production workflows.'
-      type: string
-      enum:
-      - error
-      - warning
-      - info
-      - debug
-      default: info
-      example: warning
-    resource_parameter:
-      x-additionalPropertiesName: Parameter Name
-      type: object
-      title: Resource Parameter
-      description: 'Describes a parameter for various resources (e.g. file formats, service types).
-
-
-        The parameters are specified according to the [JSON Schema draft-07](http://json-schema.org/) specification.
-
-        See the chapter [''Schemas'' in ''Defining Processes''](#section/Processes/Defining-Processes) for more information.
-
-
-        The following more complex JSON Schema keywords SHOULD NOT be used:
-
-        `if`, `then`, `else`, `readOnly`, `writeOnly`, `dependencies`, `minProperties`, `maxProperties`, `patternProperties`.
-
-
-        JSON Schemas SHOULD always be dereferenced (i.e. all `$refs` should be resolved). This allows clients to consume the schemas much better.
-
-        Clients are not expected to support dereferencing `$refs`.
-
-
-        Note: The specified schema is only a common subset of JSON Schema. Additional keywords MAY be used.'
-      required:
-      - description
-      properties:
-        description:
-          type: string
-          description: A brief description of the parameter according to [JSON Schema draft-07](https://json-schema.org/draft-07/json-schema-validation.html#rfc.section.10.1).
-        required:
-          type: boolean
-          description: Determines whether this parameter is mandatory.
-          default: false
-        experimental:
-          $ref: '#/components/schemas/experimental'
-        default:
-          description: The default value represents what would be assumed by the consumer of the input as the value of the parameter if none is provided. The value MUST conform to the defined type for the parameter defined at the same level. For example, if type is string, then default can be "foo" but cannot be 1. See [JSON Schema draft-07](https://json-schema.org/draft-07/json-schema-validation.html#rfc.section.10.2).
-      allOf:
-      - $ref: '#/components/schemas/json_schema'
-    experimental:
-      type: boolean
-      description: Declares that the specified entity is experimental, which means that it is likely to change or may produce unpredictable behavior. Users should refrain from using it in production, but still feel encouraged to try it out and give feedback.
-      default: false
-    process_schema:
-      title: Process Data types
-      description: Either a single data type or a list of data types for process parameter or process return values.
-      oneOf:
-      - $ref: '#/components/schemas/process_json_schema'
-      - title: Multiple data types
-        description: A list of data types supported, specified as JSON Schemas.
-        type: array
-        minItems: 1
-        uniqueItems: true
-        items:
-          $ref: '#/components/schemas/process_json_schema'
-    object_title:
-      type: string
-      description: A human-readable short title to be displayed to users **in addition** to the names specified in the keys. This property is only for better user experience so that users can understand the names better. Example titles could be `GeoTiff` for the key `GTiff` (for file formats) or `OGC Web Map Service` for the key `WMS` (for service types). The title MUST NOT be used in communication (e.g. in process graphs), although clients MAY translate the titles into the corresponding names.
-    log_entry:
-      title: Log Entry
-      description: An log message that communicates information about the processed data.
-      type: object
-      required:
-      - id
-      - level
-      - message
-      properties:
-        id:
-          type: string
-          description: An unique identifier for the log message, could simply be an incrementing number.
-          example: '1'
-        code:
-          $ref: '#/components/schemas/log_code'
-        level:
-          $ref: '#/components/schemas/log_level'
-        message:
-          type: string
-          description: 'A concise message explaining the log entry.
-
-            Messages do *not* explicitly support [CommonMark 0.29](http://commonmark.org/) syntax as other descriptive fields in the openEO API do, but the messages MAY contain line breaks or indentation.
-
-            It is NOT RECOMMENDED to add stacktraces to the `message`.'
-          example: Can not load the UDF file from the URL `https://openeo.example/invalid/file.txt`. Server responded with error 404.
-        time:
-          type: string
-          format: date-time
-          title: Date and Time
-          description: The date and time the event happened, in UTC. Formatted as a [RFC 3339](https://www.rfc-editor.org/rfc/rfc3339.html) date-time.
-        data:
-          description: 'Data of any type. It is the back-ends task to decide how to best
-
-            present passed data to a user.
-
-
-            For example, a datacube passed to the `inspect` SHOULD return the
-
-            metadata similar to the collection metadata, including `cube:dimensions`.
-
-            There are implementation guidelines available for the `inspect` process.'
-        path:
-          description: 'Describes where the log entry originates from.
-
-
-            The first element of the array is the process that has triggered the log entry, the second element is the parent of the process that has triggered the log entry, etc. This pattern is followed until the root of the process graph.'
-          type: array
-          items:
-            type: object
-            required:
-            - node_id
-            properties:
-              node_id:
-                type: string
-                description: The id of the node the log entry originates from.
-                example: runudf1
-              process_id:
-                $ref: '#/components/schemas/process_id'
-              namespace:
-                $ref: '#/components/schemas/process_namespace'
-              parameter:
-                type:
-                - string
-                - 'null'
-                description: If applicable, the name of the parameter the log entry corresponds to.
-                pattern: ^\w+$
-                example: udf
-        usage:
-          $ref: '#/components/schemas/usage'
-        stacktrace:
-          type: string
-          description: A stacktrace or similar, may include whitespaces for formatting.
-        links:
-          $ref: '#/components/schemas/log_links'
-    geometry_type:
-      title: Geometry type
-      type: string
-      enum:
-      - Point
-      - MultiPoint
-      - LineString
-      - MultiLineString
-      - Polygon
-      - MultiPolygon
-      - GeometryCollection
     log_code:
       type: string
       description: The code is either one of the standardized error codes or a custom code, for example specified by a user in the `inspect` process.
       example: SampleError
-    money:
-      description: An amount of money or credits. The value MUST be specified in the currency the back-end is working with. The currency can be retrieved by calling `GET /`. If no currency is set, this field MUST be `null`.
-      type:
-      - number
-      - 'null'
-      minimum: 0
-      example: 12.98
-      default: null
-    base_parameter:
-      type: object
-      required:
-      - name
-      - description
-      properties:
-        name:
-          type: string
-          description: "A unique name for the parameter. \n\nUsing [snake case](https://en.wikipedia.org/wiki/Snake_case) (e.g. `window_size` or `scale_factor`) is RECOMMENDED."
-          pattern: ^\w+$
-        description:
-          $ref: '#/components/schemas/process_description'
-        optional:
-          type: boolean
-          description: 'Determines whether this parameter is optional to be specified even when no default is specified.
-
-            Clients SHOULD automatically set this parameter to `true`, if a default value is specified. Back-ends SHOULD NOT fail, if a default value is specified and this flag is missing.'
-          default: false
-        deprecated:
-          $ref: '#/components/schemas/deprecated'
-        experimental:
-          $ref: '#/components/schemas/experimental'
-        default:
-          description: The default value for this parameter. Required parameters SHOULD NOT specify a default value. Optional parameters SHOULD always specify a default value.
-    process_parameter:
-      title: Process Parameter
-      type: object
-      required:
-      - schema
-      properties:
-        schema:
-          $ref: '#/components/schemas/process_schema'
-      allOf:
-      - $ref: '#/components/schemas/base_parameter'
-    billing_plan_null_default:
-      type:
-      - string
-      - 'null'
-      description: "The billing plan to process and charge the job or service with.\n\nBilling plans MUST be accepted in a *case insensitive* manner.\nBack-ends MUST resolve the billing plan in the following way:\n\n* If a non-`null` value is given: Persist the `plan` that has been provided in the request.\n* Otherwise:\n  1. Persist the `default_plan` exposed through `GET /me`, if available.\n  2. Persist the `default_plan` exposed through `GET /`, if available.\n  3. If a single plan is exposed by the back-end, persist it.\n  4. Otherwise, the back-end MUST throw a `BillingPlanMissing` error.\n\nThe resolved plan MUST be persisted permanently, regardless of any \nchanges to the exposed billing plans in `GET /` in the future.\n\nBilling plans not on the list of available plans MUST be rejected with\nopenEO error `BillingPlanInvalid`."
-      example: free
-      default: null
-    process_summary:
-      type: string
-      description: A short summary of what the process does.
-    usage_metric:
-      type: object
-      required:
-      - value
-      - unit
-      properties:
-        value:
-          type: number
-          minimum: 0
-        unit:
-          type: string
     process_arguments:
       title: Process Arguments
       type: object
       additionalProperties:
         $ref: '#/components/schemas/process_argument_value'
-    budget:
-      type:
-      - number
-      - 'null'
-      minimum: 0
-      description: 'Maximum amount of costs the request is allowed to produce.
-
-        The value MUST be specified in the currency of the back-end.
-
-        No limits apply, if the value is `null` or the back-end has no currency
-
-        set in `GET /`.'
-      example: 100
-      default: null
-    eo_title:
-      description: A short description to easily distinguish entities.
-      type:
-      - string
-      - 'null'
-      example: NDVI based on Sentinel-2
-    billing_plan_null:
-      type:
-      - string
-      - 'null'
-      description: 'The billing plan to process and charge the job or service with.
-
-
-        Billing plans MUST be accepted in a *case insensitive* manner.
-
-        Back-ends MUST resolve the billing plan in the following way if billing is supported:
-
-
-        * If a value is given and it is not `null`: Persist the `plan` that has been provided in the request.
-
-        * Otherwise, do not change the billing plan.
-
-
-        Billing plans not on the list of available plans MUST be rejected with
-
-        openEO error `BillingPlanInvalid`.'
-      example: free
-    description:
-      type: string
-      format: commonmark
-      description: 'Detailed description to explain the entity.
-
-
-        [CommonMark 0.29](http://commonmark.org/) syntax MAY be used for rich text representation.'
-    log_level:
-      description: 'The severity level of the log entry.
-
-
-        The order of the levels is as follows (from low to high severity): `debug`, `info`, `warning`, `error`.
-
-
-        The level `error` usually corresponds with critical issues that usually terminate the data processing.'
-      type: string
-      enum:
-      - error
-      - warning
-      - info
-      - debug
-      example: error
-    process_argument_value:
-      title: Process Argument Value
-      description: Arguments for a process. See the API documentation for more information.
-      anyOf:
-      - type:
-        - object
-        - 'null'
-        title: Object (restricted)
-        properties:
-          from_parameter:
-            not: {}
-          from_node:
-            not: {}
-          process_graph:
-            not: {}
-      - type: string
-        title: String
-      - type: number
-        title: Number (incl. integers)
-      - type: boolean
-        title: Boolean
-      - type: array
-        title: Array
-        items:
-          $ref: '#/components/schemas/process_argument_value'
-      - $ref: '#/components/schemas/process_graph_with_metadata'
-      - type: object
-        title: Result Reference
-        description: Data that is expected to be passed from another process.
-        required:
-        - from_node
-        properties:
-          from_node:
-            description: The ID of the node that data is expected to come from.
-            type: string
-        additionalProperties: false
-      - type: object
-        title: Parameter Reference
-        description: A parameter for a process graph. Data that is expected to be passed to a process graph either from the user directly or from the process that is executing the process graph.
-        required:
-        - from_parameter
-        properties:
-          from_parameter:
-            description: The name of the parameter that data is expected to come from.
-            type: string
-        additionalProperties: false
-    json_schema_type:
-      type: string
-      enum:
-      - array
-      - boolean
-      - integer
-      - 'null'
-      - number
-      - object
-      - string
-    dimension_axis_xyz:
-      title: Axis
-      description: Axis of a geometry or dimension (`x`, `y` or `z`)
-      type: string
-      enum:
-      - x
-      - y
-      - z
-    process_exceptions:
-      type: object
-      title: Process Exceptions
-      description: 'Declares exceptions (errors) that might occur during execution
-
-        of this process. This list is just for informative purposes and may be
-
-        incomplete. This list MUST only contain exceptions that stop the
-
-        execution of a process and MUST NOT contain warnings, notices or
-
-        debugging messages. It is meant to primarily contain errors that
-
-        have been caused by the user. It is RECOMMENDED that exceptions
-
-        are referred to and explained in process or parameter descriptions.
-
-
-        The keys define the error code and MUST match the following pattern:
-
-        `^\w+$`
-
-
-        This schema follows the schema of the general openEO error list (see
-
-        errors.json).'
-      additionalProperties:
-        x-additionalPropertiesName: Error Code
-        title: Process Exception
-        type: object
-        required:
-        - message
-        properties:
-          description:
-            type: string
-            format: commonmark
-            description: 'Detailed description to explain the error to client
-
-              users and back-end developers. This should not be shown in the
-
-              clients directly, but MAY be linked to in the errors `url`
-
-              property.
-
-
-              [CommonMark 0.29](http://commonmark.org/) syntax MAY be used
-
-              for rich text representation.'
-          message:
-            type: string
-            description: 'Explains the reason the server is rejecting the request. This message is intended to be displayed to the client user. For "4xx" error codes the message SHOULD explain shortly how the client needs to modify the request.
-
-
-              The message MAY contain variables, which are enclosed by curly brackets. Example: `{variable_name}`'
-            example: 'The value specified for the process argument ''{argument}'' in process ''{process}'' is invalid: {reason}'
-          http:
-            type: integer
-            description: HTTP Status Code, following the [error handling conventions in openEO](#section/API-Principles/Error-Handling). Defaults to `400`.
-            default: 400
-    process_namespace:
-      type:
-      - string
-      - 'null'
-      default: null
-      example: null
-      description: "The namespace the `process_id` is valid for.\n\nThe following options are predefined by the openEO API, but additional\nnamespaces may be introduced by back-ends or in a future version of the API.\n\n* `null` (default): Checks both user-defined and predefined processes,\n   but prefers user-defined processes if both are available.\n   This allows users to add missing predefined processes for portability,\n   e.g. common processes from [processes.openeo.org](https://processes.openeo.org)\n   that have a process graph included.\n   Logging the namespace selected by the back-end for debugging purposes is RECOMMENDED.\n* `backend`: Uses exclusively the predefined processes listed at `GET /processes`.\n* `user`: Uses exclusively the user-defined processes listed at `GET /process_graphs`.\n\nIf multiple processes with the same identifier exist, Clients SHOULD\ninform the user that it's recommended to select a namespace."
-    min_log_level_update:
-      description: 'Updates the minimum severity level for log entries that the back-end stores for the processing requests.
-
-
-        The back-end does not need to update existing log entries.'
-      type: string
-      enum:
-      - error
-      - warning
-      - info
-      - debug
-      example: warning
-    deprecated:
-      type: boolean
-      description: 'Declares that the specified entity is deprecated with the potential
-
-        to be removed in any of the next versions. It should be transitioned out
-
-        of usage as soon as possible and users should refrain from using it in
-
-        new implementations.'
-      default: false
-    process:
-      title: Process
-      type: object
-      properties:
-        id:
-          $ref: '#/components/schemas/process_id'
-        summary:
-          $ref: '#/components/schemas/process_summary'
-        description:
-          $ref: '#/components/schemas/process_description'
-        categories:
-          $ref: '#/components/schemas/process_categories'
-        parameters:
-          $ref: '#/components/schemas/process_parameters'
-        returns:
-          $ref: '#/components/schemas/process_return_value'
-        deprecated:
-          $ref: '#/components/schemas/deprecated'
-        experimental:
-          $ref: '#/components/schemas/experimental'
-        exceptions:
-          $ref: '#/components/schemas/process_exceptions'
-        examples:
-          type: array
-          description: Examples, may be used for unit tests.
-          items:
-            title: Process Example
-            type: object
-            required:
-            - arguments
-            properties:
-              title:
-                type: string
-                description: A title for the example.
-              description:
-                $ref: '#/components/schemas/process_description'
-              arguments:
-                $ref: '#/components/schemas/process_arguments'
-              returns:
-                description: The return value which can by of any data type.
-        links:
-          type: array
-          description: 'Links related to this process, e.g. additional external documentation.
-
-
-            Providing links with the following `rel` (relation) types is RECOMMENDED:
-
-
-            1. `latest-version`: If a process has been marked as deprecated, a link SHOULD
-
-            point to the preferred version of the process. The relation types `predecessor-version`
-
-            (link to older version) and `successor-version` (link to newer version) can also be used
-
-            to show the relation between versions.
-
-
-            2. `version-history`: A link to a changelog and/or a list of versions of the process
-
-            (see also the relation types `latest-version` etc.).
-
-
-            3. `example`: Links to examples of other processes that use this process.
-
-
-            4. `cite-as`: For all DOIs associated with the process, the respective DOI
-
-            links SHOULD be added.
-
-
-            5. `license`: Links to applicable license(s). The link titles should reflect the license names.
-
-
-            6. `author`: Links to authors of the process. The `href` can use the `mailto:` protocol to
-
-            link to an email address. The link titles should reflect the author names and affiliations.
-
-
-            7. `canonical`: Points to a publicly accessible and more long-lived URL.
-
-
-            For additional relation types see also the lists of
-
-            [common relation types in openEO](#section/API-Principles/Web-Linking).'
-          items:
-            $ref: '#/components/schemas/link'
-        process_graph:
-          $ref: '#/components/schemas/process_graph'
-    process_id:
-      type: string
-      description: "The identifier for the process. It MUST be unique across its namespace\n(e.g. predefined processes or user-defined processes).\n\nClients SHOULD warn the user if a user-defined process is added with the \nsame identifier as one of the predefined process."
-      pattern: ^\w+$
-      example: ndvi
-    process_graph_with_metadata:
-      title: Process Graph with metadata
-      description: A process graph, optionally enriched with process metadata.
-      type: object
-      required:
-      - process_graph
-      properties:
-        id:
-          type:
-          - string
-          - 'null'
-        summary:
-          type:
-          - string
-          - 'null'
-        description:
-          type:
-          - string
-          - 'null'
-        parameters:
-          type:
-          - array
-          - 'null'
-          items: {}
-        returns:
-          type:
-          - object
-          - 'null'
-      allOf:
-      - $ref: '#/components/schemas/process'
-    process_categories:
-      type: array
-      description: A list of categories.
-      items:
-        type: string
-        description: Name of the category.
-    service_id:
-      type: string
-      description: A per-back-end unique identifier of the secondary web service, generated by the back-end during creation. MUST match the specified pattern.
-      pattern: ^[\w\-\.~]+$
-      example: wms-a3cca9
-    service_configuration:
-      type: object
-      title: Service Configuration
-      description: Map of configuration settings, i.e. the setting names supported by the secondary web service combined with actual values. See `GET /service_types` for supported configuration settings. For example, this could specify the required version of the service, visualization details or any other service dependent configuration.
-      example:
-        version: 1.3.0
     created:
       type: string
       format: date-time
       description: 'Date and time of creation (for batch jobs: the status ''created'' was set), formatted as a [RFC 3339](https://www.rfc-editor.org/rfc/rfc3339.html) date-time.'
       example: '2017-01-01T09:32:12Z'
-    process_return_value:
-      type: object
-      title: Process Return Value
-      description: Description of the data that is returned by this process.
-      required:
-      - schema
-      properties:
-        description:
-          $ref: '#/components/schemas/process_description'
-        schema:
-          $ref: '#/components/schemas/process_schema'
-    log_links:
-      description: 'Links related to this log entry / error, e.g. to a resource that
-
-        provides further explanations.
-
-
-        For relation types see the lists of
-
-        [common relation types in openEO](#section/API-Principles/Web-Linking).'
-      type: array
-      items:
-        $ref: '#/components/schemas/link'
-      example:
-      - href: https://openeo.example/docs/errors/SampleError
-        rel: about
-    link:
-      title: Link
-      description: A link to another resource on the web. Bases on [RFC 5899](https://www.rfc-editor.org/rfc/rfc5988.html).
-      type: object
-      required:
-      - href
-      - rel
-      properties:
-        rel:
-          type: string
-          description: Relationship between the current document and the linked document. SHOULD be a [registered link relation type](https://www.iana.org/assignments/link-relations/link-relations.xml) whenever feasible.
-          example: related
-        href:
-          type: string
-          description: The value MUST be a valid URL.
-          format: uri
-          example: https://openeo.example
-        type:
-          type: string
-          description: The value MUST be a string that hints at the format used to represent data at the provided URI, preferably a media (MIME) type.
-          example: text/html
-        title:
-          type: string
-          description: Used as a human-readable label for a link.
-          example: openEO
-    budget_update:
-      type:
-      - number
-      - 'null'
-      minimum: 0
-      description: 'Maximum amount of costs the request is allowed to produce.
-
-        The value MUST be specified in the currency of the back-end.
-
-        No limits apply, if the value is `null`.'
-      example: 100
-    datacube_json_schema:
-      title: Datacube
-      properties:
-        subtype:
-          type: string
-          enum:
-          - datacube
-        dimensions:
-          title: Datacube constraints
-          description: "Allows to specify requirements the data cube has to fulfill.\nRight now, it only allows to specify the dimension types and \nadds for specific dimension types:\n* axes for `spatial` dimensions in raster datacubes\n* geometry types for `geometry` dimensions in vector datacubes"
-          type: array
-          items:
-            type: object
-            required:
-            - type
-            properties:
-              type:
-                type: string
-            oneOf:
-            - title: Spatial (raster)
-              properties:
-                type:
-                  type: string
-                  enum:
-                  - spatial
-                axis:
-                  type: array
-                  minItems: 1
-                  items:
-                    $ref: '#/components/schemas/dimension_axis_xyz'
-            - title: Spatial (vector)
-              properties:
-                type:
-                  type: string
-                  enum:
-                  - geometry
-                geometry_type:
-                  type: array
-                  minItems: 1
-                  items:
-                    $ref: '#/components/schemas/geometry_type'
-            - title: Other
-              properties:
-                type:
-                  type: string
-                  enum:
-                  - bands
-                  - temporal
-                  - other
-    data_type_schema:
-      title: Data Types
-      description: Either a single data type or a list of data types.
-      oneOf:
-      - $ref: '#/components/schemas/process_json_schema'
-      - title: Multiple data types
-        description: A list of data types this parameter supports, specified as JSON Schemas.
-        type: array
-        minItems: 1
-        uniqueItems: true
-        items:
-          $ref: '#/components/schemas/process_json_schema'
-    error:
-      title: General Error
-      description: 'An error object declares additional information about a client-side or server-side error.
-
-        See also: * [Error Handling](#section/API-Principles/Error-Handling) in the API in general. * [Common Error Codes](errors.json)'
-      type: object
-      required:
-      - code
-      - message
-      properties:
-        id:
-          type: string
-          description: A back-end MAY add a unique identifier to the error response to be able to log and track errors with further non-disclosable details. A client could communicate this id to a back-end provider to get further information.
-          example: 550e8400-e29b-11d4-a716-446655440000
-        code:
-          $ref: '#/components/schemas/log_code'
-        message:
-          type: string
-          description: A message explaining what the client may need to change or what difficulties the server is facing.
-          example: Parameter 'sample' is missing.
-        links:
-          $ref: '#/components/schemas/log_links'
     json_schema:
       type: object
       title: JSON Schema
@@ -1761,113 +1389,495 @@ components:
         enum:
         - a
         - b
-    links_pagination:
-      description: 'Links related to this list of resources, for example links for pagination
-
-        or alternative formats such as a human-readable HTML version.
-
-        The links array MUST NOT be paginated.
-
-
-        If pagination is implemented, the following `rel` (relation) types apply:
-
-
-        1. `next` (REQUIRED): A link to the next page, except on the last page.
-
-
-        2. `prev` (OPTIONAL): A link to the previous page, except on the first page.
-
-
-        3. `first` (OPTIONAL): A link to the first page, except on the first page.
-
-
-        4. `last` (OPTIONAL): A link to the last page, except on the last page.
-
-
-        For additional relation types see also the lists of
-
-        [common relation types in openEO](#section/API-Principles/Web-Linking).'
-      type: array
-      items:
-        $ref: '#/components/schemas/link'
-    eo_description:
-      type:
-      - string
+    json_schema_type:
+      type: string
+      enum:
+      - array
+      - boolean
+      - integer
       - 'null'
-      format: commonmark
-      description: 'Detailed multi-line description to explain the entity.
+      - number
+      - object
+      - string
+    process_json_schema:
+      type: object
+      title: Single Data Type
+      description: 'Specifies a data type supported by a parameter or return value.
 
 
-        [CommonMark 0.29](http://commonmark.org/) syntax MAY be used for rich text representation.'
-      example: Deriving minimum NDVI measurements over pixel time series of Sentinel-2
-    service:
-      title: Secondary Web Service
-      description: The metadata of a secondary web service that has been submitted by the authenticated user.
+        The data types are specified according to the [JSON Schema draft-07](http://json-schema.org/) specification.
+
+        See the chapter [''Schemas'' in ''Defining Processes''](#section/Processes/Defining-Processes) for more information.
+
+
+        JSON Schemas SHOULD NOT contain `default`, `anyOf`, `oneOf`, `allOf` or `not` at the top-level of the schema.
+
+        Instead specify each data type in a separate array element.
+
+
+        The following more complex JSON Schema keywords SHOULD NOT be used:
+
+        `if`, `then`, `else`, `readOnly`, `writeOnly`, `dependencies`, `minProperties`, `maxProperties`, `patternProperties`.
+
+
+        JSON Schemas SHOULD always be dereferenced (i.e. all `$refs` should be resolved). This allows clients to consume the schemas much better.
+
+        Clients are not expected to support dereferencing `$refs`.
+
+
+        Note: The specified schema is only a common subset of JSON Schema. Additional keywords MAY be used.'
+      properties:
+        subtype:
+          type: string
+          description: The allowed sub data type for a value. See the chapter on [subtypes](#section/Processes/Defining-Processes) for more information.
+        deprecated:
+          $ref: '#/components/schemas/deprecated'
+      allOf:
+      - $ref: '#/components/schemas/json_schema'
+      oneOf:
+      - title: Generic
+      - $ref: '#/components/schemas/process_graph_json_schema'
+      - $ref: '#/components/schemas/datacube_json_schema'
+    datacube_json_schema:
+      title: Datacube
+      properties:
+        subtype:
+          type: string
+          enum:
+          - datacube
+        dimensions:
+          title: Datacube constraints
+          description: "Allows to specify requirements the data cube has to fulfill.\nRight now, it only allows to specify the dimension types and \nadds for specific dimension types:\n* axes for `spatial` dimensions in raster datacubes\n* geometry types for `geometry` dimensions in vector datacubes"
+          type: array
+          items:
+            type: object
+            required:
+            - type
+            properties:
+              type:
+                type: string
+            oneOf:
+            - title: Spatial (raster)
+              properties:
+                type:
+                  type: string
+                  enum:
+                  - spatial
+                axis:
+                  type: array
+                  minItems: 1
+                  items:
+                    $ref: '#/components/schemas/dimension_axis_xyz'
+            - title: Spatial (vector)
+              properties:
+                type:
+                  type: string
+                  enum:
+                  - geometry
+                geometry_type:
+                  type: array
+                  minItems: 1
+                  items:
+                    $ref: '#/components/schemas/geometry_type'
+            - title: Other
+              properties:
+                type:
+                  type: string
+                  enum:
+                  - bands
+                  - temporal
+                  - other
+    service_id:
+      type: string
+      description: A per-back-end unique identifier of the secondary web service, generated by the back-end during creation. MUST match the specified pattern.
+      pattern: ^[\w\-\.~]+$
+      example: wms-a3cca9
+    process_summary:
+      type: string
+      description: A short summary of what the process does.
+    deprecated:
+      type: boolean
+      description: 'Declares that the specified entity is deprecated with the potential
+
+        to be removed in any of the next versions. It should be transitioned out
+
+        of usage as soon as possible and users should refrain from using it in
+
+        new implementations.'
+      default: false
+    base_parameter:
+      type: object
+      required:
+      - name
+      - description
+      properties:
+        name:
+          type: string
+          description: "A unique name for the parameter. \n\nUsing [snake case](https://en.wikipedia.org/wiki/Snake_case) (e.g. `window_size` or `scale_factor`) is RECOMMENDED."
+          pattern: ^\w+$
+        description:
+          $ref: '#/components/schemas/process_description'
+        optional:
+          type: boolean
+          description: 'Determines whether this parameter is optional to be specified even when no default is specified.
+
+            Clients SHOULD automatically set this parameter to `true`, if a default value is specified. Back-ends SHOULD NOT fail, if a default value is specified and this flag is missing.'
+          default: false
+        deprecated:
+          $ref: '#/components/schemas/deprecated'
+        experimental:
+          $ref: '#/components/schemas/experimental'
+        default:
+          description: The default value for this parameter. Required parameters SHOULD NOT specify a default value. Optional parameters SHOULD always specify a default value.
+    log_entry:
+      title: Log Entry
+      description: An log message that communicates information about the processed data.
       type: object
       required:
       - id
-      - enabled
-      - type
-      - url
+      - level
+      - message
       properties:
         id:
-          $ref: '#/components/schemas/service_id'
-        title:
-          $ref: '#/components/schemas/eo_title'
-        description:
-          $ref: '#/components/schemas/eo_description'
-        url:
           type: string
-          format: uri
-          description: URL at which the secondary web service is accessible. Does not necessarily need to be located within the API.
-          example: https://openeo.example/wms/wms-a3cca9
-        type:
-          $ref: '#/components/schemas/service_type'
-        enabled:
-          $ref: '#/components/schemas/service_enabled'
-        process:
-          $ref: '#/components/schemas/process_graph_with_metadata'
-        configuration:
-          $ref: '#/components/schemas/service_configuration'
-        attributes:
-          title: Secondary Web Service Attributes
-          type: object
-          description: Additional attributes of the secondary web service, e.g. available layers for a WMS instance based on the bands in the underlying GeoTiff.
-          example:
-            layers:
-            - ndvi
-            - evi
-        created:
-          $ref: '#/components/schemas/created'
-        plan:
-          $ref: '#/components/schemas/billing_plan'
-        costs:
-          $ref: '#/components/schemas/money'
-        budget:
-          $ref: '#/components/schemas/budget'
+          description: An unique identifier for the log message, could simply be an incrementing number.
+          example: '1'
+        code:
+          $ref: '#/components/schemas/log_code'
+        level:
+          $ref: '#/components/schemas/log_level'
+        message:
+          type: string
+          description: 'A concise message explaining the log entry.
+
+            Messages do *not* explicitly support [CommonMark 0.29](http://commonmark.org/) syntax as other descriptive fields in the openEO API do, but the messages MAY contain line breaks or indentation.
+
+            It is NOT RECOMMENDED to add stacktraces to the `message`.'
+          example: Can not load the UDF file from the URL `https://openeo.example/invalid/file.txt`. Server responded with error 404.
+        time:
+          type: string
+          format: date-time
+          title: Date and Time
+          description: The date and time the event happened, in UTC. Formatted as a [RFC 3339](https://www.rfc-editor.org/rfc/rfc3339.html) date-time.
+        data:
+          description: 'Data of any type. It is the back-ends task to decide how to best
+
+            present passed data to a user.
+
+
+            For example, a datacube passed to the `inspect` SHOULD return the
+
+            metadata similar to the collection metadata, including `cube:dimensions`.
+
+            There are implementation guidelines available for the `inspect` process.'
+        path:
+          description: 'Describes where the log entry originates from.
+
+
+            The first element of the array is the process that has triggered the log entry, the second element is the parent of the process that has triggered the log entry, etc. This pattern is followed until the root of the process graph.'
+          type: array
+          items:
+            type: object
+            required:
+            - node_id
+            properties:
+              node_id:
+                type: string
+                description: The id of the node the log entry originates from.
+                example: runudf1
+              process_id:
+                $ref: '#/components/schemas/process_id'
+              namespace:
+                $ref: '#/components/schemas/process_namespace'
+              parameter:
+                type:
+                - string
+                - 'null'
+                description: If applicable, the name of the parameter the log entry corresponds to.
+                pattern: ^\w+$
+                example: udf
         usage:
-          description: 'Metrics about the resource usage of the secondary web service.
+          $ref: '#/components/schemas/usage'
+        stacktrace:
+          type: string
+          description: A stacktrace or similar, may include whitespaces for formatting.
+        links:
+          $ref: '#/components/schemas/log_links'
+    min_log_level_update:
+      description: 'Updates the minimum severity level for log entries that the back-end stores for the processing requests.
 
 
-            Back-ends are not expected to update the metrics in real-time.
+        The back-end does not need to update existing log entries.'
+      type: string
+      enum:
+      - error
+      - warning
+      - info
+      - debug
+      example: warning
+    service_enabled:
+      type: boolean
+      description: Describes whether a secondary web service is responding to requests (true) or not (false). Disabled services do not produce any costs.
+    process_description:
+      type: string
+      format: commonmark
+      description: 'Detailed description to explain the entity.
 
-            For detailed usage metrics for individual processing steps, metrics
 
-            can be added to the logs (e.g. `GET /jobs/{job_id}/logs`) with the
+        [CommonMark 0.29](http://commonmark.org/) syntax MAY be used for rich text representation. In addition to the CommonMark syntax, clients can convert process IDs that are formatted as in the following example into links instead of code blocks: ``` ``process_id()`` ```'
+    process_argument_value:
+      title: Process Argument Value
+      description: Arguments for a process. See the API documentation for more information.
+      anyOf:
+      - type:
+        - object
+        - 'null'
+        title: Object (restricted)
+        properties:
+          from_parameter:
+            not: {}
+          from_node:
+            not: {}
+          process_graph:
+            not: {}
+      - type: string
+        title: String
+      - type: number
+        title: Number (incl. integers)
+      - type: boolean
+        title: Boolean
+      - type: array
+        title: Array
+        items:
+          $ref: '#/components/schemas/process_argument_value'
+      - $ref: '#/components/schemas/process_graph_with_metadata'
+      - type: object
+        title: Result Reference
+        description: Data that is expected to be passed from another process.
+        required:
+        - from_node
+        properties:
+          from_node:
+            description: The ID of the node that data is expected to come from.
+            type: string
+        additionalProperties: false
+      - type: object
+        title: Parameter Reference
+        description: A parameter for a process graph. Data that is expected to be passed to a process graph either from the user directly or from the process that is executing the process graph.
+        required:
+        - from_parameter
+        properties:
+          from_parameter:
+            description: The name of the parameter that data is expected to come from.
+            type: string
+        additionalProperties: false
+    min_log_level_default:
+      description: 'The minimum severity level for log entries that the back-end stores for the processing request.
 
-            same schema.'
-          allOf:
-          - $ref: '#/components/schemas/usage'
-        log_level:
-          $ref: '#/components/schemas/min_log_level_default'
+
+        The order of the levels is as follows (from low to high severity): `debug`, `info`, `warning`, `error`.
+
+        That means if `warning` is set, the back-end will only store log entries with the level `warning` and `error`.
+
+
+        The default minimum log level is `info`.
+
+        Users need to specifically set this property to `debug` to capture *all* log entries.
+
+        It is RECOMMENDED that users set the level at least to "warning" in production workflows.'
+      type: string
+      enum:
+      - error
+      - warning
+      - info
+      - debug
+      default: info
+      example: warning
+    process_parameters:
+      type: array
+      description: 'A list of parameters.
+
+
+        The order in the array corresponds to the parameter order to
+
+        be used in clients that do not support named parameters.
+
+
+        **Note:** Specifying an empty array is different from (if allowed)
+
+        `null` or the property being absent.
+
+        An empty array means the process has no parameters.
+
+        `null` / property absent means that the parameters are unknown as
+
+        the user has not specified them. There could still be parameters in the
+
+        process graph, if one is specified.'
+      items:
+        $ref: '#/components/schemas/process_parameter'
+    process_categories:
+      type: array
+      description: A list of categories.
+      items:
+        type: string
+        description: Name of the category.
+    process_parameter:
+      title: Process Parameter
+      type: object
+      required:
+      - schema
+      properties:
+        schema:
+          $ref: '#/components/schemas/process_schema'
+      allOf:
+      - $ref: '#/components/schemas/base_parameter'
+  responses:
+    server_error:
+      description: 'The request can not be fulfilled due to an error at the back-end. The
+
+        error is never the client’s fault and therefore it is reasonable for the
+
+        client to retry the exact same request that triggered this response.
+
+
+        The response body SHOULD contain a JSON error object. MUST be any HTTP
+
+        status code specified in [RFC 7231](https://www.rfc-editor.org/rfc/rfc7231.html#section-6.6).
+
+
+        See also:
+
+        * [Error Handling](#section/API-Principles/Error-Handling) in the API in general.
+
+        * [Common Error Codes](errors.json)'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/error'
+    logs:
+      description: Lists the requested log entries.
+      content:
+        application/json:
+          schema:
+            title: Log Entries
+            type: object
+            required:
+            - logs
+            - links
+            properties:
+              level:
+                description: 'The minimum severity level for log entries that the back-end returns.
+
+                  This property MUST reflect the effective lowest `level` that may appear in the document,
+
+                  which is (if implemented) the highest level of:
+
+                  1. the `log_level` specified by the user for the processing request.
+
+                  2. the `level` specified by the user for the log request.
+
+
+                  The order of the levels is as follows (from low to high severity): `debug`, `info`, `warning`, `error`.
+
+                  That means if `warning` is set, the logs will only contain entries with the level `warning` and `error`.'
+                type: string
+                enum:
+                - error
+                - warning
+                - info
+                - debug
+                default: debug
+              logs:
+                description: A chronological list of logs.
+                type: array
+                items:
+                  $ref: '#/components/schemas/log_entry'
+              links:
+                $ref: '#/components/schemas/links_pagination'
+    client_error:
+      description: 'The request can not be fulfilled due to an error on client-side, i.e. the
+
+        request is invalid. The client SHOULD NOT repeat the request without
+
+        modifications.
+
+
+        The response body SHOULD contain a JSON error object.
+
+        MUST be any HTTP status code specified in [RFC
+
+        7231](https://www.rfc-editor.org/rfc/rfc7231.html#section-6.6). This request
+
+        usually does not respond with HTTP status codes 401 and 403 due to
+
+        missing authorization. HTTP status code 404 SHOULD be used if the value
+
+        of a path parameter is invalid.
+
+
+        See also:
+
+        * [Error Handling](#section/API-Principles/Error-Handling) in the API in general.
+
+        * [Common Error Codes](errors.json)'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/error'
+    client_error_auth:
+      description: 'The request can not be fulfilled due to an error on client-side, i.e. the
+
+        request is invalid. The client SHOULD NOT repeat the request without
+
+        modifications.
+
+
+        The response body SHOULD contain a JSON error object.
+
+        MUST be any HTTP status code specified in [RFC 7231](https://www.rfc-editor.org/rfc/rfc7231.html#section-6.6).
+
+        This request MUST respond with HTTP status codes 401 if authorization is required or
+
+        403 if the authorization failed or access is forbidden in general to the
+
+        authenticated user. HTTP status code 404 SHOULD be used if the value of
+
+        a path parameter is invalid.
+
+
+        See also:
+
+        * [Error Handling](#section/API-Principles/Error-Handling) in the API in general.
+
+        * [Common Error Codes](errors.json)'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/error'
   parameters:
-    service_id:
-      name: service_id
-      in: path
-      description: Identifier of the secondary web service.
-      required: true
+    log_level:
+      name: level
+      description: 'The minimum severity level for log entries that the back-end returns.
+
+
+        The order of the levels is as follows (from low to high severity): `debug`, `info`, `warning`, `error`.
+
+        That means if `warning` is set, the back-end will only return log entries with the level `warning` and `error`.
+
+
+        The default minimum log level is `debug`, which returns all log levels.'
+      in: query
+      allowEmptyValue: true
+      example: error
       schema:
-        $ref: '#/components/schemas/service_id'
+        type: string
+        enum:
+        - error
+        - warning
+        - info
+        - debug
+        default: debug
     pagination_limit:
       name: limit
       description: 'This parameter enables pagination for the endpoint and specifies the maximum number of
@@ -1921,151 +1931,13 @@ components:
       example: log1234
       schema:
         type: string
-    log_level:
-      name: level
-      description: 'The minimum severity level for log entries that the back-end returns.
-
-
-        The order of the levels is as follows (from low to high severity): `debug`, `info`, `warning`, `error`.
-
-        That means if `warning` is set, the back-end will only return log entries with the level `warning` and `error`.
-
-
-        The default minimum log level is `debug`, which returns all log levels.'
-      in: query
-      allowEmptyValue: true
-      example: error
+    service_id:
+      name: service_id
+      in: path
+      description: Identifier of the secondary web service.
+      required: true
       schema:
-        type: string
-        enum:
-        - error
-        - warning
-        - info
-        - debug
-        default: debug
-  responses:
-    logs:
-      description: Lists the requested log entries.
-      content:
-        application/json:
-          schema:
-            title: Log Entries
-            type: object
-            required:
-            - logs
-            - links
-            properties:
-              level:
-                description: 'The minimum severity level for log entries that the back-end returns.
-
-                  This property MUST reflect the effective lowest `level` that may appear in the document,
-
-                  which is (if implemented) the highest level of:
-
-                  1. the `log_level` specified by the user for the processing request.
-
-                  2. the `level` specified by the user for the log request.
-
-
-                  The order of the levels is as follows (from low to high severity): `debug`, `info`, `warning`, `error`.
-
-                  That means if `warning` is set, the logs will only contain entries with the level `warning` and `error`.'
-                type: string
-                enum:
-                - error
-                - warning
-                - info
-                - debug
-                default: debug
-              logs:
-                description: A chronological list of logs.
-                type: array
-                items:
-                  $ref: '#/components/schemas/log_entry'
-              links:
-                $ref: '#/components/schemas/links_pagination'
-    server_error:
-      description: 'The request can not be fulfilled due to an error at the back-end. The
-
-        error is never the client’s fault and therefore it is reasonable for the
-
-        client to retry the exact same request that triggered this response.
-
-
-        The response body SHOULD contain a JSON error object. MUST be any HTTP
-
-        status code specified in [RFC 7231](https://www.rfc-editor.org/rfc/rfc7231.html#section-6.6).
-
-
-        See also:
-
-        * [Error Handling](#section/API-Principles/Error-Handling) in the API in general.
-
-        * [Common Error Codes](errors.json)'
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/error'
-    client_error_auth:
-      description: 'The request can not be fulfilled due to an error on client-side, i.e. the
-
-        request is invalid. The client SHOULD NOT repeat the request without
-
-        modifications.
-
-
-        The response body SHOULD contain a JSON error object.
-
-        MUST be any HTTP status code specified in [RFC 7231](https://www.rfc-editor.org/rfc/rfc7231.html#section-6.6).
-
-        This request MUST respond with HTTP status codes 401 if authorization is required or
-
-        403 if the authorization failed or access is forbidden in general to the
-
-        authenticated user. HTTP status code 404 SHOULD be used if the value of
-
-        a path parameter is invalid.
-
-
-        See also:
-
-        * [Error Handling](#section/API-Principles/Error-Handling) in the API in general.
-
-        * [Common Error Codes](errors.json)'
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/error'
-    client_error:
-      description: 'The request can not be fulfilled due to an error on client-side, i.e. the
-
-        request is invalid. The client SHOULD NOT repeat the request without
-
-        modifications.
-
-
-        The response body SHOULD contain a JSON error object.
-
-        MUST be any HTTP status code specified in [RFC
-
-        7231](https://www.rfc-editor.org/rfc/rfc7231.html#section-6.6). This request
-
-        usually does not respond with HTTP status codes 401 and 403 due to
-
-        missing authorization. HTTP status code 404 SHOULD be used if the value
-
-        of a path parameter is invalid.
-
-
-        See also:
-
-        * [Error Handling](#section/API-Principles/Error-Handling) in the API in general.
-
-        * [Common Error Codes](errors.json)'
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/error'
+        $ref: '#/components/schemas/service_id'
   securitySchemes:
     Bearer:
       type: http
@@ -2078,6 +1950,3 @@ components:
 externalDocs:
   description: openEO Documentation
   url: https://openeo.org/documentation/1.0/
-x-refined-from:
-- openeo-api-openapi.yaml
-- openeo-openapi.yml

@@ -1,7 +1,8 @@
 openapi: 3.2.0
 info:
-  title: Openeo EO Data Discovery API
+  title: openEO EO Data Discovery API
   version: 1.3.0
+  description: The openEO API specification for interoperable cloud-based processing of large Earth observation datasets.
   contact:
     name: openEO Project Steering Committee
     url: https://openeo.org
@@ -9,7 +10,6 @@ info:
   license:
     name: Apache 2.0
     url: http://www.apache.org/licenses/LICENSE-2.0.html
-  description: 'Operations tagged EO Data Discovery across 2 of this provider''s published API definitions: openeo-api-openapi.yaml, openeo-openapi.yml. Each path carries the servers of the definition it was published in.'
 servers:
 - url: https://openeo.example/api/{version}
   description: The URL of the API MAY freely be chosen by the back-end providers. The path, including API versioning, is a *recommendation* only. Nevertheless, all servers MUST support HTTPS as the authentication methods are not secure with HTTP only!
@@ -170,38 +170,6 @@ paths:
           $ref: '#/components/responses/client_error_auth'
         5XX:
           $ref: '#/components/responses/server_error'
-    servers:
-    - url: https://openeo.example/api/{version}
-      description: The URL of the API MAY freely be chosen by the back-end providers. The path, including API versioning, is a *recommendation* only. Nevertheless, all servers MUST support HTTPS as the authentication methods are not secure with HTTP only!
-      variables:
-        version:
-          default: v1
-          description: 'API versioning is RECOMMENDED. As the openEO API is following
-
-            [SemVer](https://semver.org/) only the **major** part of the version
-
-            numbers SHOULD be used for API versioning in the URL. To make clear
-
-            that it is a version number, it is RECOMMENDED to add the prefix `v`.
-
-
-            Example: API version `1.2.3` is recommended to use `v1`.
-
-
-            The reason to only consider the major part is that backward-incompatible
-
-            changes are introduced by major changes only. All changes from minor
-
-            and patch releases can usually be integrated without breakages and thus
-
-            a change in the URL is not really needed.
-
-
-            The version number in the URL MUST not be used by the clients to detect
-
-            the version number of the API. Use the version number returned in the
-
-            property `api_version` from `GET /` instead.'
   /collections/{collection_id}:
     get:
       summary: Full metadata for a specific dataset
@@ -422,38 +390,6 @@ paths:
           $ref: '#/components/responses/client_error_auth'
         5XX:
           $ref: '#/components/responses/server_error'
-    servers:
-    - url: https://openeo.example/api/{version}
-      description: The URL of the API MAY freely be chosen by the back-end providers. The path, including API versioning, is a *recommendation* only. Nevertheless, all servers MUST support HTTPS as the authentication methods are not secure with HTTP only!
-      variables:
-        version:
-          default: v1
-          description: 'API versioning is RECOMMENDED. As the openEO API is following
-
-            [SemVer](https://semver.org/) only the **major** part of the version
-
-            numbers SHOULD be used for API versioning in the URL. To make clear
-
-            that it is a version number, it is RECOMMENDED to add the prefix `v`.
-
-
-            Example: API version `1.2.3` is recommended to use `v1`.
-
-
-            The reason to only consider the major part is that backward-incompatible
-
-            changes are introduced by major changes only. All changes from minor
-
-            and patch releases can usually be integrated without breakages and thus
-
-            a change in the URL is not really needed.
-
-
-            The version number in the URL MUST not be used by the clients to detect
-
-            the version number of the API. Use the version number returned in the
-
-            property `api_version` from `GET /` instead.'
   /collections/{collection_id}/queryables:
     get:
       summary: Metadata filters for a specific dataset
@@ -524,47 +460,224 @@ paths:
           $ref: '#/components/responses/client_error_auth'
         5XX:
           $ref: '#/components/responses/server_error'
-    servers:
-    - url: https://openeo.example/api/{version}
-      description: The URL of the API MAY freely be chosen by the back-end providers. The path, including API versioning, is a *recommendation* only. Nevertheless, all servers MUST support HTTPS as the authentication methods are not secure with HTTP only!
-      variables:
-        version:
-          default: v1
-          description: 'API versioning is RECOMMENDED. As the openEO API is following
-
-            [SemVer](https://semver.org/) only the **major** part of the version
-
-            numbers SHOULD be used for API versioning in the URL. To make clear
-
-            that it is a version number, it is RECOMMENDED to add the prefix `v`.
-
-
-            Example: API version `1.2.3` is recommended to use `v1`.
-
-
-            The reason to only consider the major part is that backward-incompatible
-
-            changes are introduced by major changes only. All changes from minor
-
-            and patch releases can usually be integrated without breakages and thus
-
-            a change in the URL is not really needed.
-
-
-            The version number in the URL MUST not be used by the clients to detect
-
-            the version number of the API. Use the version number returned in the
-
-            property `api_version` from `GET /` instead.'
 components:
-  schemas:
-    stac_version:
-      type: string
-      description: 'The [version of the STAC specification](https://github.com/radiantearth/stac-spec/releases), which MAY not be equal to the [STAC API version](#tag/EO-Data-Discovery/STAC).
+  responses:
+    server_error:
+      description: 'The request can not be fulfilled due to an error at the back-end. The
 
-        The openEO API allows for the STAC versions 1.x.x (RECOMMENDED) and 0.9.x (DEPRECATED).'
-      pattern: ^(0\.9.\d+|1\.\d+.\d+)
-      example: 1.1.0
+        error is never the client’s fault and therefore it is reasonable for the
+
+        client to retry the exact same request that triggered this response.
+
+
+        The response body SHOULD contain a JSON error object. MUST be any HTTP
+
+        status code specified in [RFC 7231](https://www.rfc-editor.org/rfc/rfc7231.html#section-6.6).
+
+
+        See also:
+
+        * [Error Handling](#section/API-Principles/Error-Handling) in the API in general.
+
+        * [Common Error Codes](errors.json)'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/error'
+    client_error_auth:
+      description: 'The request can not be fulfilled due to an error on client-side, i.e. the
+
+        request is invalid. The client SHOULD NOT repeat the request without
+
+        modifications.
+
+
+        The response body SHOULD contain a JSON error object.
+
+        MUST be any HTTP status code specified in [RFC 7231](https://www.rfc-editor.org/rfc/rfc7231.html#section-6.6).
+
+        This request MUST respond with HTTP status codes 401 if authorization is required or
+
+        403 if the authorization failed or access is forbidden in general to the
+
+        authenticated user. HTTP status code 404 SHOULD be used if the value of
+
+        a path parameter is invalid.
+
+
+        See also:
+
+        * [Error Handling](#section/API-Principles/Error-Handling) in the API in general.
+
+        * [Common Error Codes](errors.json)'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/error'
+  schemas:
+    error:
+      title: General Error
+      description: 'An error object declares additional information about a client-side or server-side error.
+
+        See also: * [Error Handling](#section/API-Principles/Error-Handling) in the API in general. * [Common Error Codes](errors.json)'
+      type: object
+      required:
+      - code
+      - message
+      properties:
+        id:
+          type: string
+          description: A back-end MAY add a unique identifier to the error response to be able to log and track errors with further non-disclosable details. A client could communicate this id to a back-end provider to get further information.
+          example: 550e8400-e29b-11d4-a716-446655440000
+        code:
+          $ref: '#/components/schemas/log_code'
+        message:
+          type: string
+          description: A message explaining what the client may need to change or what difficulties the server is facing.
+          example: Parameter 'sample' is missing.
+        links:
+          $ref: '#/components/schemas/log_links'
+    description:
+      type: string
+      format: commonmark
+      description: 'Detailed description to explain the entity.
+
+
+        [CommonMark 0.29](http://commonmark.org/) syntax MAY be used for rich text representation.'
+    collection_id:
+      type: string
+      description: A unique identifier for the collection, which MUST match the specified pattern.
+      pattern: ^[\w\-\.~\/]+$
+      example: Sentinel-2A
+    links_pagination:
+      description: 'Links related to this list of resources, for example links for pagination
+
+        or alternative formats such as a human-readable HTML version.
+
+        The links array MUST NOT be paginated.
+
+
+        If pagination is implemented, the following `rel` (relation) types apply:
+
+
+        1. `next` (REQUIRED): A link to the next page, except on the last page.
+
+
+        2. `prev` (OPTIONAL): A link to the previous page, except on the first page.
+
+
+        3. `first` (OPTIONAL): A link to the first page, except on the first page.
+
+
+        4. `last` (OPTIONAL): A link to the last page, except on the last page.
+
+
+        For additional relation types see also the lists of
+
+        [common relation types in openEO](#section/API-Principles/Web-Linking).'
+      type: array
+      items:
+        $ref: '#/components/schemas/link'
+    stac_license:
+      type: string
+      description: 'License(s) of the data as a SPDX [License identifier](https://spdx.org/licenses/).
+
+        Alternatively, use `proprietary` if the license is not on the SPDX
+
+        license list or `various` if multiple licenses apply. In these two cases
+
+        links to the license texts SHOULD be added, see the `license` link
+
+        relation type.
+
+
+        Non-SPDX licenses SHOULD add a link to the license text with the
+
+        `license` relation in the links section. The license text MUST NOT be
+
+        provided as a value of this field. If there is no public license URL
+
+        available, it is RECOMMENDED to host the license text and link to it.'
+      example: Apache-2.0
+    link:
+      title: Link
+      description: A link to another resource on the web. Bases on [RFC 5899](https://www.rfc-editor.org/rfc/rfc5988.html).
+      type: object
+      required:
+      - href
+      - rel
+      properties:
+        rel:
+          type: string
+          description: Relationship between the current document and the linked document. SHOULD be a [registered link relation type](https://www.iana.org/assignments/link-relations/link-relations.xml) whenever feasible.
+          example: related
+        href:
+          type: string
+          description: The value MUST be a valid URL.
+          format: uri
+          example: https://openeo.example
+        type:
+          type: string
+          description: The value MUST be a string that hints at the format used to represent data at the provided URI, preferably a media (MIME) type.
+          example: text/html
+        title:
+          type: string
+          description: Used as a human-readable label for a link.
+          example: openEO
+    stac_assets:
+      type: object
+      title: Assets
+      description: 'Dictionary of asset objects for data that can be downloaded, each with a
+
+        unique key. The keys MAY be used by clients as file names.'
+      additionalProperties:
+        $ref: '#/components/schemas/asset'
+      example:
+        preview.png:
+          href: https://openeo.example/api/v1/download/583fba8b2ce583fba8b2ce/preview.png
+          type: image/png
+          title: Thumbnail
+          roles:
+          - thumbnail
+        process.json:
+          href: https://openeo.example/api/v1/download/583fba8b2ce583fba8b2ce/process.json
+          type: application/json
+          title: Original Process
+          roles:
+          - process
+          - reproduction
+        1.tif:
+          href: https://openeo.example/api/v1/download/583fba8b2ce583fba8b2ce/1.tif
+          type: image/tiff; application=geotiff
+          title: Band 1
+          roles:
+          - data
+        2.tif:
+          href: https://openeo.example/api/v1/download/583fba8b2ce583fba8b2ce/2.tif
+          type: image/tiff; application=geotiff
+          title: Band 2
+          roles:
+          - data
+        inspire.xml:
+          href: https://openeo.example/api/v1/download/583fba8b2ce583fba8b2ce/inspire.xml
+          type: application/xml
+          title: INSPIRE metadata
+          description: INSPIRE compliant XML metadata
+          roles:
+          - metadata
+    stac_extensions:
+      type: array
+      description: A list of implemented STAC extensions. The list contains URLs to the JSON Schema files it can be validated against.
+      uniqueItems: true
+      items:
+        anyOf:
+        - title: Reference to a JSON Schema
+          type: string
+          format: uri
+          example: https://openeo.example/stac/custom-extemsion/v1.0.0/schema.json
+        - title: Reference to a core extension (STAC < 1.0.0-rc.1 only, DEPRECATED)
+          type: string
+          example: datacube
     asset:
       title: STAC Asset
       type: object
@@ -610,23 +723,21 @@ components:
             * `metadata`: Additional metadata available for the computed data.'
           example:
           - data
-    stac_extensions:
+    log_links:
+      description: 'Links related to this log entry / error, e.g. to a resource that
+
+        provides further explanations.
+
+
+        For relation types see the lists of
+
+        [common relation types in openEO](#section/API-Principles/Web-Linking).'
       type: array
-      description: A list of implemented STAC extensions. The list contains URLs to the JSON Schema files it can be validated against.
-      uniqueItems: true
       items:
-        anyOf:
-        - title: Reference to a JSON Schema
-          type: string
-          format: uri
-          example: https://openeo.example/stac/custom-extemsion/v1.0.0/schema.json
-        - title: Reference to a core extension (STAC < 1.0.0-rc.1 only, DEPRECATED)
-          type: string
-          example: datacube
-    log_code:
-      type: string
-      description: The code is either one of the standardized error codes or a custom code, for example specified by a user in the `inspect` process.
-      example: SampleError
+        $ref: '#/components/schemas/link'
+      example:
+      - href: https://openeo.example/docs/errors/SampleError
+        rel: about
     dimension:
       title: Dimension
       description: A dimension, each object represents a distinct dimension with the key being the dimension name.
@@ -653,6 +764,103 @@ components:
           bands: '#/components/schemas/dimension_bands'
           geometry: '#/components/schemas/dimension_geometry'
           other: '#/components/schemas/dimension_other'
+    log_code:
+      type: string
+      description: The code is either one of the standardized error codes or a custom code, for example specified by a user in the `inspect` process.
+      example: SampleError
+    json_schema:
+      type: object
+      title: JSON Schema
+      description: 'A JSON Schema compliant to [JSON Schema draft-07](https://json-schema.org/draft-07/json-schema-validation.html) or later.
+
+
+        JSON Schemas SHOULD always be dereferenced (i.e. all `$refs` should be resolved).
+
+        This allows clients to consume the schemas much better.
+
+        Clients are not expected to support dereferencing `$refs`.
+
+
+        Note: The specified schema in the OpenAPI document is only a common subset of JSON Schema.
+
+        Additional keywords from the JSON Schema specification MAY be used.'
+      properties:
+        $schema:
+          description: 'The JSON Schema version. If not given in the context of openEO,
+
+            defaults to JSON Schema draft-07: `http://json-schema.org/draft-07/schema#`
+
+
+            The default value for `$schema` property may have to be added to the JSON Schema
+
+            object before passing it to a JSON Schema validator.'
+          type: string
+          format: uri
+          default: http://json-schema.org/draft-07/schema#
+        $id:
+          description: ID of your JSON Schema.
+          type: string
+          format: uri
+        type:
+          description: 'The allowed data type(s) for a value.
+
+
+            If this property is not present, all data types are allowed.'
+          oneOf:
+          - $ref: '#/components/schemas/json_schema_type'
+          - type: array
+            minItems: 1
+            uniqueItems: true
+            items:
+              $ref: '#/components/schemas/json_schema_type'
+        pattern:
+          type: string
+          format: regex
+          description: The regular expression a string value must match against.
+        enum:
+          type: array
+          items: {}
+          description: An exclusive list of allowed values.
+        minimum:
+          type: number
+          description: The minimum value (inclusive) allowed for a numerical value.
+        maximum:
+          type: number
+          description: The maximum value (inclusive) allowed for a numerical value.
+        minItems:
+          type: number
+          minimum: 0
+          default: 0
+          description: The minimum number of items required in an array.
+        maxItems:
+          type: number
+          minimum: 0
+          description: The maximum number of items required in an array.
+        items:
+          description: Specifies schemas for the items in an array.
+          anyOf:
+          - type: array
+            minItems: 1
+            items:
+              $ref: '#/components/schemas/json_schema'
+          - $ref: '#/components/schemas/json_schema'
+      additionalProperties:
+        description: Any other property supported by the JSON Schema version that is given through the property `$schema` are allowed. Defaults to JSON Schema [draft-07](https://json-schema.org/draft-07/json-schema-validation.html), but can also be any later version of JSON Schema.
+      example:
+        type: string
+        enum:
+        - a
+        - b
+    json_schema_type:
+      type: string
+      enum:
+      - array
+      - boolean
+      - integer
+      - 'null'
+      - number
+      - object
+      - string
     stac_providers:
       type: array
       description: A list of providers, which MAY include all organizations capturing or processing the data or the hosting provider. Providers SHOULD be listed in chronological order with the most recent provider being the last element of the list.
@@ -717,13 +925,6 @@ components:
             type: string
             format: uri
             example: https://cloud.example
-    description:
-      type: string
-      format: commonmark
-      description: 'Detailed description to explain the entity.
-
-
-        [CommonMark 0.29](http://commonmark.org/) syntax MAY be used for rich text representation.'
     collection:
       title: Collection
       type: object
@@ -996,254 +1197,6 @@ components:
             The keys MAY be used by clients as file names.'
           allOf:
           - $ref: '#/components/schemas/stac_assets'
-    json_schema_type:
-      type: string
-      enum:
-      - array
-      - boolean
-      - integer
-      - 'null'
-      - number
-      - object
-      - string
-    collection_summary_stats:
-      type: object
-      title: Statistics / Range
-      description: 'By default, only ranges with a minimum and a maximum value can be specified. Ranges can be specified for ordinal values only, which means they need to have a rank order. Therefore, ranges can only be specified for numbers and some special types of strings. Examples: grades (A to F), dates or times. Implementors are free to add other derived statistical values to the object, for example `mean` or `stddev`.'
-      required:
-      - minimum
-      - maximum
-      properties:
-        minimum:
-          description: The minimum value (inclusive).
-          anyOf:
-          - type: string
-          - type: number
-        maximum:
-          description: The maximum value (inclusive).
-          anyOf:
-          - type: string
-          - type: number
-    log_links:
-      description: 'Links related to this log entry / error, e.g. to a resource that
-
-        provides further explanations.
-
-
-        For relation types see the lists of
-
-        [common relation types in openEO](#section/API-Principles/Web-Linking).'
-      type: array
-      items:
-        $ref: '#/components/schemas/link'
-      example:
-      - href: https://openeo.example/docs/errors/SampleError
-        rel: about
-    link:
-      title: Link
-      description: A link to another resource on the web. Bases on [RFC 5899](https://www.rfc-editor.org/rfc/rfc5988.html).
-      type: object
-      required:
-      - href
-      - rel
-      properties:
-        rel:
-          type: string
-          description: Relationship between the current document and the linked document. SHOULD be a [registered link relation type](https://www.iana.org/assignments/link-relations/link-relations.xml) whenever feasible.
-          example: related
-        href:
-          type: string
-          description: The value MUST be a valid URL.
-          format: uri
-          example: https://openeo.example
-        type:
-          type: string
-          description: The value MUST be a string that hints at the format used to represent data at the provided URI, preferably a media (MIME) type.
-          example: text/html
-        title:
-          type: string
-          description: Used as a human-readable label for a link.
-          example: openEO
-    stac_assets:
-      type: object
-      title: Assets
-      description: 'Dictionary of asset objects for data that can be downloaded, each with a
-
-        unique key. The keys MAY be used by clients as file names.'
-      additionalProperties:
-        $ref: '#/components/schemas/asset'
-      example:
-        preview.png:
-          href: https://openeo.example/api/v1/download/583fba8b2ce583fba8b2ce/preview.png
-          type: image/png
-          title: Thumbnail
-          roles:
-          - thumbnail
-        process.json:
-          href: https://openeo.example/api/v1/download/583fba8b2ce583fba8b2ce/process.json
-          type: application/json
-          title: Original Process
-          roles:
-          - process
-          - reproduction
-        1.tif:
-          href: https://openeo.example/api/v1/download/583fba8b2ce583fba8b2ce/1.tif
-          type: image/tiff; application=geotiff
-          title: Band 1
-          roles:
-          - data
-        2.tif:
-          href: https://openeo.example/api/v1/download/583fba8b2ce583fba8b2ce/2.tif
-          type: image/tiff; application=geotiff
-          title: Band 2
-          roles:
-          - data
-        inspire.xml:
-          href: https://openeo.example/api/v1/download/583fba8b2ce583fba8b2ce/inspire.xml
-          type: application/xml
-          title: INSPIRE metadata
-          description: INSPIRE compliant XML metadata
-          roles:
-          - metadata
-    error:
-      title: General Error
-      description: 'An error object declares additional information about a client-side or server-side error.
-
-        See also: * [Error Handling](#section/API-Principles/Error-Handling) in the API in general. * [Common Error Codes](errors.json)'
-      type: object
-      required:
-      - code
-      - message
-      properties:
-        id:
-          type: string
-          description: A back-end MAY add a unique identifier to the error response to be able to log and track errors with further non-disclosable details. A client could communicate this id to a back-end provider to get further information.
-          example: 550e8400-e29b-11d4-a716-446655440000
-        code:
-          $ref: '#/components/schemas/log_code'
-        message:
-          type: string
-          description: A message explaining what the client may need to change or what difficulties the server is facing.
-          example: Parameter 'sample' is missing.
-        links:
-          $ref: '#/components/schemas/log_links'
-    json_schema:
-      type: object
-      title: JSON Schema
-      description: 'A JSON Schema compliant to [JSON Schema draft-07](https://json-schema.org/draft-07/json-schema-validation.html) or later.
-
-
-        JSON Schemas SHOULD always be dereferenced (i.e. all `$refs` should be resolved).
-
-        This allows clients to consume the schemas much better.
-
-        Clients are not expected to support dereferencing `$refs`.
-
-
-        Note: The specified schema in the OpenAPI document is only a common subset of JSON Schema.
-
-        Additional keywords from the JSON Schema specification MAY be used.'
-      properties:
-        $schema:
-          description: 'The JSON Schema version. If not given in the context of openEO,
-
-            defaults to JSON Schema draft-07: `http://json-schema.org/draft-07/schema#`
-
-
-            The default value for `$schema` property may have to be added to the JSON Schema
-
-            object before passing it to a JSON Schema validator.'
-          type: string
-          format: uri
-          default: http://json-schema.org/draft-07/schema#
-        $id:
-          description: ID of your JSON Schema.
-          type: string
-          format: uri
-        type:
-          description: 'The allowed data type(s) for a value.
-
-
-            If this property is not present, all data types are allowed.'
-          oneOf:
-          - $ref: '#/components/schemas/json_schema_type'
-          - type: array
-            minItems: 1
-            uniqueItems: true
-            items:
-              $ref: '#/components/schemas/json_schema_type'
-        pattern:
-          type: string
-          format: regex
-          description: The regular expression a string value must match against.
-        enum:
-          type: array
-          items: {}
-          description: An exclusive list of allowed values.
-        minimum:
-          type: number
-          description: The minimum value (inclusive) allowed for a numerical value.
-        maximum:
-          type: number
-          description: The maximum value (inclusive) allowed for a numerical value.
-        minItems:
-          type: number
-          minimum: 0
-          default: 0
-          description: The minimum number of items required in an array.
-        maxItems:
-          type: number
-          minimum: 0
-          description: The maximum number of items required in an array.
-        items:
-          description: Specifies schemas for the items in an array.
-          anyOf:
-          - type: array
-            minItems: 1
-            items:
-              $ref: '#/components/schemas/json_schema'
-          - $ref: '#/components/schemas/json_schema'
-      additionalProperties:
-        description: Any other property supported by the JSON Schema version that is given through the property `$schema` are allowed. Defaults to JSON Schema [draft-07](https://json-schema.org/draft-07/json-schema-validation.html), but can also be any later version of JSON Schema.
-      example:
-        type: string
-        enum:
-        - a
-        - b
-    links_pagination:
-      description: 'Links related to this list of resources, for example links for pagination
-
-        or alternative formats such as a human-readable HTML version.
-
-        The links array MUST NOT be paginated.
-
-
-        If pagination is implemented, the following `rel` (relation) types apply:
-
-
-        1. `next` (REQUIRED): A link to the next page, except on the last page.
-
-
-        2. `prev` (OPTIONAL): A link to the previous page, except on the first page.
-
-
-        3. `first` (OPTIONAL): A link to the first page, except on the first page.
-
-
-        4. `last` (OPTIONAL): A link to the last page, except on the last page.
-
-
-        For additional relation types see also the lists of
-
-        [common relation types in openEO](#section/API-Principles/Web-Linking).'
-      type: array
-      items:
-        $ref: '#/components/schemas/link'
-    collection_id:
-      type: string
-      description: A unique identifier for the collection, which MUST match the specified pattern.
-      pattern: ^[\w\-\.~\/]+$
-      example: Sentinel-2A
     bbox:
       description: 'Each bounding box is provided as four or six numbers,
 
@@ -1302,27 +1255,31 @@ components:
       - -90
       - 180
       - 90
-    stac_license:
+    collection_summary_stats:
+      type: object
+      title: Statistics / Range
+      description: 'By default, only ranges with a minimum and a maximum value can be specified. Ranges can be specified for ordinal values only, which means they need to have a rank order. Therefore, ranges can only be specified for numbers and some special types of strings. Examples: grades (A to F), dates or times. Implementors are free to add other derived statistical values to the object, for example `mean` or `stddev`.'
+      required:
+      - minimum
+      - maximum
+      properties:
+        minimum:
+          description: The minimum value (inclusive).
+          anyOf:
+          - type: string
+          - type: number
+        maximum:
+          description: The maximum value (inclusive).
+          anyOf:
+          - type: string
+          - type: number
+    stac_version:
       type: string
-      description: 'License(s) of the data as a SPDX [License identifier](https://spdx.org/licenses/).
+      description: 'The [version of the STAC specification](https://github.com/radiantearth/stac-spec/releases), which MAY not be equal to the [STAC API version](#tag/EO-Data-Discovery/STAC).
 
-        Alternatively, use `proprietary` if the license is not on the SPDX
-
-        license list or `various` if multiple licenses apply. In these two cases
-
-        links to the license texts SHOULD be added, see the `license` link
-
-        relation type.
-
-
-        Non-SPDX licenses SHOULD add a link to the license text with the
-
-        `license` relation in the links section. The license text MUST NOT be
-
-        provided as a value of this field. If there is no public license URL
-
-        available, it is RECOMMENDED to host the license text and link to it.'
-      example: Apache-2.0
+        The openEO API allows for the STAC versions 1.x.x (RECOMMENDED) and 0.9.x (DEPRECATED).'
+      pattern: ^(0\.9.\d+|1\.\d+.\d+)
+      example: 1.1.0
   parameters:
     pagination_limit:
       name: limit
@@ -1376,59 +1333,6 @@ components:
       required: true
       schema:
         $ref: '#/components/schemas/collection_id'
-  responses:
-    server_error:
-      description: 'The request can not be fulfilled due to an error at the back-end. The
-
-        error is never the client’s fault and therefore it is reasonable for the
-
-        client to retry the exact same request that triggered this response.
-
-
-        The response body SHOULD contain a JSON error object. MUST be any HTTP
-
-        status code specified in [RFC 7231](https://www.rfc-editor.org/rfc/rfc7231.html#section-6.6).
-
-
-        See also:
-
-        * [Error Handling](#section/API-Principles/Error-Handling) in the API in general.
-
-        * [Common Error Codes](errors.json)'
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/error'
-    client_error_auth:
-      description: 'The request can not be fulfilled due to an error on client-side, i.e. the
-
-        request is invalid. The client SHOULD NOT repeat the request without
-
-        modifications.
-
-
-        The response body SHOULD contain a JSON error object.
-
-        MUST be any HTTP status code specified in [RFC 7231](https://www.rfc-editor.org/rfc/rfc7231.html#section-6.6).
-
-        This request MUST respond with HTTP status codes 401 if authorization is required or
-
-        403 if the authorization failed or access is forbidden in general to the
-
-        authenticated user. HTTP status code 404 SHOULD be used if the value of
-
-        a path parameter is invalid.
-
-
-        See also:
-
-        * [Error Handling](#section/API-Principles/Error-Handling) in the API in general.
-
-        * [Common Error Codes](errors.json)'
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/error'
   securitySchemes:
     Bearer:
       type: http
@@ -1441,6 +1345,3 @@ components:
 externalDocs:
   description: openEO Documentation
   url: https://openeo.org/documentation/1.0/
-x-refined-from:
-- openeo-api-openapi.yaml
-- openeo-openapi.yml

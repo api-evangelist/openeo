@@ -4,11 +4,7 @@
     "_original/openeo-api-openapi.yaml",
     "_original/openeo-commercial-data-openapi.yaml",
     "_original/openeo-processing-parameters-openapi.yaml",
-    "_original/openeo-workspaces-openapi.yaml",
-    "openeo-commercial-data-openapi.yml",
-    "openeo-openapi.yml",
-    "openeo-processing-parameters-openapi.yml",
-    "openeo-workspaces-openapi.yml"
+    "_original/openeo-workspaces-openapi.yaml"
   ],
   "outputs": [
     "openeo-account-management-api-openapi.yml",
@@ -23,38 +19,35 @@
     "openeo-orders-api-openapi.yml",
     "openeo-workspaces-api-openapi.yml"
   ],
-  "archived": [
-    "archived openapi/openeo-commercial-data-openapi.yml",
-    "archived openapi/openeo-openapi.yml",
-    "archived openapi/openeo-processing-parameters-openapi.yml",
-    "archived openapi/openeo-workspaces-openapi.yml"
-  ],
+  "archived": [],
   "errors": [],
   "warnings": [],
   "notes": [
+    "4 archived document(s) dropped as subsets of other archived documents",
     "sourced from openapi/_original/ (4 archived document(s)); previously refined output at the top level was skipped rather than re-split",
     "openeo-api-openapi.yaml: upgraded openapi 3.0.2 -> OpenAPI 3.2.0",
     "openeo-commercial-data-openapi.yaml: upgraded openapi 3.0.2 -> OpenAPI 3.2.0",
     "openeo-processing-parameters-openapi.yaml: upgraded openapi 3.0.2 -> OpenAPI 3.2.0",
     "openeo-processing-parameters-openapi.yaml: multi-axis tagging (4 tags, 1 first tags, 4.00x duplication over 1 operations) \u2014 split on first tag, 1 operations narrowed",
     "openeo-workspaces-openapi.yaml: upgraded openapi 3.0.2 -> OpenAPI 3.2.0",
-    "openeo-commercial-data-openapi.yml: upgraded openapi 3.0.2 -> OpenAPI 3.2.0",
-    "openeo-openapi.yml: upgraded openapi 3.0.2 -> OpenAPI 3.2.0",
-    "openeo-processing-parameters-openapi.yml: upgraded openapi 3.0.2 -> OpenAPI 3.2.0",
-    "openeo-processing-parameters-openapi.yml: multi-axis tagging (4 tags, 1 first tags, 4.00x duplication over 1 operations) \u2014 split on first tag, 1 operations narrowed",
-    "openeo-workspaces-openapi.yml: upgraded openapi 3.0.2 -> OpenAPI 3.2.0",
-    "tag 'Account Management' spans 2 source specs (openeo-api-openapi.yaml, openeo-openapi.yml): per-path servers applied",
-    "tag 'Batch Jobs' spans 2 source specs (openeo-api-openapi.yaml, openeo-openapi.yml): per-path servers applied",
-    "tag 'Capabilities' spans 4 source specs (openeo-api-openapi.yaml, openeo-processing-parameters-openapi.yaml, openeo-openapi.yml, openeo-processing-parameters-openapi.yml): per-path servers applied",
-    "tag 'Data Processing' spans 2 source specs (openeo-api-openapi.yaml, openeo-openapi.yml): per-path servers applied",
-    "tag 'EO Data Discovery' spans 2 source specs (openeo-api-openapi.yaml, openeo-openapi.yml): per-path servers applied",
-    "tag 'File Storage' spans 2 source specs (openeo-api-openapi.yaml, openeo-openapi.yml): per-path servers applied",
-    "tag 'Process Discovery' spans 2 source specs (openeo-api-openapi.yaml, openeo-openapi.yml): per-path servers applied",
-    "tag 'Secondary Services' spans 2 source specs (openeo-api-openapi.yaml, openeo-openapi.yml): per-path servers applied",
-    "tag 'User-Defined Processes' spans 2 source specs (openeo-api-openapi.yaml, openeo-openapi.yml): per-path servers applied",
-    "tag 'Orders' spans 2 source specs (openeo-commercial-data-openapi.yaml, openeo-commercial-data-openapi.yml): per-path servers applied",
-    "tag 'Workspaces' spans 2 source specs (openeo-workspaces-openapi.yaml, openeo-workspaces-openapi.yml): per-path servers applied",
-    "apis.yml register: written (+11 apis, 11 total)"
+    "tag 'Capabilities' spans 2 source specs (openeo-api-openapi.yaml, openeo-processing-parameters-openapi.yaml): per-path servers applied",
+    "apis.yml register: already-registered"
   ],
-  "skipped": []
+  "skipped": [
+    "_original/openeo-workspaces-openapi.yml: archived document superseded by a larger archived document",
+    "_original/openeo-processing-parameters-openapi.yml: archived document superseded by a larger archived document",
+    "_original/openeo-openapi.yml: archived document superseded by a larger archived document",
+    "_original/openeo-commercial-data-openapi.yml: archived document superseded by a larger archived document",
+    "openeo-account-management-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "openeo-batch-jobs-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "openeo-capabilities-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "openeo-data-processing-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "openeo-eo-data-discovery-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "openeo-file-storage-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "openeo-orders-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "openeo-process-discovery-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "openeo-secondary-services-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "openeo-user-defined-processes-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "openeo-workspaces-api-openapi.yml: previously refined output, superseded by openapi/_original/"
+  ]
 }

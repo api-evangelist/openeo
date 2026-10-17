@@ -1,7 +1,8 @@
 openapi: 3.2.0
 info:
-  title: Openeo File Storage API
+  title: openEO File Storage API
   version: 1.3.0
+  description: The openEO API specification for interoperable cloud-based processing of large Earth observation datasets.
   contact:
     name: openEO Project Steering Committee
     url: https://openeo.org
@@ -9,7 +10,6 @@ info:
   license:
     name: Apache 2.0
     url: http://www.apache.org/licenses/LICENSE-2.0.html
-  description: 'Operations tagged File Storage across 2 of this provider''s published API definitions: openeo-api-openapi.yaml, openeo-openapi.yml. Each path carries the servers of the definition it was published in.'
 servers:
 - url: https://openeo.example/api/{version}
   description: The URL of the API MAY freely be chosen by the back-end providers. The path, including API versioning, is a *recommendation* only. Nevertheless, all servers MUST support HTTPS as the authentication methods are not secure with HTTP only!
@@ -91,38 +91,6 @@ paths:
           $ref: '#/components/responses/client_error_auth'
         5XX:
           $ref: '#/components/responses/server_error'
-    servers:
-    - url: https://openeo.example/api/{version}
-      description: The URL of the API MAY freely be chosen by the back-end providers. The path, including API versioning, is a *recommendation* only. Nevertheless, all servers MUST support HTTPS as the authentication methods are not secure with HTTP only!
-      variables:
-        version:
-          default: v1
-          description: 'API versioning is RECOMMENDED. As the openEO API is following
-
-            [SemVer](https://semver.org/) only the **major** part of the version
-
-            numbers SHOULD be used for API versioning in the URL. To make clear
-
-            that it is a version number, it is RECOMMENDED to add the prefix `v`.
-
-
-            Example: API version `1.2.3` is recommended to use `v1`.
-
-
-            The reason to only consider the major part is that backward-incompatible
-
-            changes are introduced by major changes only. All changes from minor
-
-            and patch releases can usually be integrated without breakages and thus
-
-            a change in the URL is not really needed.
-
-
-            The version number in the URL MUST not be used by the clients to detect
-
-            the version number of the API. Use the version number returned in the
-
-            property `api_version` from `GET /` instead.'
   /files/{path}:
     parameters:
     - name: path
@@ -213,39 +181,135 @@ paths:
           $ref: '#/components/responses/client_error_auth'
         5XX:
           $ref: '#/components/responses/server_error'
-    servers:
-    - url: https://openeo.example/api/{version}
-      description: The URL of the API MAY freely be chosen by the back-end providers. The path, including API versioning, is a *recommendation* only. Nevertheless, all servers MUST support HTTPS as the authentication methods are not secure with HTTP only!
-      variables:
-        version:
-          default: v1
-          description: 'API versioning is RECOMMENDED. As the openEO API is following
-
-            [SemVer](https://semver.org/) only the **major** part of the version
-
-            numbers SHOULD be used for API versioning in the URL. To make clear
-
-            that it is a version number, it is RECOMMENDED to add the prefix `v`.
-
-
-            Example: API version `1.2.3` is recommended to use `v1`.
-
-
-            The reason to only consider the major part is that backward-incompatible
-
-            changes are introduced by major changes only. All changes from minor
-
-            and patch releases can usually be integrated without breakages and thus
-
-            a change in the URL is not really needed.
-
-
-            The version number in the URL MUST not be used by the clients to detect
-
-            the version number of the API. Use the version number returned in the
-
-            property `api_version` from `GET /` instead.'
 components:
+  schemas:
+    link:
+      title: Link
+      description: A link to another resource on the web. Bases on [RFC 5899](https://www.rfc-editor.org/rfc/rfc5988.html).
+      type: object
+      required:
+      - href
+      - rel
+      properties:
+        rel:
+          type: string
+          description: Relationship between the current document and the linked document. SHOULD be a [registered link relation type](https://www.iana.org/assignments/link-relations/link-relations.xml) whenever feasible.
+          example: related
+        href:
+          type: string
+          description: The value MUST be a valid URL.
+          format: uri
+          example: https://openeo.example
+        type:
+          type: string
+          description: The value MUST be a string that hints at the format used to represent data at the provided URI, preferably a media (MIME) type.
+          example: text/html
+        title:
+          type: string
+          description: Used as a human-readable label for a link.
+          example: openEO
+    log_links:
+      description: 'Links related to this log entry / error, e.g. to a resource that
+
+        provides further explanations.
+
+
+        For relation types see the lists of
+
+        [common relation types in openEO](#section/API-Principles/Web-Linking).'
+      type: array
+      items:
+        $ref: '#/components/schemas/link'
+      example:
+      - href: https://openeo.example/docs/errors/SampleError
+        rel: about
+    file:
+      title: Workspace File
+      type: object
+      required:
+      - path
+      properties:
+        path:
+          type: string
+          description: 'Path of the file, relative to the root directory of the user''s server-side workspace.
+
+            MUST NOT start with a slash `/` and MUST NOT be url-encoded.
+
+
+            The Windows-style path name component separator `\` is not supported,
+
+            always use `/` instead.
+
+
+            Note: The pattern only specifies a minimal subset of invalid characters.
+
+            The back-ends MAY enforce additional restrictions depending on their OS/environment.'
+          example: folder/file.txt
+          pattern: ^[^/\r\n\t\\:'"][^\r\n\t\\:'"]*$
+        size:
+          type: integer
+          description: File size in bytes.
+          example: 1024
+        modified:
+          type: string
+          format: date-time
+          description: Date and time the file has lastly been modified, formatted as a [RFC 3339](https://www.rfc-editor.org/rfc/rfc3339.html) date-time.
+          example: '2018-01-03T10:55:29Z'
+    log_code:
+      type: string
+      description: The code is either one of the standardized error codes or a custom code, for example specified by a user in the `inspect` process.
+      example: SampleError
+    links_pagination:
+      description: 'Links related to this list of resources, for example links for pagination
+
+        or alternative formats such as a human-readable HTML version.
+
+        The links array MUST NOT be paginated.
+
+
+        If pagination is implemented, the following `rel` (relation) types apply:
+
+
+        1. `next` (REQUIRED): A link to the next page, except on the last page.
+
+
+        2. `prev` (OPTIONAL): A link to the previous page, except on the first page.
+
+
+        3. `first` (OPTIONAL): A link to the first page, except on the first page.
+
+
+        4. `last` (OPTIONAL): A link to the last page, except on the last page.
+
+
+        For additional relation types see also the lists of
+
+        [common relation types in openEO](#section/API-Principles/Web-Linking).'
+      type: array
+      items:
+        $ref: '#/components/schemas/link'
+    error:
+      title: General Error
+      description: 'An error object declares additional information about a client-side or server-side error.
+
+        See also: * [Error Handling](#section/API-Principles/Error-Handling) in the API in general. * [Common Error Codes](errors.json)'
+      type: object
+      required:
+      - code
+      - message
+      properties:
+        id:
+          type: string
+          description: A back-end MAY add a unique identifier to the error response to be able to log and track errors with further non-disclosable details. A client could communicate this id to a back-end provider to get further information.
+          example: 550e8400-e29b-11d4-a716-446655440000
+        code:
+          $ref: '#/components/schemas/log_code'
+        message:
+          type: string
+          description: A message explaining what the client may need to change or what difficulties the server is facing.
+          example: Parameter 'sample' is missing.
+        links:
+          $ref: '#/components/schemas/log_links'
   responses:
     server_error:
       description: 'The request can not be fulfilled due to an error at the back-end. The
@@ -299,134 +363,6 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/error'
-  schemas:
-    log_links:
-      description: 'Links related to this log entry / error, e.g. to a resource that
-
-        provides further explanations.
-
-
-        For relation types see the lists of
-
-        [common relation types in openEO](#section/API-Principles/Web-Linking).'
-      type: array
-      items:
-        $ref: '#/components/schemas/link'
-      example:
-      - href: https://openeo.example/docs/errors/SampleError
-        rel: about
-    log_code:
-      type: string
-      description: The code is either one of the standardized error codes or a custom code, for example specified by a user in the `inspect` process.
-      example: SampleError
-    link:
-      title: Link
-      description: A link to another resource on the web. Bases on [RFC 5899](https://www.rfc-editor.org/rfc/rfc5988.html).
-      type: object
-      required:
-      - href
-      - rel
-      properties:
-        rel:
-          type: string
-          description: Relationship between the current document and the linked document. SHOULD be a [registered link relation type](https://www.iana.org/assignments/link-relations/link-relations.xml) whenever feasible.
-          example: related
-        href:
-          type: string
-          description: The value MUST be a valid URL.
-          format: uri
-          example: https://openeo.example
-        type:
-          type: string
-          description: The value MUST be a string that hints at the format used to represent data at the provided URI, preferably a media (MIME) type.
-          example: text/html
-        title:
-          type: string
-          description: Used as a human-readable label for a link.
-          example: openEO
-    file:
-      title: Workspace File
-      type: object
-      required:
-      - path
-      properties:
-        path:
-          type: string
-          description: 'Path of the file, relative to the root directory of the user''s server-side workspace.
-
-            MUST NOT start with a slash `/` and MUST NOT be url-encoded.
-
-
-            The Windows-style path name component separator `\` is not supported,
-
-            always use `/` instead.
-
-
-            Note: The pattern only specifies a minimal subset of invalid characters.
-
-            The back-ends MAY enforce additional restrictions depending on their OS/environment.'
-          example: folder/file.txt
-          pattern: ^[^/\r\n\t\\:'"][^\r\n\t\\:'"]*$
-        size:
-          type: integer
-          description: File size in bytes.
-          example: 1024
-        modified:
-          type: string
-          format: date-time
-          description: Date and time the file has lastly been modified, formatted as a [RFC 3339](https://www.rfc-editor.org/rfc/rfc3339.html) date-time.
-          example: '2018-01-03T10:55:29Z'
-    error:
-      title: General Error
-      description: 'An error object declares additional information about a client-side or server-side error.
-
-        See also: * [Error Handling](#section/API-Principles/Error-Handling) in the API in general. * [Common Error Codes](errors.json)'
-      type: object
-      required:
-      - code
-      - message
-      properties:
-        id:
-          type: string
-          description: A back-end MAY add a unique identifier to the error response to be able to log and track errors with further non-disclosable details. A client could communicate this id to a back-end provider to get further information.
-          example: 550e8400-e29b-11d4-a716-446655440000
-        code:
-          $ref: '#/components/schemas/log_code'
-        message:
-          type: string
-          description: A message explaining what the client may need to change or what difficulties the server is facing.
-          example: Parameter 'sample' is missing.
-        links:
-          $ref: '#/components/schemas/log_links'
-    links_pagination:
-      description: 'Links related to this list of resources, for example links for pagination
-
-        or alternative formats such as a human-readable HTML version.
-
-        The links array MUST NOT be paginated.
-
-
-        If pagination is implemented, the following `rel` (relation) types apply:
-
-
-        1. `next` (REQUIRED): A link to the next page, except on the last page.
-
-
-        2. `prev` (OPTIONAL): A link to the previous page, except on the first page.
-
-
-        3. `first` (OPTIONAL): A link to the first page, except on the first page.
-
-
-        4. `last` (OPTIONAL): A link to the last page, except on the last page.
-
-
-        For additional relation types see also the lists of
-
-        [common relation types in openEO](#section/API-Principles/Web-Linking).'
-      type: array
-      items:
-        $ref: '#/components/schemas/link'
   parameters:
     pagination_limit:
       name: limit
@@ -485,6 +421,3 @@ components:
 externalDocs:
   description: openEO Documentation
   url: https://openeo.org/documentation/1.0/
-x-refined-from:
-- openeo-api-openapi.yaml
-- openeo-openapi.yml

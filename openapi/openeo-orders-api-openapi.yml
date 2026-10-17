@@ -1,7 +1,8 @@
 openapi: 3.2.0
 info:
-  title: Openeo Orders API
+  title: openEO API - Commercial Data Extension Orders API
   version: 0.1.0
+  description: The Commercial Data Extension to the openEO API provides an interface for discovering, ordering and using commercial data in openEO.
   contact:
     name: openEO Consortium
     url: https://openeo.org
@@ -9,7 +10,6 @@ info:
   license:
     name: Apache 2.0
     url: http://www.apache.org/licenses/LICENSE-2.0.html
-  description: 'Operations tagged Orders across 2 of this provider''s published API definitions: openeo-commercial-data-openapi.yaml, openeo-commercial-data-openapi.yml. Each path carries the servers of the definition it was published in.'
 servers:
 - url: https://openeo.example/api/{version}
   description: The URL of the API MAY freely be chosen by the back-end providers. The path, including API versioning, is a *recommendation* only. Nevertheless, all servers MUST support HTTPS as the authentication methods are not secure with HTTP only!
@@ -132,13 +132,6 @@ paths:
           $ref: ../../openapi.yaml#/components/responses/client_error_auth
         5XX:
           $ref: ../../openapi.yaml#/components/responses/server_error
-    servers:
-    - url: https://openeo.example/api/{version}
-      description: The URL of the API MAY freely be chosen by the back-end providers. The path, including API versioning, is a *recommendation* only. Nevertheless, all servers MUST support HTTPS as the authentication methods are not secure with HTTP only!
-      variables:
-        version:
-          default: v1
-          description: API versioning is RECOMMENDED. As the openEO API is following [SemVer](https://semver.org/) only the MAJOR part of the stable version numbers (i.e. versions >= 1.0.0) SHOULD be used for API versioning in the URL. The reason is that backward-incompatible changes are usually introduced by major changes. Therefore, the version number in the URL MUST not be used by the clients to detect the version number of the API. Use the version number returned from `GET /` instead.
   /orders/{order_id}:
     parameters:
     - $ref: '#/components/parameters/order_id'
@@ -216,24 +209,7 @@ paths:
           $ref: ../../openapi.yaml#/components/responses/client_error_auth
         5XX:
           $ref: ../../openapi.yaml#/components/responses/server_error
-    servers:
-    - url: https://openeo.example/api/{version}
-      description: The URL of the API MAY freely be chosen by the back-end providers. The path, including API versioning, is a *recommendation* only. Nevertheless, all servers MUST support HTTPS as the authentication methods are not secure with HTTP only!
-      variables:
-        version:
-          default: v1
-          description: API versioning is RECOMMENDED. As the openEO API is following [SemVer](https://semver.org/) only the MAJOR part of the stable version numbers (i.e. versions >= 1.0.0) SHOULD be used for API versioning in the URL. The reason is that backward-incompatible changes are usually introduced by major changes. Therefore, the version number in the URL MUST not be used by the clients to detect the version number of the API. Use the version number returned from `GET /` instead.
 components:
-  parameters:
-    order_id:
-      name: order_id
-      in: path
-      description: 'Unique identifier of an order.
-
-        This corresponds to the `id` property of an order.'
-      required: true
-      schema:
-        $ref: '#/components/schemas/order_id'
   schemas:
     order:
       type: object
@@ -340,6 +316,11 @@ components:
       type: string
       description: Unique identifier of the item. Must be unique within a collection.
       example: c8a1f88d-89cf-4933-9118-45e9c1a5df20
+    order_id:
+      type: string
+      description: Unique identifier of the order at the back-end, which MUST match the specified pattern.
+      pattern: ^[\w\-\.~]+$
+      example: fb6799ab
     order_parameters:
       type: object
       description: Key-value pairs of available `order_parameters` as listed at `GET /collections/{collection_id}` for filtering available items.
@@ -348,11 +329,16 @@ components:
         description: Value of the order parameter for the request.
       example:
         resamplingKernel: NN
+  parameters:
     order_id:
-      type: string
-      description: Unique identifier of the order at the back-end, which MUST match the specified pattern.
-      pattern: ^[\w\-\.~]+$
-      example: fb6799ab
+      name: order_id
+      in: path
+      description: 'Unique identifier of an order.
+
+        This corresponds to the `id` property of an order.'
+      required: true
+      schema:
+        $ref: '#/components/schemas/order_id'
   securitySchemes:
     Bearer:
       type: http
@@ -363,6 +349,3 @@ components:
       scheme: basic
 externalDocs:
   url: https://github.com/Open-EO/openeo-api/blob/draft/extensions/commercial-data/README.md
-x-refined-from:
-- openeo-commercial-data-openapi.yaml
-- openeo-commercial-data-openapi.yml

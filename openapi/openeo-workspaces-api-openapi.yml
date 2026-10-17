@@ -1,7 +1,11 @@
 openapi: 3.2.0
 info:
-  title: Openeo Workspaces API
+  title: openEO API - Extension Workspaces API
   version: 0.1.0
+  description: 'The Workspace Extension to the openEO API provides an interface for connecting external file storage such as cloud buckets to openEO back-end implementations. This allows for example to store batch job results on such file storage systems.
+
+
+    The Workspace API is inspired by the EOEPCA Workspace API with regards to workspace management.'
   contact:
     name: openEO Consortium
     url: https://openeo.org
@@ -9,7 +13,6 @@ info:
   license:
     name: Apache 2.0
     url: http://www.apache.org/licenses/LICENSE-2.0.html
-  description: 'Operations tagged Workspaces across 2 of this provider''s published API definitions: openeo-workspaces-openapi.yaml, openeo-workspaces-openapi.yml. Each path carries the servers of the definition it was published in.'
 servers:
 - url: https://openeo.example/api/{version}
   description: The URL of the API MAY freely be chosen by the back-end providers. The path, including API versioning, is a *recommendation* only. Nevertheless, all servers MUST support HTTPS as the authentication methods are not secure with HTTP only!
@@ -117,13 +120,6 @@ paths:
           $ref: ../../openapi.yaml#/components/responses/client_error_auth
         5XX:
           $ref: ../../openapi.yaml#/components/responses/server_error
-    servers:
-    - url: https://openeo.example/api/{version}
-      description: The URL of the API MAY freely be chosen by the back-end providers. The path, including API versioning, is a *recommendation* only. Nevertheless, all servers MUST support HTTPS as the authentication methods are not secure with HTTP only!
-      variables:
-        version:
-          default: v1
-          description: API versioning is RECOMMENDED. As the openEO API is following [SemVer](https://semver.org/) only the MAJOR part of the stable version numbers (i.e. versions >= 1.0.0) SHOULD be used for API versioning in the URL. The reason is that backward-incompatible changes are usually introduced by major changes. Therefore, the version number in the URL MUST not be used by the clients to detect the version number of the API. Use the version number returned from `GET /` instead.
   /workspaces:
     get:
       summary: List all workspaces
@@ -225,13 +221,6 @@ paths:
           $ref: ../../openapi.yaml#/components/responses/client_error_auth
         5XX:
           $ref: ../../openapi.yaml#/components/responses/server_error
-    servers:
-    - url: https://openeo.example/api/{version}
-      description: The URL of the API MAY freely be chosen by the back-end providers. The path, including API versioning, is a *recommendation* only. Nevertheless, all servers MUST support HTTPS as the authentication methods are not secure with HTTP only!
-      variables:
-        version:
-          default: v1
-          description: API versioning is RECOMMENDED. As the openEO API is following [SemVer](https://semver.org/) only the MAJOR part of the stable version numbers (i.e. versions >= 1.0.0) SHOULD be used for API versioning in the URL. The reason is that backward-incompatible changes are usually introduced by major changes. Therefore, the version number in the URL MUST not be used by the clients to detect the version number of the API. Use the version number returned from `GET /` instead.
   /workspaces/{workspace_id}:
     parameters:
     - $ref: '#/components/parameters/workspace_id'
@@ -295,29 +284,8 @@ paths:
           $ref: ../../openapi.yaml#/components/responses/client_error_auth
         5XX:
           $ref: ../../openapi.yaml#/components/responses/server_error
-    servers:
-    - url: https://openeo.example/api/{version}
-      description: The URL of the API MAY freely be chosen by the back-end providers. The path, including API versioning, is a *recommendation* only. Nevertheless, all servers MUST support HTTPS as the authentication methods are not secure with HTTP only!
-      variables:
-        version:
-          default: v1
-          description: API versioning is RECOMMENDED. As the openEO API is following [SemVer](https://semver.org/) only the MAJOR part of the stable version numbers (i.e. versions >= 1.0.0) SHOULD be used for API versioning in the URL. The reason is that backward-incompatible changes are usually introduced by major changes. Therefore, the version number in the URL MUST not be used by the clients to detect the version number of the API. Use the version number returned from `GET /` instead.
 components:
   schemas:
-    workspace_url:
-      type: string
-      format: uri
-      description: The URL of the actual workspace, e.g. a bucket URL.
-      example: https://my-bucket.s3.eu-west-3.amazonaws.com
-    workspace_description:
-      type: string
-      format: commonmark
-      description: 'A description that describes the workspace.
-
-
-        [CommonMark 0.29](http://commonmark.org/) syntax MAY be used for rich
-
-        text representation.'
     workspace_properties:
       type: object
       description: Any additional metadata of the workspace provided by the workspace provider. The structure is not specified by the API.
@@ -326,6 +294,10 @@ components:
       example:
         region: eu-west-3
         storage_class: standard
+    workspace_id:
+      type: string
+      pattern: ^[\w\-\.~]+$
+      example: my-workspace
     register_workspace:
       required:
       - type
@@ -343,10 +315,47 @@ components:
           $ref: '#/components/schemas/workspace_url'
         parameters:
           $ref: '#/components/schemas/workspace_parameters'
-    workspace_id:
+    create_workspace:
+      title: Create workspace
+      properties:
+        intent:
+          enum:
+          - create
+          example: create
+        type:
+          type:
+          - string
+          - 'null'
+          description: The workspace provider name as defined in `GET /workspace_providers`. If not provided or `null`, the back-end chooses a default provider.
+          default: null
+        parameters:
+          $ref: '#/components/schemas/workspace_parameters'
+    workspace_parameters:
+      type: object
+      description: Additional parameters to register the workspace as defined in `GET /workspace_providers`. The structure is not specified by the API.
+      additionalProperties:
+        description: Any type
+      example:
+        aws_access_key_id: REDACTED_AWS_ACCESS_KEY_ID
+        aws_secret_access_key: TheKey1CorrespondingtoAccessKey.
+        bucket_name: my-bucket123
+    workspace_description:
       type: string
-      pattern: ^[\w\-\.~]+$
-      example: my-workspace
+      format: commonmark
+      description: 'A description that describes the workspace.
+
+
+        [CommonMark 0.29](http://commonmark.org/) syntax MAY be used for rich
+
+        text representation.'
+    workspace_title:
+      type: string
+      description: A short title for the workspace.
+    workspace_url:
+      type: string
+      format: uri
+      description: The URL of the actual workspace, e.g. a bucket URL.
+      example: https://my-bucket.s3.eu-west-3.amazonaws.com
     workspace:
       title: Workspace
       required:
@@ -395,33 +404,6 @@ components:
             $ref: '#/components/schemas/workspace_properties'
           free:
             $ref: ../../openapi.yaml#/components/schemas/storage_quota_free
-    create_workspace:
-      title: Create workspace
-      properties:
-        intent:
-          enum:
-          - create
-          example: create
-        type:
-          type:
-          - string
-          - 'null'
-          description: The workspace provider name as defined in `GET /workspace_providers`. If not provided or `null`, the back-end chooses a default provider.
-          default: null
-        parameters:
-          $ref: '#/components/schemas/workspace_parameters'
-    workspace_title:
-      type: string
-      description: A short title for the workspace.
-    workspace_parameters:
-      type: object
-      description: Additional parameters to register the workspace as defined in `GET /workspace_providers`. The structure is not specified by the API.
-      additionalProperties:
-        description: Any type
-      example:
-        aws_access_key_id: REDACTED_AWS_ACCESS_KEY_ID
-        aws_secret_access_key: TheKey1CorrespondingtoAccessKey.
-        bucket_name: my-bucket123
   parameters:
     workspace_id:
       name: workspace_id
@@ -435,6 +417,3 @@ components:
       $ref: ../../openapi.yaml#/components/securitySchemes/Bearer
 externalDocs:
   url: https://github.com/Open-EO/openeo-api/blob/draft/extensions/workspaces/README.md
-x-refined-from:
-- openeo-workspaces-openapi.yaml
-- openeo-workspaces-openapi.yml
