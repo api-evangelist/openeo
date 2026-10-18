@@ -425,6 +425,8 @@ apis:
   description: Management of commercial data orders
   humanURL: https://api.openeo.org/
   tags:
+  - Order
+  tags_raw:
   - Orders
   properties:
   - type: OpenAPI
@@ -593,6 +595,8 @@ apis:
   description: Management of User Workspaces
   humanURL: https://api.openeo.org/
   tags:
+  - Workspace
+  tags_raw:
   - Workspaces
   properties:
   - type: OpenAPI
