@@ -1,0 +1,12 @@
+{
+ "url": "https://api.openeo.org/openapi.yaml",
+ "requested_url": "https://api.openeo.org/openapi.yaml",
+ "status": 200,
+ "content_type": "text/yaml",
+ "bytes": 300564,
+ "sha256": "0c5e31955a199cd264120a197ed154a79d62712fce0948c6490e199aa2ae4cae",
+ "fetched_at": "2026-10-19",
+ "fetched_by": "APIEvangelist-Harvest/1.0 (+https://apievangelist.com)",
+ "match": "equivalent",
+ "note": "Re-fetched from the provider by verify-openapi-sources.py; the provider's current document describes the same operations (Jaccard 1.0), but the bytes differ, so the archive is an earlier or reformatted copy."
+}
