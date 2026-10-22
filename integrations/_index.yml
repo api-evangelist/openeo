@@ -52,3 +52,33 @@
     detected: '2026-10-18'
   status: not-a-workflow
   arazzo: null
+- slug: openeo-cran
+  label: CRAN
+  partner_name: CRAN
+  category: official SDK (R)
+  type: register
+  channel: package-registry
+  evidence: https://cran.r-project.org/package=openeo
+  source: edge
+  relationship: distribution-channel
+  contract_reference:
+    register: CRAN (packages.rds, the public package metadata table)
+    spec_file: null
+    language: R
+    packages:
+    - name: openeo
+      version: 1.4.1
+      title: Client Interface for 'openEO' Servers
+      released: '2025-07-29'
+      released_field: Published
+      lapsed: false
+      page: https://cran.r-project.org/package=openeo
+      repo_leg: github-org:open-eo
+      publisher_leg: github-org:open-eo
+      matched_by: github-org
+    current: true
+    signal_note: 'an official R package on CRAN: distribution, not an integration; lapsed = no release in 24 months'
+    detected_by: sweep-cran-r-packages.py
+    detected: '2026-10-22'
+  status: not-a-workflow
+  arazzo: null
