@@ -593,3 +593,9 @@ components:
 externalDocs:
   description: openEO Documentation
   url: https://openeo.org/documentation/1.0/
+x-provenance:
+  method: harvested
+  publisher: openEO
+  source: https://api.openeo.org/openapi.yaml
+  note: split by refine-openapis from the provider's own published document, verified by fetch (openapi/_original/*.fetch.json);
+    stamped by stamp-openapi-provenance.py (roadmap#793)
